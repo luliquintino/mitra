@@ -229,8 +229,18 @@ export default function PerfilPage() {
 
   if (loading || !pet) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] bg-creme">
-        <div className="w-12 h-12 border-4 border-coral border-t-transparent rounded-full animate-spin" />
+      <div className="space-y-4">
+        <div className="h-6 w-48 pt-skeleton rounded-lg" />
+        <div className="h-4 w-32 pt-skeleton rounded-lg" />
+        <div className="pt-card space-y-4">
+          <div className="h-20 pt-skeleton rounded-xl" />
+          <div className="h-20 pt-skeleton rounded-xl" />
+        </div>
+        <div className="pt-card space-y-3">
+          <div className="h-14 pt-skeleton rounded-xl" />
+          <div className="h-14 pt-skeleton rounded-xl" />
+          <div className="h-14 pt-skeleton rounded-xl" />
+        </div>
       </div>
     );
   }
@@ -243,134 +253,100 @@ export default function PerfilPage() {
   const tutoresList = tutores.filter((t) => ['TUTOR_PRINCIPAL', 'TUTOR_EMERGENCIA'].includes(t.role));
   const prestadoresList = tutores.filter((t) => PRESTADOR_ROLES.includes(t.role));
 
-  // Compute pet age numbers for bento cards
+  // Compute pet age
   const ageText = pet.dataNascimento ? petAge(pet.dataNascimento) : null;
-  // Extract numeric years if possible (e.g. "2 anos" -> 2)
   const ageMatch = ageText?.match(/(\d+)/);
   const ageYears = ageMatch ? parseInt(ageMatch[1]) : null;
   const humanYears = ageYears != null ? ageYears * 7 : null;
 
-  // Weight for paw graph (scale 1-5)
   const pesoNum = pet.peso ? parseFloat(String(pet.peso)) : null;
-  const pawsFilled = pesoNum != null ? Math.min(5, Math.max(1, Math.round(pesoNum / 10))) : 0;
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="space-y-6 animate-fade-in">
+      {/* Confirmation banner */}
       {confirmation && (
-        <div className="bg-coral-light text-coral rounded-xl px-4 py-3 flex items-center gap-3 font-body">
-          <span className="text-xl">✅</span>
-          <span>{confirmation}</span>
+        <div className="rounded-xl bg-creme-dark px-4 py-3 flex items-center gap-2 animate-fade-in">
+          <span className="text-texto-soft text-sm">&#10003;</span>
+          <span className="text-sm text-texto font-medium font-body">{confirmation}</span>
         </div>
       )}
 
-      {/* Avatar Section */}
-      <div className="flex flex-col items-center gap-4 pt-4">
-        <div className="relative">
-          {/* Decorative blobs */}
-          <div className="absolute -top-4 -left-4 w-24 h-24 bg-rosa-light rounded-full -z-10 animate-pulse" />
-          <div className="absolute -bottom-2 -right-6 w-32 h-32 bg-azul-light rounded-full -z-10" />
-          {/* Pet photo */}
+      {/* Section header */}
+      <div>
+        <h2 className="font-headline text-xl font-bold text-texto">Perfil do Pet</h2>
+        <p className="text-sm text-texto-soft font-body">Dados cadastrais, rede de cuidado e configuracoes</p>
+      </div>
+
+      {/* Section 1: Pet Info Card */}
+      <div className="pt-card">
+        <div className="flex items-center gap-4">
           <PetImage
             fotoUrl={pet.fotoUrl}
             nome={pet.nome}
             especie={pet.especie}
-            className="w-64 h-64 rounded-full border-[12px] border-white shadow-xl overflow-hidden transform rotate-2"
+            className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0"
             fallbackClassName="bg-gradient-to-br from-coral-light to-azul-light"
           />
-          {/* Paw badge */}
-          <div className="absolute bottom-4 right-4 bg-coral-light p-4 rounded-full shadow-lg border-4 border-white">
-            <span className="text-2xl">🐾</span>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-headline text-lg font-bold text-texto truncate">{pet.nome}</h3>
+            <span className="inline-block mt-1 px-3 py-1 rounded-full text-xs font-headline font-bold bg-azul-light text-azul">
+              {especieLabel(pet.especie)}{pet.raca ? ` · ${pet.raca}` : ''}
+            </span>
           </div>
-        </div>
-        <h1 className="font-headline text-5xl font-extrabold text-texto tracking-tighter text-center">
-          {pet.nome}
-        </h1>
-        <div className="bg-azul-light text-azul px-6 py-2 rounded-full font-bold text-lg">
-          {especieLabel(pet.especie)}{pet.raca ? ` · ${pet.raca}` : ''}
-        </div>
-      </div>
-
-      {/* Bento Grid — Age & Weight */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Age card */}
-        <div className="md:col-span-7 bg-white/70 backdrop-blur-md rounded-xl p-8 shadow-sm border-b-8 border-azul-light">
-          <p className="pt-label mb-4">Idade</p>
-          <div className="flex items-center gap-4">
-            <div>
-              <span className="text-7xl font-extrabold text-texto">{ageYears ?? '—'}</span>
-              <span className="text-lg font-body text-texto-soft ml-2">anos pet</span>
-            </div>
-            <div className="bg-creme rounded-full p-3">
-              <span className="text-2xl text-azul">🔄</span>
-            </div>
-            <div>
-              <span className="text-7xl font-extrabold text-rosa">{humanYears ?? '—'}</span>
-              <span className="text-lg font-body text-texto-soft ml-2">anos humanos</span>
-            </div>
-          </div>
-          {pet.dataNascimento && (
-            <p className="text-sm text-texto-soft mt-3 font-body">
-              Nascido em {formatDate(pet.dataNascimento)}
-            </p>
-          )}
-        </div>
-
-        {/* Weight card */}
-        <div className="md:col-span-5 bg-white/70 backdrop-blur-md rounded-xl p-8 shadow-sm border-b-8 border-coral-light">
-          <p className="pt-label mb-4">Peso</p>
-          {pesoNum != null ? (
-            <>
-              <div className="flex items-baseline gap-2">
-                <span className="text-6xl font-extrabold text-coral">{pesoNum}</span>
-                <span className="text-2xl font-body text-texto-soft">kg</span>
-              </div>
-              <div className="flex gap-2 mt-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <span
-                    key={i}
-                    className={cn(
-                      'text-3xl',
-                      i <= pawsFilled ? 'text-coral' : 'text-creme-dark'
-                    )}
-                  >
-                    🐾
-                  </span>
-                ))}
-              </div>
-            </>
-          ) : (
-            <p className="text-texto-soft font-body">Não informado</p>
-          )}
-        </div>
-      </div>
-
-      {/* Dados do pet — Detail fields */}
-      <div className="pt-card space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="font-headline text-3xl font-extrabold text-coral">Dados do pet</p>
           <button
             onClick={() => router.push(`/pets/${petId}/editar`)}
-            className="pt-btn-ghost text-sm"
+            className="pt-btn-ghost text-sm flex-shrink-0"
           >
-            <span className="text-lg">✏️</span>
             Editar
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          {pet.genero && (
-            <Field label="Gênero" value={generoLabel(pet.genero)} />
-          )}
+        {/* Stat cards */}
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <div className="bg-azul-light/50 rounded-2xl p-4 text-center">
+            <p className="text-2xl font-bold font-headline text-texto">{ageYears ?? '--'}</p>
+            <p className="text-xs text-texto-soft font-body mt-0.5">anos pet</p>
+          </div>
+          <div className="bg-rosa-light/50 rounded-2xl p-4 text-center">
+            <p className="text-2xl font-bold font-headline text-rosa">{humanYears ?? '--'}</p>
+            <p className="text-xs text-texto-soft font-body mt-0.5">anos humanos</p>
+          </div>
+          <div className="bg-coral-light/50 rounded-2xl p-4 text-center">
+            <p className="text-2xl font-bold font-headline text-coral">{pesoNum ?? '--'}</p>
+            <p className="text-xs text-texto-soft font-body mt-0.5">kg</p>
+          </div>
+        </div>
+
+        {pet.dataNascimento && (
+          <p className="text-xs text-texto-soft font-body mt-3">
+            Nascido em {formatDate(pet.dataNascimento)}
+          </p>
+        )}
+
+        {pet.status === 'ARQUIVADO' && (
+          <div className="bg-azul-light rounded-xl px-4 py-3 mt-3">
+            <p className="text-sm text-azul font-headline font-bold">Pet arquivado</p>
+            <p className="text-xs text-azul/70 mt-0.5 font-body">
+              Para reativar, todos os tutores precisam confirmar.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Section 2: Dados do Pet */}
+      <div className="pt-card space-y-4">
+        <h3 className="font-headline text-lg font-bold text-texto">Dados do Pet</h3>
+
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          {pet.genero && <Field label="Genero" value={generoLabel(pet.genero)} />}
           {pet.cor && <Field label="Cor" value={pet.cor} />}
           {pet.peso && <Field label="Peso" value={`${pet.peso} kg`} />}
-          {pet.microchip && (
-            <Field label="Microchip" value={pet.microchip} />
-          )}
+          {pet.microchip && <Field label="Microchip" value={pet.microchip} />}
         </div>
 
         {pet.observacoes && (
-          <div className="bg-white rounded-xl px-4 py-3">
-            <p className="text-xs text-texto-soft mb-1 font-headline font-bold uppercase tracking-widest">Observações</p>
+          <div className="bg-creme-dark/40 rounded-xl px-4 py-3">
+            <p className="pt-label mb-1">Observacoes</p>
             <p className="text-sm text-texto font-body">{pet.observacoes}</p>
           </div>
         )}
@@ -379,277 +355,103 @@ export default function PerfilPage() {
           <CodigoPetDisplay codigo={pet.codigoPet} nome={pet.nome} />
         )}
 
-        {pet.status === 'ARQUIVADO' && (
-          <div className="bg-azul-light rounded-xl px-4 py-3">
-            <p className="text-sm text-azul font-headline font-bold">
-              <span className="text-base align-middle mr-1">📦</span>
-              Pet arquivado
-            </p>
-            <p className="text-xs text-azul/70 mt-0.5 font-body">
-              Para reativar, todos os tutores precisam confirmar.
-            </p>
+        {/* AirTag */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="pt-label">Localizacao (AirTag)</p>
+            {!editingAirTag && (
+              <button
+                onClick={() => { setAirTagInput(pet.airTagUrl ?? ''); setEditingAirTag(true); }}
+                className="pt-btn-ghost text-sm"
+              >
+                {pet.airTagUrl ? 'Alterar' : 'Cadastrar'}
+              </button>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Localização — AirTag */}
-      <div className="pt-card space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="font-headline text-3xl font-extrabold text-rosa">Localização</p>
-          {!editingAirTag && (
-            <button
-              onClick={() => { setAirTagInput(pet.airTagUrl ?? ''); setEditingAirTag(true); }}
-              className="pt-btn-ghost text-sm"
-            >
-              <span className="text-lg">📍</span>
-              {pet.airTagUrl ? 'Alterar' : 'Cadastrar'}
-            </button>
+          {editingAirTag ? (
+            <div className="space-y-3 bg-azul-light/30 rounded-xl p-4">
+              <p className="text-xs text-texto-soft font-body">
+                Cole o link de compartilhamento do Apple Find My (gerado pelo app no iPhone).
+              </p>
+              <input
+                type="url"
+                className="pt-input"
+                placeholder="https://findmy.apple.com/..."
+                value={airTagInput}
+                onChange={(e) => { setAirTagInput(e.target.value); setAirTagError(''); }}
+                autoFocus
+              />
+              {airTagError && <p className="text-xs text-erro font-body">{airTagError}</p>}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSaveAirTag}
+                  disabled={airTagSaving}
+                  className="pt-btn flex-1 text-sm"
+                >
+                  {airTagSaving ? 'Salvando...' : 'Salvar'}
+                </button>
+                <button
+                  onClick={() => { setEditingAirTag(false); setAirTagError(''); }}
+                  className="pt-btn-secondary text-sm px-4"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : pet.airTagUrl ? (
+            <div className="space-y-2">
+              <p className="text-xs text-texto-soft truncate font-body">{pet.airTagUrl}</p>
+              <a
+                href={pet.airTagUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pt-btn-secondary flex items-center justify-center gap-2 w-full text-sm"
+              >
+                Ver localizacao no Find My
+              </a>
+            </div>
+          ) : (
+            <p className="text-xs text-texto-soft font-body">
+              Nenhum AirTag cadastrado. Adicione o link do Find My para localizar {pet.nome} rapidamente.
+            </p>
           )}
         </div>
 
-        {editingAirTag ? (
-          <div className="space-y-3">
-            <p className="text-xs text-texto-soft font-body">
-              Cole o link de compartilhamento do Apple Find My (gerado pelo app no iPhone).
-            </p>
-            <input
-              type="url"
-              className="pt-input"
-              placeholder="https://findmy.apple.com/..."
-              value={airTagInput}
-              onChange={(e) => { setAirTagInput(e.target.value); setAirTagError(''); }}
-              autoFocus
-            />
-            {airTagError && <p className="text-xs text-erro font-body">{airTagError}</p>}
-            <div className="flex gap-3">
-              <button
-                onClick={handleSaveAirTag}
-                disabled={airTagSaving}
-                className="pt-btn flex-1 text-sm"
-              >
-                {airTagSaving ? 'Salvando...' : 'Salvar'}
-              </button>
-              <button
-                onClick={() => { setEditingAirTag(false); setAirTagError(''); }}
-                className="pt-btn-secondary text-sm px-4"
-              >
-                Cancelar
-              </button>
+        {/* Plano de saude resumo */}
+        {plano && (
+          <div className="bg-rosa-light/30 rounded-xl px-4 py-3 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-rosa-light flex items-center justify-center flex-shrink-0">
+              <span className="text-lg">+</span>
             </div>
-          </div>
-        ) : pet.airTagUrl ? (
-          <div className="space-y-3">
-            <p className="text-xs text-texto-soft truncate font-body">
-              <span className="text-sm align-middle mr-1">📡</span>
-              {pet.airTagUrl}
-            </p>
-            <a
-              href={pet.airTagUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pt-btn flex items-center justify-center gap-2 w-full text-sm"
-            >
-              <span className="text-lg">📍</span>
-              Ver localização no Find My
-            </a>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 py-2">
-            <span className="text-3xl text-rosa">📡</span>
-            <div>
-              <p className="text-sm font-headline font-bold text-texto">Nenhum AirTag cadastrado</p>
+            <div className="min-w-0">
+              <p className="text-sm font-headline font-bold text-texto truncate">{plano.operadora}</p>
               <p className="text-xs text-texto-soft font-body">
-                Adicione o link do Find My para localizar {pet.nome} rapidamente
+                {plano.plano || 'Plano'}{plano.dataExpiracao ? ` · Expira ${formatDate(plano.dataExpiracao)}` : ''}
               </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Guarda */}
-      <div className="pt-card space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="font-headline text-3xl font-extrabold text-coral">Guarda</p>
-          <span className="bg-coral-light text-coral rounded-full px-4 py-1.5 text-sm font-headline font-bold">
-            Conjunta
-          </span>
-        </div>
-
-        {/* Guarda atual */}
-        <div className="bg-white rounded-xl p-6">
-          <p className="text-xs text-texto-soft mb-1 font-headline font-bold uppercase tracking-widest">Atualmente com</p>
-          <p className="text-sm font-headline font-bold text-texto">
-            {tutores.find(t => t.role === 'TUTOR_PRINCIPAL')?.usuario?.nome || 'Tutor principal'}
-          </p>
-        </div>
-
-        {/* Guardas temporarias agendadas */}
-        {guardas.length > 0 && (
-          <div className="space-y-3">
-            <p className="text-xs text-azul font-headline font-bold uppercase tracking-widest">
-              Proximas guardas
-            </p>
-            {guardas.map((g: any, i: number) => (
-              <div key={i} className="bg-white rounded-xl p-4 flex items-center gap-3">
-                <span className="text-xl text-azul">📅</span>
-                <div>
-                  <p className="text-sm font-headline font-bold text-texto">{g.responsavel || 'Responsavel'}</p>
-                  <p className="text-xs text-rosa font-body">
-                    {g.dataInicio ? formatDate(g.dataInicio) : ''} — {g.dataFim ? formatDate(g.dataFim) : ''}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Solicitacoes pendentes */}
-        {solicitacoes.filter((s: any) => s.status === 'PENDENTE').length > 0 && (
-          <div className="space-y-3">
-            <p className="text-xs text-azul font-headline font-bold uppercase tracking-widest">
-              Solicitacoes pendentes
-            </p>
-            {solicitacoes.filter((s: any) => s.status === 'PENDENTE').map((s: any) => (
-              <div key={s.id} className="bg-rosa-light text-rosa rounded-xl px-4 py-3 flex items-center gap-3 font-body">
-                <span>⏳</span>
-                <span>{s.descricao || 'Solicitacao de alteracao de guarda'}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Solicitar alteracao button */}
-        <button
-          onClick={() => setShowGuardaForm(true)}
-          className="pt-btn-secondary w-full text-sm"
-        >
-          Solicitar alteracao
-        </button>
-      </div>
-
-      {/* Tutores */}
-      <div className="pt-card space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="font-headline text-3xl font-extrabold text-coral">
-            Pessoas vinculadas ({tutores.length})
-          </p>
-          <button
-            onClick={() => setShowAddTutor(!showAddTutor)}
-            className="pt-btn-ghost text-sm"
-          >
-            <span className="text-lg">👤</span>
-            Convidar
-          </button>
-        </div>
-
-        {showAddTutor && (
-          <form
-            onSubmit={handleAddTutor}
-            className="space-y-3 bg-white rounded-xl p-6"
-          >
-            <h4 className="font-headline font-bold text-texto">
-              Convidar pessoa
-            </h4>
-            <p className="text-xs text-texto-soft font-body">
-              A pessoa receberá acesso ao perfil do pet com as permissões do papel selecionado.
-            </p>
-            <div>
-              <label className="pt-label">E-mail *</label>
-              <input
-                type="email"
-                className="pt-input"
-                placeholder="veterinario@email.com"
-                value={tutorForm.email}
-                onChange={(e) =>
-                  setTutorForm((f) => ({ ...f, email: e.target.value }))
-                }
-                required
-              />
-            </div>
-            <div>
-              <label className="pt-label">Papel</label>
-              <select
-                className="pt-input"
-                value={tutorForm.role}
-                onChange={(e) =>
-                  setTutorForm((f) => ({ ...f, role: e.target.value }))
-                }
-              >
-                <optgroup label="Tutores">
-                  <option value="TUTOR_EMERGENCIA">Tutor de emergência — cuida em emergências</option>
-                </optgroup>
-                <optgroup label="Profissionais">
-                  <option value="VETERINARIO">Veterinário — saúde e medicina</option>
-                  <option value="ADESTRADOR">Adestrador — treinamento</option>
-                  <option value="PASSEADOR">Passeador — passeios regulares</option>
-                </optgroup>
-                <optgroup label="Pessoal">
-                  <option value="FAMILIAR">Familiar — membro da família</option>
-                  <option value="AMIGO">Amigo — contato de confiança</option>
-                  <option value="OUTRO">Outro vínculo</option>
-                </optgroup>
-              </select>
-            </div>
-            {tutorError && (
-              <p className="text-xs text-erro font-body">{tutorError}</p>
-            )}
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={tutorSaving}
-                className="pt-btn flex-1 text-sm"
-              >
-                {tutorSaving ? 'Adicionando...' : 'Adicionar'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowAddTutor(false)}
-                className="pt-btn-secondary text-sm px-4"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        )}
-
-        <div className="space-y-2">
-          {tutores.map((pu) => (
-            <TutorRow key={pu.id} pu={pu} isMe={pu.usuarioId === user?.id} />
-          ))}
-        </div>
-      </div>
-
-      {/* Plano de saúde resumo */}
-      {plano && (
-        <div className="pt-card">
-          <p className="font-headline text-3xl font-extrabold text-rosa mb-4">Plano de saúde</p>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-rosa-light flex items-center justify-center">
-              <span className="text-2xl">🏥</span>
-            </div>
-            <div>
-              <p className="font-headline font-bold text-texto">{plano.operadora}</p>
-              <p className="text-xs text-texto-soft font-body">{plano.plano || 'Plano'}{plano.dataExpiracao ? ` · Expira ${formatDate(plano.dataExpiracao)}` : ''}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── REDE DE CUIDADO ─── */}
+      {/* Section 3: Rede de Cuidado */}
       <div className="pt-card space-y-6">
-        <p className="font-headline text-3xl font-extrabold text-azul">Rede de Cuidado</p>
+        <div>
+          <h3 className="font-headline text-lg font-bold text-texto">Rede de Cuidado</h3>
+          <p className="text-sm text-texto-soft font-body">Pessoas com acesso ao perfil de {pet.nome}</p>
+        </div>
 
         {/* === Tutores === */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="font-headline text-lg font-bold text-texto">
+            <p className="font-headline text-sm font-bold text-texto">
               Tutores ({tutoresList.length})
             </p>
             <button
               onClick={() => { setShowAddTutor(!showAddTutor); setShowAddPrestador(false); setShowAddVisitante(false); }}
               className="pt-btn-ghost text-sm"
             >
-              + Convidar tutor
+              + Convidar
             </button>
           </div>
 
@@ -691,10 +493,7 @@ export default function PerfilPage() {
           )}
 
           {tutoresList.length === 0 ? (
-            <div className="text-center py-6">
-              <span className="text-3xl">👥</span>
-              <p className="text-sm text-texto-soft font-body mt-2">Nenhum tutor vinculado</p>
-            </div>
+            <p className="text-sm text-texto-soft font-body py-3 text-center">Nenhum tutor vinculado</p>
           ) : (
             <div className="space-y-2">
               {tutoresList.map((pu) => (
@@ -709,14 +508,14 @@ export default function PerfilPage() {
         {/* === Prestadores === */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="font-headline text-lg font-bold text-texto">
+            <p className="font-headline text-sm font-bold text-texto">
               Prestadores ({prestadoresList.length})
             </p>
             <button
               onClick={() => { setShowAddPrestador(!showAddPrestador); setShowAddTutor(false); setShowAddVisitante(false); }}
               className="pt-btn-ghost text-sm"
             >
-              + Convidar prestador
+              + Convidar
             </button>
           </div>
 
@@ -748,11 +547,7 @@ export default function PerfilPage() {
           )}
 
           {prestadoresList.length === 0 ? (
-            <div className="text-center py-6">
-              <span className="text-3xl">🩺</span>
-              <p className="text-sm text-texto-soft font-body mt-2">Nenhum prestador vinculado</p>
-              <p className="text-xs text-texto-soft font-body">Veterinarios, adestradores e passeadores aparecerao aqui.</p>
-            </div>
+            <p className="text-sm text-texto-soft font-body py-3 text-center">Nenhum prestador vinculado</p>
           ) : (
             <div className="space-y-2">
               {prestadoresList.map((pu) => (
@@ -767,14 +562,14 @@ export default function PerfilPage() {
         {/* === Visitantes === */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="font-headline text-lg font-bold text-texto">
+            <p className="font-headline text-sm font-bold text-texto">
               Visitantes ({visitantes.length})
             </p>
             <button
               onClick={() => { setShowAddVisitante(!showAddVisitante); setShowAddTutor(false); setShowAddPrestador(false); }}
               className="pt-btn-ghost text-sm"
             >
-              + Convidar visitante
+              + Convidar
             </button>
           </div>
 
@@ -844,15 +639,11 @@ export default function PerfilPage() {
           {visitantesLoading ? (
             <div className="space-y-2">
               {[1, 2].map((i) => (
-                <div key={i} className="h-16 bg-creme-dark/50 rounded-xl animate-pulse" />
+                <div key={i} className="h-14 pt-skeleton rounded-xl" />
               ))}
             </div>
           ) : visitantes.length === 0 ? (
-            <div className="text-center py-6">
-              <span className="text-3xl">👁️</span>
-              <p className="text-sm text-texto-soft font-body mt-2">Nenhum visitante vinculado</p>
-              <p className="text-xs text-texto-soft font-body">Visitantes podem visualizar informacoes com permissoes limitadas.</p>
-            </div>
+            <p className="text-sm text-texto-soft font-body py-3 text-center">Nenhum visitante vinculado</p>
           ) : (
             <div className="space-y-2">
               {visitantes.map((v) => (
@@ -863,30 +654,26 @@ export default function PerfilPage() {
         </div>
       </div>
 
-      {/* Ações */}
+      {/* Section 4: Acoes */}
       <div className="pt-card space-y-3">
-        <p className="font-headline text-3xl font-extrabold text-coral mb-2">Ações</p>
+        <h3 className="font-headline text-lg font-bold text-texto">Acoes</h3>
+
         <button
           onClick={() => setShowFeedback(!showFeedback)}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white active:scale-[0.97] transition-all duration-200 text-left"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-creme-dark/30 active:scale-[0.98] transition-all text-left"
         >
-          <span className="text-2xl text-azul">💬</span>
-          <div>
-            <p className="text-sm font-headline font-bold text-texto">
-              Enviar feedback
-            </p>
-            <p className="text-xs text-texto-soft font-body">
-              Compartilhe sua experiência
-            </p>
+          <div className="w-10 h-10 rounded-full bg-azul-light flex items-center justify-center flex-shrink-0">
+            <span className="text-sm text-azul font-bold">?</span>
           </div>
-          <span className="ml-auto text-texto-soft"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-headline font-bold text-texto">Enviar feedback</p>
+            <p className="text-xs text-texto-soft font-body">Compartilhe sua experiencia</p>
+          </div>
+          <svg className="text-texto-soft flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         </button>
 
         {showFeedback && (
-          <form
-            onSubmit={handleFeedback}
-            className="space-y-3 bg-white rounded-xl p-6"
-          >
+          <form onSubmit={handleFeedback} className="space-y-3 bg-azul-light/30 rounded-xl p-5">
             <div>
               <label className="pt-label">Tipo</label>
               <select
@@ -896,7 +683,7 @@ export default function PerfilPage() {
                   setFeedbackForm((f) => ({ ...f, tipo: e.target.value }))
                 }
               >
-                <option value="SUGESTAO">Sugestão</option>
+                <option value="SUGESTAO">Sugestao</option>
                 <option value="BUG">Bug</option>
                 <option value="ELOGIO">Elogio</option>
                 <option value="OUTRO">Outro</option>
@@ -933,26 +720,20 @@ export default function PerfilPage() {
           </form>
         )}
 
-        <div className="px-4 py-3">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 bg-coral-light text-coral text-xs px-3 py-1 rounded-full font-headline font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-coral animate-pulse" />
-              Beta
-            </span>
-            <p className="text-xs text-texto-soft font-body">
-              Você está no acesso antecipado do MITRA
-            </p>
-          </div>
+        <div className="flex items-center gap-2 px-4 py-2">
+          <span className="inline-flex items-center gap-1.5 bg-coral-light text-coral text-xs px-3 py-1 rounded-full font-headline font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-coral animate-pulse" />
+            Beta
+          </span>
+          <p className="text-xs text-texto-soft font-body">
+            Voce esta no acesso antecipado do MITRA
+          </p>
         </div>
-      </div>
 
-      {/* Editar Perfil — big CTA */}
-      <div className="flex justify-center pt-4">
         <button
           onClick={() => router.push(`/pets/${petId}/editar`)}
-          className="group bg-coral-light text-coral font-headline font-black text-2xl px-16 py-6 rounded-full shadow-xl hover:scale-105 active:scale-90 transition-all duration-300 flex items-center gap-4"
+          className="pt-btn w-full text-sm"
         >
-          <span className="text-3xl group-hover:rotate-45 transition-transform">✏️</span>
           Editar Perfil
         </button>
       </div>
@@ -994,8 +775,8 @@ export default function PerfilPage() {
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white rounded-xl px-4 py-3">
-      <p className="text-xs text-texto-soft mb-0.5 font-headline font-bold uppercase tracking-widest">{label}</p>
+    <div className="bg-creme-dark/40 rounded-xl px-4 py-3">
+      <p className="pt-label mb-0.5">{label}</p>
       <p className="text-sm font-headline font-bold text-texto">{value}</p>
     </div>
   );
@@ -1035,7 +816,7 @@ function TutorRow({
 }) {
   const badge = ROLE_BADGE[pu.role] ?? { bg: 'bg-creme-dark', text: 'text-texto-soft' };
   return (
-    <div className="bg-white/70 backdrop-blur-md rounded-xl p-4 flex items-center gap-3">
+    <div className="bg-creme-dark/30 rounded-xl p-3 flex items-center gap-3">
       <div className="w-10 h-10 rounded-full bg-coral-light flex items-center justify-center flex-shrink-0">
         <span className="text-coral text-sm font-headline font-bold">
           {getInitials(pu.usuario.nome)}
@@ -1046,13 +827,13 @@ function TutorRow({
           {pu.usuario.nome}
           {isMe && (
             <span className="text-texto-soft font-normal text-xs ml-1 font-body">
-              (você)
+              (voce)
             </span>
           )}
         </p>
         <p className="text-xs text-texto-soft font-body">{pu.usuario.email}</p>
       </div>
-      <span className={cn('px-4 py-1.5 rounded-full text-xs font-headline font-bold flex-shrink-0', badge.bg, badge.text)}>
+      <span className={cn('px-3 py-1 rounded-full text-xs font-headline font-bold flex-shrink-0', badge.bg, badge.text)}>
         {roleLabel(pu.role)}
       </span>
     </div>
@@ -1064,7 +845,7 @@ function VisitanteRow({ visitante, onRemove }: { visitante: PetVisitante; onRemo
   const permissoes = visitante.permissoesVisualizacao || [];
 
   return (
-    <div className="bg-white/70 backdrop-blur-md rounded-xl p-4 space-y-2">
+    <div className="bg-creme-dark/30 rounded-xl p-3 space-y-2">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-rosa-light flex items-center justify-center flex-shrink-0">
           <span className="text-rosa text-sm font-headline font-bold">
@@ -1079,18 +860,18 @@ function VisitanteRow({ visitante, onRemove }: { visitante: PetVisitante; onRemo
         </div>
         <button
           onClick={onRemove}
-          className="text-xs text-erro hover:text-erro/80 font-headline font-bold px-3 py-1.5 rounded-full bg-erro/10 flex-shrink-0 transition-colors"
+          className="text-xs text-erro hover:text-erro/80 font-headline font-bold px-3 py-1 rounded-full bg-erro/10 flex-shrink-0 transition-colors"
           title="Remover acesso"
         >
           Remover
         </button>
       </div>
       {permissoes.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 ml-13">
+        <div className="flex flex-wrap gap-1.5 pl-13">
           {permissoes.map((p) => (
             <span
               key={p}
-              className="px-3 py-1 rounded-full text-xs font-headline font-bold bg-coral-light text-coral"
+              className="px-2 py-0.5 rounded-full text-xs font-headline font-bold bg-coral-light text-coral"
             >
               {PERMISSAO_LABELS[p] || p}
             </span>
@@ -1110,26 +891,23 @@ function CodigoPetDisplay({ codigo, nome }: { codigo: string; nome: string }) {
   };
 
   return (
-    <div className="bg-white rounded-xl px-4 py-4">
+    <div className="bg-creme-dark/40 rounded-xl px-4 py-3">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-texto-soft mb-1 font-headline font-bold uppercase tracking-widest">Código do pet</p>
-          <p className="text-lg font-mono font-bold text-texto tracking-wider">
+          <p className="pt-label mb-0.5">Codigo do pet</p>
+          <p className="text-sm font-mono font-bold text-texto tracking-wider">
             {codigo}
           </p>
         </div>
         <button
           onClick={handleCopy}
-          className="pt-btn-ghost text-sm flex items-center gap-1.5"
-          title="Copiar código"
+          className="pt-btn-ghost text-sm"
+          title="Copiar codigo"
         >
-          <span className="text-lg">
-            {copied ? '✅' : '📋'}
-          </span>
-          {copied ? 'Copiado' : 'Copiar'}
+          {copied ? 'Copiado!' : 'Copiar'}
         </button>
       </div>
-      <p className="text-xs text-texto-soft mt-2 font-body">
+      <p className="text-xs text-texto-soft mt-1 font-body">
         Compartilhe para outros se vincularem a {nome}
       </p>
     </div>
