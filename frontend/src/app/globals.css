@@ -1,0 +1,409 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-coral: #FF6B4A;
+    --color-coral-light: #FFF5F2;
+    --color-rosa: #FF4E8C;
+    --color-rosa-light: #FFF0F5;
+    --color-amarelo: #FFB930;
+    --color-amarelo-light: #FFF8E8;
+    --color-menta: #2ED8A3;
+    --color-menta-light: #F0FFF8;
+    --color-azul: #4DA3FF;
+    --color-azul-light: #F0F6FF;
+    --color-creme: #FFF8F0;
+    --color-creme-dark: #FFF0E0;
+    --color-texto: #2D1B14;
+    --color-texto-soft: #8C7A6B;
+    --color-texto-muted: #B5A898;
+    --color-branco: #FFFFFF;
+    --color-erro: #E53935;
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #FFF8F0;
+    color: #2D1B14;
+    font-family: var(--font-vietnam), 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+  }
+}
+
+@layer components {
+  /* ═══════════════════════════════════════════
+     Playground Tropical Design System (pt-*)
+     ═══════════════════════════════════════════ */
+
+  /* ── Cards ───────────────────────────────── */
+
+  .pt-card {
+    background-color: #FFFFFF;
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    box-shadow: 0 4px 20px rgba(45,27,20,0.08);
+    transition: all 250ms ease;
+  }
+  .pt-card:hover {
+    box-shadow: 0 8px 30px rgba(45,27,20,0.12);
+    transform: translateY(-2px);
+  }
+
+  .pt-card-saude { background-color: #FFF0F5; }
+  .pt-card-agenda { background-color: #F0F6FF; }
+  .pt-card-guarda { background-color: #F0FFF8; }
+  .pt-card-historico { background-color: #FFF8E8; }
+  .pt-card-governanca { background-color: #FFF5F2; }
+
+  .pt-card-flat {
+    background-color: #FFFFFF;
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  /* ── Buttons ─────────────────────────────── */
+
+  .pt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--color-coral);
+    color: #FFFFFF;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 700;
+    padding: 0.875rem 1.75rem;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    transition: all 200ms var(--ease-bounce);
+    font-size: 1rem;
+  }
+  .pt-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255,107,74,0.3);
+  }
+  .pt-btn:active {
+    transform: scale(0.92);
+  }
+  .pt-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .pt-btn-rosa {
+    background-color: var(--color-rosa);
+  }
+  .pt-btn-rosa:hover {
+    box-shadow: 0 6px 20px rgba(255,78,140,0.3);
+  }
+
+  .pt-btn-menta {
+    background-color: var(--color-menta);
+    color: #FFFFFF;
+  }
+  .pt-btn-menta:hover {
+    box-shadow: 0 6px 20px rgba(46,216,163,0.3);
+  }
+
+  .pt-btn-azul {
+    background-color: var(--color-azul);
+    color: #FFFFFF;
+  }
+  .pt-btn-azul:hover {
+    box-shadow: 0 6px 20px rgba(77,163,255,0.3);
+  }
+
+  .pt-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--color-creme-dark);
+    color: var(--color-coral);
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    transition: all 200ms var(--ease-bounce);
+    font-size: 0.9375rem;
+  }
+  .pt-btn-secondary:hover {
+    transform: scale(1.05);
+    background-color: #FFE8CC;
+  }
+  .pt-btn-secondary:active {
+    transform: scale(0.92);
+  }
+
+  .pt-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: transparent;
+    color: var(--color-coral);
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    transition: all 200ms ease;
+    font-size: 0.9375rem;
+  }
+  .pt-btn-ghost:hover {
+    background-color: var(--color-coral-light);
+  }
+  .pt-btn-ghost:active {
+    transform: scale(0.92);
+  }
+
+  /* ── Inputs ──────────────────────────────── */
+
+  .pt-input {
+    width: 100%;
+    background-color: #FFFFFF;
+    border-radius: 1rem;
+    padding: 0.875rem 1rem;
+    color: var(--color-texto);
+    font-family: var(--font-vietnam), 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: 1rem;
+    transition: all 200ms ease;
+    outline: none;
+    border: none;
+  }
+  .pt-input::placeholder {
+    color: var(--color-texto-muted);
+  }
+  .pt-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-coral);
+  }
+
+  .pt-select {
+    width: 100%;
+    background-color: #FFFFFF;
+    border-radius: 1rem;
+    padding: 0.875rem 2.5rem 0.875rem 1rem;
+    color: var(--color-texto);
+    font-family: var(--font-vietnam), 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: 1rem;
+    transition: all 200ms ease;
+    outline: none;
+    border: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238C7A6B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  .pt-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-coral);
+  }
+
+  .pt-label {
+    display: block;
+    font-size: 0.875rem;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 600;
+    color: var(--color-texto-soft);
+    margin-bottom: 0.375rem;
+  }
+
+  /* ── Tab Pills ───────────────────────────── */
+
+  .pt-tab {
+    padding: 0.5rem 1.125rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 600;
+    color: var(--color-texto-soft);
+    transition: all 200ms var(--ease-bounce);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+  }
+  .pt-tab:hover {
+    background-color: var(--color-creme-dark);
+    color: var(--color-texto);
+  }
+
+  .pt-tab-active {
+    background-color: var(--color-coral);
+    color: #FFFFFF;
+    transform: scale(1.05);
+  }
+  .pt-tab-active:hover {
+    background-color: var(--color-coral);
+    color: #FFFFFF;
+  }
+
+  /* ── Badges ──────────────────────────────── */
+
+  .pt-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 700;
+  }
+
+  /* ── Section Title ───────────────────────── */
+
+  .pt-section-title {
+    font-size: 0.8125rem;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 700;
+    color: var(--color-texto-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Overlay ─────────────────────────────── */
+
+  .pt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(45, 27, 20, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* ── Skeleton ────────────────────────────── */
+
+  .pt-skeleton {
+    border-radius: 1rem;
+    background: linear-gradient(90deg, #FFF0E0 25%, #FFE8CC 50%, #FFF0E0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Utility Classes
+   ═══════════════════════════════════════════ */
+
+/* Bounce effect on click */
+.bounce-effect {
+  transition: transform 200ms var(--ease-bounce);
+}
+.bounce-effect:active {
+  transform: scale(0.92);
+}
+
+/* Hover lift effect for cards/interactive items */
+.hover-lift {
+  transition: all 250ms ease;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(45,27,20,0.12);
+}
+
+/* Decorative blob gradients */
+.bg-blobs {
+  background-image:
+    radial-gradient(ellipse at 10% 20%, rgba(255,107,74,0.15) 0px, transparent 50%),
+    radial-gradient(ellipse at 90% 10%, rgba(255,78,140,0.12) 0px, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(255,185,48,0.1) 0px, transparent 50%),
+    radial-gradient(ellipse at 5% 85%, rgba(46,216,163,0.1) 0px, transparent 50%);
+}
+
+/* Stagger animation delays for lists */
+.stagger-1 { animation-delay: 0ms; }
+.stagger-2 { animation-delay: 80ms; }
+.stagger-3 { animation-delay: 160ms; }
+.stagger-4 { animation-delay: 240ms; }
+.stagger-5 { animation-delay: 320ms; }
+.stagger-6 { animation-delay: 400ms; }
+
+/* Hide scrollbar utility */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Warm scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #B5A898;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8C7A6B;
+}
+
+/* Scroll reveal (IntersectionObserver) */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.scroll-reveal-delay-1 { transition-delay: 100ms; }
+.scroll-reveal-delay-2 { transition-delay: 200ms; }
+.scroll-reveal-delay-3 { transition-delay: 300ms; }
+.scroll-reveal-delay-4 { transition-delay: 400ms; }
+
+/* Confetti particle base */
+.confetti-particle {
+  position: absolute;
+  font-size: 1.5rem;
+  pointer-events: none;
+  animation: confettiFall 1s ease-out forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-150px) rotate(720deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

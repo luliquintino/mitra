@@ -1,0 +1,577 @@
+// ─────────────────────────────────────────────
+// MITRA — Prisma Schema
+// ─────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  TUTOR_PRINCIPAL
+  TUTOR_EMERGENCIA
+}
+
+enum PetStatus {
+  ATIVO
+  ARQUIVADO
+}
+
+enum PetSpecies {
+  CACHORRO
+  GATO
+  CAVALO
+  PEIXE
+  PASSARO
+  ROEDOR
+  COELHO
+  REPTIL
+  FURAO
+  OUTRO
+}
+
+enum PetGender {
+  MACHO
+  FEMEA
+}
+
+enum SolicitacaoTipo {
+  ALTERACAO_GUARDA
+  ARQUIVAR_PET
+  REATIVAR_PET
+  REMOVER_TUTOR
+  SAIDA_TUTOR
+}
+
+enum SolicitacaoStatus {
+  PENDENTE
+  APROVADA
+  RECUSADA
+  EXPIRADA
+}
+
+enum EventoTipo {
+  MEDICAMENTO_ADMINISTRADO
+  VACINA_REGISTRADA
+  VACINA_ATUALIZADA
+  SINTOMA_REGISTRADO
+  SOLICITACAO_CRIADA
+  SOLICITACAO_APROVADA
+  SOLICITACAO_RECUSADA
+  SOLICITACAO_EXPIRADA
+  TUTOR_ADICIONADO
+  TUTOR_REMOVIDO
+  PET_ARQUIVADO
+  PET_REATIVADO
+  PET_CRIADO
+  GUARDA_ALTERADA
+  PLANO_SAUDE_ATUALIZADO
+  GUARDA_TEMPORARIA_CRIADA
+  GUARDA_TEMPORARIA_CONFIRMADA
+  GUARDA_TEMPORARIA_CANCELADA
+  COMPROMISSO_CRIADO
+  // Tutor actions
+  CONSULTA_REGISTRADA
+  EXAME_ANEXADO
+  // Prestador actions
+  VISITA_REGISTRADA
+  ALIMENTACAO_REGISTRADA
+  CHECK_IN_REGISTRADO
+  CHECK_OUT_REGISTRADO
+  SESSAO_REGISTRADA
+  PROGRESSO_REGISTRADO
+  // Visitante
+  OBSERVACAO_REGISTRADA
+}
+
+enum TipoGuarda {
+  CONJUNTA
+  SEPARADA
+}
+
+enum MedicamentoStatus {
+  ATIVO
+  CONCLUIDO
+  CANCELADO
+}
+
+enum NotificacaoTipo {
+  SOLICITACAO_RECEBIDA
+  SOLICITACAO_APROVADA
+  SOLICITACAO_RECUSADA
+  SOLICITACAO_EXPIRADA
+  MEDICAMENTO_LEMBRETE
+  VACINA_LEMBRETE
+  GUARDA_LEMBRETE
+  CONVITE_PRESTADOR
+  PRESTADOR_ACEITO_CONVITE
+  ACESSO_REMOVIDO_PRESTADOR
+  CONVITE_VISITANTE
+  VISITANTE_ACEITO_CONVITE
+  ACESSO_REMOVIDO_VISITANTE
+  GUARDA_TEMPORARIA_LEMBRETE
+  GUARDA_TEMPORARIA_RETORNO
+  GUARDA_TEMPORARIA_AUTO_CONFIRMADA
+}
+
+enum TipoUsuario {
+  TUTOR
+  PRESTADOR
+  AMBOS
+}
+
+enum TipoPrestador {
+  VETERINARIO
+  PET_SITTER
+  DAY_CARE
+  HOTEL
+  ADESTRADOR
+  BANHO_TOSA
+  CUIDADOR_EVENTUAL
+  OUTRO
+}
+
+enum CompromissoTipo {
+  PASSEIO
+  CONSULTA
+  BANHO
+  ADESTRAMENTO
+  CRECHE
+  HOSPEDAGEM
+  OUTRO
+}
+
+enum CompromissoRecorrencia {
+  UNICO
+  DIARIO
+  SEMANAL
+  QUINZENAL
+  MENSAL
+}
+
+enum GuardaTemporariaTipo {
+  PESSOA
+  PRESTADOR
+}
+
+enum GuardaTemporariaStatus {
+  AGENDADA
+  CONFIRMADA
+  EM_ANDAMENTO
+  CONCLUIDA
+  CANCELADA
+}
+
+enum PermissaoPrestador {
+  VISUALIZAR
+  REGISTRAR_SERVICO
+  REGISTRAR_VACINA
+  ANEXAR_DOCUMENTO
+  REGISTRAR_OBSERVACOES
+  EDITAR_SAUDE
+}
+
+enum PermissaoVisitante {
+  DADOS_BASICOS
+  STATUS_SAUDE
+  HISTORICO_VACINACAO
+  MEDICAMENTOS
+  AGENDA_CONSULTAS
+  PRESTADORES_PET
+  TIMELINE_ATUALIZACOES
+}
+
+// ─────────────────────────────────────────────
+// MODELS
+// ─────────────────────────────────────────────
+
+model Usuario {
+  id           String      @id @default(uuid())
+  nome         String
+  email        String      @unique
+  senhaHash    String      @map("senha_hash")
+  telefone     String?
+  avatarUrl    String?     @map("avatar_url")
+  tipoUsuario  TipoUsuario @default(TUTOR) @map("tipo_usuario")
+  refreshToken String?     @map("refresh_token")
+  ativo        Boolean     @default(true)
+  criadoEm     DateTime    @default(now()) @map("criado_em")
+  atualizadoEm DateTime    @updatedAt @map("atualizado_em")
+
+  petUsuarios           PetUsuario[]
+  perfilPrestador       PerfilPrestador?
+  petVisitantes         PetVisitante[]
+  solicitacoesFeitas    Solicitacao[]    @relation("SolicitacaoSolicitante")
+  solicitacoesRecebidas Solicitacao[]    @relation("SolicitacaoDestinatario")
+  notificacoes          Notificacao[]
+  feedbacks             Feedback[]
+  auditLogs             AuditLog[]       @relation("AuditLogAtor")
+  compromissosCriados   Compromisso[]    @relation("CompromissoCriador")
+  guardasTemporarias    GuardaTemporaria[] @relation("GuardaTempResponsavel")
+
+  @@map("usuarios")
+}
+
+model Pet {
+  id             String     @id @default(uuid())
+  nome           String
+  especie        PetSpecies
+  raca           String?
+  genero         PetGender?
+  dataNascimento DateTime?  @map("data_nascimento")
+  cor            String?
+  peso           Float?
+  microchip      String?
+  fotoUrl        String?    @map("foto_url")
+  status         PetStatus   @default(ATIVO)
+  observacoes    String?
+  codigoPet      String?     @unique @map("codigo_pet")
+  tipoGuarda     TipoGuarda? @map("tipo_guarda")
+  criadoEm       DateTime    @default(now()) @map("criado_em")
+  atualizadoEm   DateTime   @updatedAt @map("atualizado_em")
+
+  petUsuarios  PetUsuario[]
+  prestadores  PetPrestador[]
+  visitantes   PetVisitante[]
+  vacinas      Vacina[]
+  medicamentos Medicamento[]
+  sintomas     Sintoma[]
+  planoSaude   PlanoSaude?
+  guardas            Guarda[]
+  solicitacoes       Solicitacao[]
+  eventos            Evento[]
+  auditLogs          AuditLog[]
+  compromissos       Compromisso[]
+  guardasTemporarias GuardaTemporaria[]
+
+  @@map("pets")
+}
+
+model PetUsuario {
+  id           String   @id @default(uuid())
+  petId        String   @map("pet_id")
+  usuarioId    String   @map("usuario_id")
+  role         UserRole @default(TUTOR_PRINCIPAL)
+  ativo        Boolean  @default(true)
+  adicionadoEm DateTime @default(now()) @map("adicionado_em")
+  apresentacao String?
+
+  pet     Pet     @relation(fields: [petId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([petId, usuarioId])
+  @@map("pet_usuarios")
+}
+
+model PerfilPrestador {
+  id                   String        @id @default(uuid())
+  usuarioId            String        @unique @map("usuario_id")
+  tipoPrestador        TipoPrestador
+  nomeEmpresa          String?       @map("nome_empresa")
+  cnpj                 String?       @unique
+  telefoneProfissional String        @map("telefone_profissional")
+  endereco             String
+  registroProfissional String?       @map("registro_profissional")
+  descricao            String?
+  website              String?
+  avaliacaoMedia       Float?        @default(0) @map("avaliacao_media")
+  totalAvaliacoes      Int           @default(0) @map("total_avaliacoes")
+  ativo                Boolean       @default(true)
+  criadoEm             DateTime      @default(now()) @map("criado_em")
+  atualizadoEm         DateTime      @updatedAt @map("atualizado_em")
+
+  usuario        Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  petPrestadores PetPrestador[]
+
+  @@map("perfis_prestador")
+}
+
+model PetPrestador {
+  id            String               @id @default(uuid())
+  petId         String               @map("pet_id")
+  prestadorId   String               @map("prestador_id")
+  permissoes    PermissaoPrestador[] @default([VISUALIZAR, REGISTRAR_SERVICO])
+  statusVinculo String               @default("ATIVO") @map("status_vinculo")
+  dataInicio    DateTime             @default(now()) @map("data_inicio")
+  dataFim       DateTime?            @map("data_fim")
+  convidadoPor  String?              @map("convidado_por")
+  aceito        Boolean              @default(false)
+  dataAceite    DateTime?            @map("data_aceite")
+  observacoes   String?
+  criadoEm      DateTime             @default(now()) @map("criado_em")
+  atualizadoEm  DateTime             @updatedAt @map("atualizado_em")
+
+  pet                Pet              @relation(fields: [petId], references: [id], onDelete: Cascade)
+  prestador          PerfilPrestador  @relation(fields: [prestadorId], references: [id], onDelete: Cascade)
+  compromissos       Compromisso[]
+  guardasTemporarias GuardaTemporaria[]
+
+  @@unique([petId, prestadorId])
+  @@map("pet_prestadores")
+}
+
+model PetVisitante {
+  id                     String               @id @default(uuid())
+  petId                  String               @map("pet_id")
+  visitanteId            String               @map("visitante_id")
+  permissoesVisualizacao PermissaoVisitante[] @default([DADOS_BASICOS, STATUS_SAUDE])
+  statusVinculo          String               @default("ATIVO") @map("status_vinculo")
+  relacao                String?
+  convidadoPor           String               @map("convidado_por")
+  aceito                 Boolean              @default(false)
+  dataAceite             DateTime?            @map("data_aceite")
+  dataFim                DateTime?            @map("data_fim")
+  criadoEm               DateTime             @default(now()) @map("criado_em")
+  atualizadoEm           DateTime             @updatedAt @map("atualizado_em")
+
+  pet       Pet     @relation(fields: [petId], references: [id], onDelete: Cascade)
+  visitante Usuario @relation(fields: [visitanteId], references: [id], onDelete: Cascade)
+
+  @@unique([petId, visitanteId])
+  @@map("pet_visitantes")
+}
+
+model Vacina {
+  id             String    @id @default(uuid())
+  petId          String    @map("pet_id")
+  nome           String
+  dataAplicacao  DateTime  @map("data_aplicacao")
+  proximaDose    DateTime? @map("proxima_dose")
+  veterinario    String?
+  clinica        String?
+  lote           String?
+  observacoes    String?
+  comprovanteUrl String?   @map("comprovante_url")
+  criadoEm       DateTime  @default(now()) @map("criado_em")
+  atualizadoEm   DateTime  @updatedAt @map("atualizado_em")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@map("vacinas")
+}
+
+model Medicamento {
+  id           String            @id @default(uuid())
+  petId        String            @map("pet_id")
+  nome         String
+  dosagem      String
+  frequencia   String
+  dataInicio   DateTime          @map("data_inicio")
+  dataFim      DateTime?         @map("data_fim")
+  horarios     String[]
+  veterinario  String?
+  motivo       String?
+  status       MedicamentoStatus @default(ATIVO)
+  observacoes  String?
+  criadoEm     DateTime          @default(now()) @map("criado_em")
+  atualizadoEm DateTime          @updatedAt @map("atualizado_em")
+
+  pet            Pet                @relation(fields: [petId], references: [id], onDelete: Cascade)
+  administracoes AdministracaoMed[]
+
+  @@map("medicamentos")
+}
+
+model AdministracaoMed {
+  id              String   @id @default(uuid())
+  medicamentoId   String   @map("medicamento_id")
+  administradoEm  DateTime @default(now()) @map("administrado_em")
+  administradoPor String?  @map("administrado_por")
+  observacoes     String?
+
+  medicamento Medicamento @relation(fields: [medicamentoId], references: [id], onDelete: Cascade)
+
+  @@map("administracoes_med")
+}
+
+model Sintoma {
+  id          String    @id @default(uuid())
+  petId       String    @map("pet_id")
+  descricao   String
+  dataInicio  DateTime  @map("data_inicio")
+  dataFim     DateTime? @map("data_fim")
+  intensidade Int? // 1-5
+  observacoes String?
+  criadoEm    DateTime  @default(now()) @map("criado_em")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@map("sintomas")
+}
+
+model PlanoSaude {
+  id            String    @id @default(uuid())
+  petId         String    @unique @map("pet_id")
+  operadora     String
+  numeroCartao  String?   @map("numero_cartao")
+  plano         String?
+  dataVigencia  DateTime? @map("data_vigencia")
+  dataExpiracao DateTime? @map("data_expiracao")
+  coberturas    String[]
+  observacoes   String?
+  criadoEm      DateTime  @default(now()) @map("criado_em")
+  atualizadoEm  DateTime  @updatedAt @map("atualizado_em")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@map("planos_saude")
+}
+
+model Guarda {
+  id          String    @id @default(uuid())
+  petId       String    @map("pet_id")
+  tutorId     String    @map("tutor_id")
+  dataInicio  DateTime  @map("data_inicio")
+  dataFim     DateTime? @map("data_fim")
+  ativa       Boolean   @default(true)
+  observacoes String?
+  criadoEm    DateTime  @default(now()) @map("criado_em")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@map("guardas")
+}
+
+model Compromisso {
+  id             String                 @id @default(uuid())
+  petId          String                 @map("pet_id")
+  titulo         String
+  tipo           CompromissoTipo
+  responsavelId  String?                @map("responsavel_id")
+  petPrestadorId String?                @map("pet_prestador_id")
+  recorrencia    CompromissoRecorrencia
+  diasSemana     Int[]                  @map("dias_semana")
+  horarioInicio  String?                @map("horario_inicio")
+  horarioFim     String?                @map("horario_fim")
+  dataInicio     DateTime               @map("data_inicio")
+  dataFim        DateTime?              @map("data_fim")
+  geraGuarda     Boolean                @default(false) @map("gera_guarda")
+  ativo          Boolean                @default(true)
+  criadoPor      String                 @map("criado_por")
+  criadoEm       DateTime               @default(now()) @map("criado_em")
+  atualizadoEm   DateTime               @updatedAt @map("atualizado_em")
+
+  pet            Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  criador        Usuario       @relation("CompromissoCriador", fields: [criadoPor], references: [id])
+  petPrestador   PetPrestador? @relation(fields: [petPrestadorId], references: [id])
+  guardasGeradas GuardaTemporaria[]
+
+  @@map("compromissos")
+}
+
+model GuardaTemporaria {
+  id             String                 @id @default(uuid())
+  petId          String                 @map("pet_id")
+  tipo           GuardaTemporariaTipo
+  responsavelId  String?                @map("responsavel_id")
+  petPrestadorId String?                @map("pet_prestador_id")
+  compromissoId  String?                @map("compromisso_id")
+  dataInicio     DateTime               @map("data_inicio")
+  dataFim        DateTime               @map("data_fim")
+  status         GuardaTemporariaStatus @default(AGENDADA)
+  confirmadoEm   DateTime?              @map("confirmado_em")
+  observacoes    String?
+  criadoEm       DateTime               @default(now()) @map("criado_em")
+
+  pet          Pet              @relation(fields: [petId], references: [id], onDelete: Cascade)
+  responsavel  Usuario?         @relation("GuardaTempResponsavel", fields: [responsavelId], references: [id])
+  petPrestador PetPrestador?    @relation(fields: [petPrestadorId], references: [id])
+  compromisso  Compromisso?     @relation(fields: [compromissoId], references: [id])
+
+  @@map("guardas_temporarias")
+}
+
+model Solicitacao {
+  id               String            @id @default(uuid())
+  petId            String            @map("pet_id")
+  solicitanteId    String            @map("solicitante_id")
+  destinatarioId   String?           @map("destinatario_id")
+  tipo             SolicitacaoTipo
+  status           SolicitacaoStatus @default(PENDENTE)
+  dados            Json?
+  justificativa    String?
+  respostaMensagem String?           @map("resposta_mensagem")
+  expiradoEm       DateTime          @map("expirado_em")
+  respondidoEm     DateTime?         @map("respondido_em")
+  criadoEm         DateTime          @default(now()) @map("criado_em")
+  atualizadoEm     DateTime          @updatedAt @map("atualizado_em")
+
+  pet          Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+  solicitante  Usuario  @relation("SolicitacaoSolicitante", fields: [solicitanteId], references: [id])
+  destinatario Usuario? @relation("SolicitacaoDestinatario", fields: [destinatarioId], references: [id])
+
+  @@map("solicitacoes")
+}
+
+model Evento {
+  id        String     @id @default(uuid())
+  petId     String     @map("pet_id")
+  tipo      EventoTipo
+  titulo    String
+  descricao String?
+  dados     Json?
+  autorId   String?    @map("autor_id")
+  criadoEm  DateTime   @default(now()) @map("criado_em")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@map("eventos")
+}
+
+model Notificacao {
+  id        String          @id @default(uuid())
+  usuarioId String          @map("usuario_id")
+  tipo      NotificacaoTipo
+  titulo    String
+  mensagem  String
+  lida      Boolean         @default(false)
+  lidaEm    DateTime?       @map("lida_em")
+  dados     Json?
+  deepLink  String?         @map("deep_link")
+  criadoEm  DateTime        @default(now()) @map("criado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([lida])
+  @@map("notificacoes")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  petId       String?  @map("pet_id")
+  atorId      String?  @map("ator_id")
+  acao        String
+  entidade    String
+  entidadeId  String?  @map("entidade_id")
+  dadosAntes  Json?    @map("dados_antes")
+  dadosDepois Json?    @map("dados_depois")
+  ip          String?
+  criadoEm    DateTime @default(now()) @map("criado_em")
+
+  pet  Pet?     @relation(fields: [petId], references: [id], onDelete: SetNull)
+  ator Usuario? @relation("AuditLogAtor", fields: [atorId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  usuarioId String?  @map("usuario_id")
+  tipo      String
+  mensagem  String
+  dados     Json?
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@map("feedbacks")
+}
