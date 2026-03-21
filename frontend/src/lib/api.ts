@@ -215,6 +215,47 @@ export const healthApi = {
       () => api.put(`/pets/${petId}/health/plano-saude`, data),
       () => mockHealthApi.upsertPlano(petId, data),
     ),
+  // ─── Carteira de Vacinacao ───────────────────────────
+  recomendacoesVacina: (petId: string) =>
+    tryReal(
+      () => api.get(`/pets/${petId}/health/recomendacoes-vacina`),
+      () => mockHealthApi.recomendacoesVacina(petId),
+    ),
+  recomendarVacina: (petId: string, data: { nomeVacina: string; nota?: string }) =>
+    tryReal(
+      () => api.post(`/pets/${petId}/health/recomendacoes-vacina`, data),
+      () => mockHealthApi.recomendarVacina(petId, data),
+    ),
+  removerRecomendacao: (petId: string, recId: string) =>
+    tryReal(
+      () => api.delete(`/pets/${petId}/health/recomendacoes-vacina/${recId}`),
+      () => mockHealthApi.removerRecomendacao(petId, recId),
+    ),
+  agendamentosVacina: (petId: string) =>
+    tryReal(
+      () => api.get(`/pets/${petId}/health/agendamentos-vacina`),
+      () => mockHealthApi.agendamentosVacina(petId),
+    ),
+  agendarVacina: (petId: string, data: { nomeVacina: string; dataAgendada: string }) =>
+    tryReal(
+      () => api.post(`/pets/${petId}/health/agendamentos-vacina`, data),
+      () => mockHealthApi.agendarVacina(petId, data),
+    ),
+  confirmarAgendamento: (petId: string, agId: string) =>
+    tryReal(
+      () => api.patch(`/pets/${petId}/health/agendamentos-vacina/${agId}/confirmar`),
+      () => mockHealthApi.confirmarAgendamento(petId, agId),
+    ),
+  cancelarAgendamento: (petId: string, agId: string) =>
+    tryReal(
+      () => api.patch(`/pets/${petId}/health/agendamentos-vacina/${agId}/cancelar`),
+      () => mockHealthApi.cancelarAgendamento(petId, agId),
+    ),
+  lembrarTutorVacina: (petId: string, nomeVacina: string) =>
+    tryReal(
+      () => api.post(`/pets/${petId}/health/vacinas/lembrar`, { nomeVacina }),
+      () => mockHealthApi.lembrarTutorVacina(petId, nomeVacina),
+    ),
 };
 
 // ─── Custody ──────────────────────────────────────────────────────────────────

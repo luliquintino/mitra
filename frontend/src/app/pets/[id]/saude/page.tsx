@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { petsApi, healthApi, compromissosApi } from '@/lib/api';
-import { Pet, Vacina, Medicamento, Sintoma, PlanoSaude, Compromisso } from '@/types';
+import { Pet, Vacina, Medicamento, Sintoma, PlanoSaude, Compromisso, RecomendacaoVacina, AgendamentoVacina } from '@/types';
 import { formatDate, cn } from '@/lib/utils';
 
 // ─── Species-specific data ──────────────────────────────────────────────────
@@ -135,9 +135,10 @@ function ConfirmationBanner({ message }: { message: string }) {
 
 // ─── Sub-tab types ───────────────────────────────────────────────────────────
 
-type SubTab = 'vacinas' | 'medicamentos' | 'sintomas' | 'plano' | 'consultas';
+type SubTab = 'carteira' | 'vacinas' | 'medicamentos' | 'sintomas' | 'plano' | 'consultas';
 
-const SUBTABS: { id: SubTab; label: string }[] = [
+const SUBTABS: { id: SubTab; label: string; emoji?: string }[] = [
+  { id: 'carteira', label: 'Carteira', emoji: '📋' },
   { id: 'vacinas', label: 'Vacinas' },
   { id: 'medicamentos', label: 'Medicamentos' },
   { id: 'sintomas', label: 'Sintomas' },
@@ -927,6 +928,534 @@ function ConsultasTab({ compromissos }: { compromissos: Compromisso[] }) {
   );
 }
 
+// ─── Carteira de Vacinacao Tab ───────────────────────────────────────────────
+
+const BADGE_DEFS = [
+  { id: 'primeira', icon: '🛡️', label: 'Primeira vacina', check: (applied: number) => applied >= 1 },
+  { id: 'dia', icon: '💉', label: 'Dia em dia', check: (_a: number, _t: number, overdue: number) => overdue === 0 && _a > 0 },
+  { id: 'total', icon: '🏆', label: 'Protecao total', check: (applied: number, total: number) => total > 0 && applied >= total },
+  { id: 'vet', icon: '⭐', label: 'Vet de confianca', check: (_a: number, _t: number, _o: number, hasVet: boolean) => hasVet },
+] as const;
+
+function ProtectionRing({ percentage }: { percentage: number }) {
+  const r = 44;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (percentage / 100) * circ;
+  const color = percentage < 40 ? '#F28B6E' : percentage < 70 ? '#E8C547' : '#7ECBA1';
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" className="transform -rotate-90">
+      <circle cx="50" cy="50" r={r} fill="none" stroke="#f0ebe4" strokeWidth="8" />
+      <circle
+        cx="50" cy="50" r={r} fill="none"
+        stroke={color} strokeWidth="8" strokeLinecap="round"
+        strokeDasharray={circ} strokeDashoffset={offset}
+        className="transition-all duration-1000 ease-out"
+      />
+    </svg>
+  );
+}
+
+function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
+  petId: string; pet: Pet | null; vacinas: Vacina[]; especie: string; role?: string; onUpdate: () => void;
+}) {
+  const [recomendacoes, setRecomendacoes] = useState<RecomendacaoVacina[]>([]);
+  const [agendamentos, setAgendamentos] = useState<AgendamentoVacina[]>([]);
+  const [loadingCarteira, setLoadingCarteira] = useState(true);
+  const [confirmation, setConfirmation] = useState('');
+  const [showRecForm, setShowRecForm] = useState(false);
+  const [showAgForm, setShowAgForm] = useState(false);
+  const [recForm, setRecForm] = useState({ nomeVacina: '', nota: '' });
+  const [agForm, setAgForm] = useState({ nomeVacina: '', dataAgendada: '' });
+  const [saving, setSaving] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  const isVet = role === 'VETERINARIO' || role === 'VETERINARIA';
+
+  const loadCarteira = useCallback(async () => {
+    try {
+      const [recRes, agRes] = await Promise.all([
+        healthApi.recomendacoesVacina(petId).catch(() => ({ data: [] })),
+        healthApi.agendamentosVacina(petId).catch(() => ({ data: [] })),
+      ]);
+      setRecomendacoes(Array.isArray(recRes.data) ? recRes.data : []);
+      setAgendamentos(Array.isArray(agRes.data) ? agRes.data : []);
+    } catch { /* silent */ } finally {
+      setLoadingCarteira(false);
+    }
+  }, [petId]);
+
+  useEffect(() => { loadCarteira(); }, [loadCarteira]);
+
+  // ─── Compute protection ──────────────────────────────────────────────────
+  const vacinasEspecie = VACINAS_POR_ESPECIE[especie] ?? [];
+  const recNomes = recomendacoes.map(r => r.nomeVacina);
+  const allRecommended = Array.from(new Set([...vacinasEspecie, ...recNomes]));
+
+  // Normalize para comparacao (lowercase, sem acentos basico)
+  const normalize = (s: string) => s.toLowerCase().replace(/[áàã]/g, 'a').replace(/[éê]/g, 'e').replace(/[íî]/g, 'i').replace(/[óõô]/g, 'o').replace(/[úû]/g, 'u').replace(/[ç]/g, 'c').replace(/[()]/, '').trim();
+
+  const appliedNames = new Set(vacinas.map(v => normalize(v.nome)));
+  const agendadoNames = new Set(
+    agendamentos.filter(a => a.status === 'PENDENTE' || a.status === 'CONFIRMADA').map(a => normalize(a.nomeVacina))
+  );
+
+  // Vacinas aplicadas com protecao ativa (nao vencidas)
+  const vacinasProtegidas = vacinas.filter(v => {
+    if (!v.proximaDose) return true;
+    return new Date(v.proximaDose) > new Date();
+  });
+  const protectedNames = new Set(vacinasProtegidas.map(v => normalize(v.nome)));
+
+  const totalRecommended = allRecommended.length;
+  const totalProtected = allRecommended.filter(name => protectedNames.has(normalize(name))).length;
+  const percentage = totalRecommended > 0 ? Math.round((totalProtected / totalRecommended) * 100) : 0;
+
+  const protectionLabel = percentage < 40 ? 'Protecao inicial' : percentage < 70 ? 'Bem protegido' : 'Imunizacao completa';
+  const protectionEmoji = percentage < 40 ? '🛡️' : percentage < 70 ? '💪' : '🏆';
+
+  // Overdue count
+  const overdueCount = vacinas.filter(v => vacinaAlertStatus(v.proximaDose) === 'overdue').length;
+
+  // Has vet linked
+  const hasVet = (pet?.petUsuarios || []).some(pu => pu.role === 'VETERINARIO' || pu.role === 'VETERINARIA' as any);
+
+  // Badges
+  const badges = BADGE_DEFS.map(b => ({
+    ...b,
+    earned: b.check(vacinasProtegidas.length, totalRecommended, overdueCount, hasVet),
+  }));
+
+  // Categorize vaccines
+  const appliedVacinas = vacinas.sort((a, b) => new Date(b.dataAplicacao).getTime() - new Date(a.dataAplicacao).getTime());
+
+  const activeAgendamentos = agendamentos.filter(a => a.status === 'PENDENTE' || a.status === 'CONFIRMADA');
+
+  const pendingVacinas = allRecommended.filter(name => {
+    const n = normalize(name);
+    return !appliedNames.has(n) && !agendadoNames.has(n);
+  });
+
+  // Next upcoming
+  const nextVacina = [...vacinas]
+    .filter(v => v.proximaDose && new Date(v.proximaDose) > new Date())
+    .sort((a, b) => new Date(a.proximaDose!).getTime() - new Date(b.proximaDose!).getTime())[0];
+
+  const nextAgendamento = activeAgendamentos
+    .sort((a, b) => new Date(a.dataAgendada).getTime() - new Date(b.dataAgendada).getTime())[0];
+
+  // Confetti trigger
+  useEffect(() => {
+    if (percentage === 100 && !showConfetti) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
+  }, [percentage, showConfetti]);
+
+  // ─── Actions ─────────────────────────────────────────────────────────────
+  const flash = (msg: string) => { setConfirmation(msg); setTimeout(() => setConfirmation(''), 4000); };
+
+  const handleConfirmar = async (agId: string) => {
+    try {
+      await healthApi.confirmarAgendamento(petId, agId);
+      flash('Agendamento confirmado!');
+      loadCarteira();
+    } catch { flash('Erro ao confirmar.'); }
+  };
+
+  const handleCancelar = async (agId: string) => {
+    try {
+      await healthApi.cancelarAgendamento(petId, agId);
+      flash('Agendamento cancelado.');
+      loadCarteira();
+    } catch { flash('Erro ao cancelar.'); }
+  };
+
+  const handleLembrar = async (nomeVacina: string) => {
+    try {
+      const { data } = await healthApi.lembrarTutorVacina(petId, nomeVacina);
+      flash((data as any).mensagem || 'Lembrete enviado!');
+    } catch { flash('Erro ao enviar lembrete.'); }
+  };
+
+  const handleRecomendar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await healthApi.recomendarVacina(petId, recForm);
+      flash(`Vacina "${recForm.nomeVacina}" recomendada ao tutor!`);
+      setShowRecForm(false);
+      setRecForm({ nomeVacina: '', nota: '' });
+      loadCarteira();
+      onUpdate();
+    } catch { flash('Erro ao recomendar.'); }
+    finally { setSaving(false); }
+  };
+
+  const handleAgendar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await healthApi.agendarVacina(petId, agForm);
+      flash(`Vacina "${agForm.nomeVacina}" agendada!`);
+      setShowAgForm(false);
+      setAgForm({ nomeVacina: '', dataAgendada: '' });
+      loadCarteira();
+      onUpdate();
+    } catch { flash('Erro ao agendar.'); }
+    finally { setSaving(false); }
+  };
+
+  // ─── Render ──────────────────────────────────────────────────────────────
+
+  if (loadingCarteira) {
+    return (
+      <div className="space-y-4">
+        <div className="pt-card"><div className="h-32 pt-skeleton rounded-xl" /></div>
+        <div className="flex gap-3">{[1,2,3,4].map(i => <div key={i} className="h-16 w-16 pt-skeleton rounded-xl" />)}</div>
+        {[1,2,3].map(i => <div key={i} className="pt-card"><div className="h-20 pt-skeleton rounded-xl" /></div>)}
+      </div>
+    );
+  }
+
+  const vacinasDisponiveisForm = Array.from(new Set([...vacinasEspecie, ...pendingVacinas])).filter(Boolean);
+
+  return (
+    <div className="space-y-5">
+      <ConfirmationBanner message={confirmation} />
+
+      {/* Confetti */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-bounce"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `-${Math.random() * 20}px`,
+                animationDelay: `${Math.random() * 1}s`,
+                animationDuration: `${1.5 + Math.random() * 2}s`,
+                fontSize: `${12 + Math.random() * 16}px`,
+              }}
+            >
+              {['🎉', '⭐', '🏆', '💉', '🛡️', '✨'][Math.floor(Math.random() * 6)]}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Capa da Caderneta ──────────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl p-5 relative overflow-hidden">
+        {/* Dot grid background */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)',
+          backgroundSize: '16px 16px',
+        }} />
+
+        <div className="relative flex items-center gap-5">
+          {/* Pet photo + ring */}
+          <div className="relative flex-shrink-0">
+            <ProtectionRing percentage={percentage} />
+            <div className="absolute inset-0 flex items-center justify-center">
+              {pet?.fotoUrl ? (
+                <img src={pet.fotoUrl} alt={pet.nome} className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-creme flex items-center justify-center text-2xl border-2 border-white">
+                  {pet?.especie === 'GATO' ? '🐱' : '🐶'}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="font-headline font-bold text-texto text-lg truncate">{pet?.nome || 'Pet'}</h3>
+              <span className="text-base">{protectionEmoji}</span>
+            </div>
+            <p className="text-sm text-texto-soft">{pet?.especie ? pet.especie.charAt(0) + pet.especie.slice(1).toLowerCase() : ''} {pet?.raca ? `\u00B7 ${pet.raca}` : ''}</p>
+
+            <div className="mt-2 flex items-center gap-2">
+              <span className={cn(
+                'text-2xl font-headline font-bold',
+                percentage < 40 ? 'text-coral' : percentage < 70 ? 'text-yellow-600' : 'text-menta',
+              )}>{percentage}%</span>
+              <span className="text-xs text-texto-soft">{protectionLabel}</span>
+            </div>
+
+            {/* Next upcoming */}
+            {(nextVacina || nextAgendamento) && (
+              <div className="mt-2 px-3 py-1.5 bg-creme rounded-lg inline-flex items-center gap-2">
+                <span className="text-xs">📅</span>
+                <span className="text-[11px] text-texto font-medium">
+                  {nextAgendamento
+                    ? `${nextAgendamento.nomeVacina} em ${formatDate(nextAgendamento.dataAgendada)}`
+                    : nextVacina
+                      ? `Proxima: ${nextVacina.nome} em ${formatDate(nextVacina.proximaDose!)}`
+                      : ''
+                  }
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Badges / Conquistas ────────────────────────────────────────────── */}
+      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
+        {badges.map(b => (
+          <div
+            key={b.id}
+            className={cn(
+              'flex flex-col items-center gap-1.5 min-w-[72px] px-3 py-3 rounded-xl border transition-all',
+              b.earned
+                ? 'bg-white border-menta/30 shadow-sm'
+                : 'bg-creme-dark/50 border-transparent opacity-40 grayscale',
+            )}
+          >
+            <span className="text-2xl">{b.icon}</span>
+            <span className="text-[10px] text-texto-soft font-medium text-center leading-tight">{b.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Vet Actions ────────────────────────────────────────────────────── */}
+      {isVet && (
+        <div className="flex gap-2">
+          <button onClick={() => setShowRecForm(!showRecForm)} className="pt-btn text-sm flex-1">
+            📋 Recomendar vacina
+          </button>
+          <button onClick={() => setShowAgForm(!showAgForm)} className="pt-btn-secondary text-sm flex-1">
+            📅 Agendar vacina
+          </button>
+        </div>
+      )}
+
+      {/* Rec form */}
+      {showRecForm && (
+        <form onSubmit={handleRecomendar} className="pt-card space-y-3 bg-azul-light/30">
+          <h3 className="font-headline font-semibold text-texto text-sm">Recomendar vacina</h3>
+          <div>
+            <label className="pt-label">Vacina *</label>
+            <select className="pt-input" value={recForm.nomeVacina} onChange={e => setRecForm(f => ({ ...f, nomeVacina: e.target.value }))} required>
+              <option value="">Selecione...</option>
+              {vacinasDisponiveisForm.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="pt-label">Nota para o tutor</label>
+            <input className="pt-input" placeholder="Ex: Recomendada por contato com outros caes..." value={recForm.nota} onChange={e => setRecForm(f => ({ ...f, nota: e.target.value }))} />
+          </div>
+          <div className="flex gap-2">
+            <button type="submit" disabled={saving} className="pt-btn text-sm flex-1">{saving ? 'Enviando...' : 'Recomendar'}</button>
+            <button type="button" onClick={() => setShowRecForm(false)} className="pt-btn-secondary text-sm px-4">Cancelar</button>
+          </div>
+        </form>
+      )}
+
+      {/* Ag form */}
+      {showAgForm && (
+        <form onSubmit={handleAgendar} className="pt-card space-y-3 bg-amarelo-light/30">
+          <h3 className="font-headline font-semibold text-texto text-sm">Agendar vacina</h3>
+          <div>
+            <label className="pt-label">Vacina *</label>
+            <select className="pt-input" value={agForm.nomeVacina} onChange={e => setAgForm(f => ({ ...f, nomeVacina: e.target.value }))} required>
+              <option value="">Selecione...</option>
+              {vacinasDisponiveisForm.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="pt-label">Data *</label>
+            <input type="date" className="pt-input" value={agForm.dataAgendada} onChange={e => setAgForm(f => ({ ...f, dataAgendada: e.target.value }))} required />
+          </div>
+          <div className="flex gap-2">
+            <button type="submit" disabled={saving} className="pt-btn text-sm flex-1">{saving ? 'Agendando...' : 'Agendar'}</button>
+            <button type="button" onClick={() => setShowAgForm(false)} className="pt-btn-secondary text-sm px-4">Cancelar</button>
+          </div>
+        </form>
+      )}
+
+      {/* ── Aplicadas (selos carimbados) ───────────────────────────────────── */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-6 h-6 rounded-full bg-menta/20 flex items-center justify-center text-xs">✅</div>
+          <h3 className="font-headline font-semibold text-texto text-sm">Aplicadas</h3>
+          <span className="text-xs text-texto-soft">({appliedVacinas.length})</span>
+        </div>
+
+        {appliedVacinas.length === 0 ? (
+          <p className="text-xs text-texto-soft pl-8">Nenhuma vacina aplicada ainda.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {appliedVacinas.map((v, idx) => {
+              const alert = vacinaAlertStatus(v.proximaDose);
+              const rotation = idx % 3 === 0 ? 'rotate-[1deg]' : idx % 3 === 1 ? '-rotate-[1deg]' : 'rotate-[0.5deg]';
+              return (
+                <div key={v.id} className={cn(
+                  'bg-white rounded-2xl p-4 border-2 transition-all hover:shadow-md',
+                  rotation,
+                  alert === 'overdue' ? 'border-red-300' : alert === 'soon' ? 'border-yellow-300' : 'border-menta/40',
+                )}>
+                  {/* Stamp header */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold',
+                        alert === 'overdue' ? 'bg-red-100 text-red-600' : alert === 'soon' ? 'bg-yellow-100 text-yellow-600' : 'bg-menta/20 text-menta',
+                      )}>
+                        {alert === 'overdue' ? '!' : alert === 'soon' ? '⏰' : '✓'}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-texto text-sm leading-tight">{v.nome}</p>
+                        <p className="text-[11px] text-texto-soft">{formatDate(v.dataAplicacao)}</p>
+                      </div>
+                    </div>
+                    {alert === 'overdue' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">Vencida</span>}
+                    {alert === 'soon' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-600 font-medium">Em breve</span>}
+                  </div>
+
+                  {/* Details */}
+                  <div className="mt-2 pl-10 space-y-0.5">
+                    {v.veterinario && <p className="text-[11px] text-texto-soft">🩺 {v.veterinario}{v.clinica ? ` \u00B7 ${v.clinica}` : ''}</p>}
+                    {v.lote && <p className="text-[11px] text-texto-soft">📦 Lote {v.lote}</p>}
+                    {v.proximaDose && (
+                      <p className={cn('text-[11px] font-medium', alert === 'overdue' ? 'text-red-500' : alert === 'soon' ? 'text-yellow-600' : 'text-menta')}>
+                        Proxima: {formatDate(v.proximaDose)}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Vet lembrar button */}
+                  {isVet && (alert === 'overdue' || alert === 'soon') && (
+                    <button onClick={() => handleLembrar(v.nome)} className="mt-2 ml-10 text-[11px] text-coral font-medium hover:underline">
+                      🔔 Lembrar tutor
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Agendadas ──────────────────────────────────────────────────────── */}
+      {activeAgendamentos.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-6 h-6 rounded-full bg-amarelo/20 flex items-center justify-center text-xs">📅</div>
+            <h3 className="font-headline font-semibold text-texto text-sm">Agendadas</h3>
+            <span className="text-xs text-texto-soft">({activeAgendamentos.length})</span>
+          </div>
+
+          <div className="space-y-3">
+            {activeAgendamentos.map(ag => {
+              const daysUntil = Math.ceil((new Date(ag.dataAgendada).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+              const isPast = daysUntil < 0;
+              return (
+                <div key={ag.id} className="bg-white rounded-2xl p-4 border-2 border-dashed border-amarelo/50">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amarelo/20 flex items-center justify-center text-sm">📅</div>
+                      <div>
+                        <p className="font-semibold text-texto text-sm">{ag.nomeVacina}</p>
+                        <p className="text-[11px] text-texto-soft">{formatDate(ag.dataAgendada)}</p>
+                        {ag.veterinarioNome && <p className="text-[11px] text-texto-soft">🩺 {ag.veterinarioNome}</p>}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className={cn(
+                        'text-[10px] px-2 py-0.5 rounded-full font-medium',
+                        ag.status === 'CONFIRMADA' ? 'bg-menta/20 text-menta' : 'bg-amarelo/20 text-yellow-700',
+                      )}>
+                        {ag.status === 'CONFIRMADA' ? 'Confirmada' : 'Aguardando'}
+                      </span>
+                      <p className={cn('text-[11px] font-medium mt-1', isPast ? 'text-red-500' : 'text-amarelo')}>
+                        {isPast ? 'Atrasada' : `Em ${daysUntil} dia${daysUntil === 1 ? '' : 's'}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  {ag.status === 'PENDENTE' && (
+                    <div className="flex gap-2 mt-3 pl-11">
+                      <button onClick={() => handleConfirmar(ag.id)} className="pt-btn text-[11px] px-3 py-1.5">Confirmar</button>
+                      <button onClick={() => handleCancelar(ag.id)} className="pt-btn-ghost text-[11px] px-3 py-1.5 text-red-500">Cancelar</button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Pendentes (nao marcou) ─────────────────────────────────────────── */}
+      {pendingVacinas.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-6 h-6 rounded-full bg-coral/20 flex items-center justify-center text-xs">⚠️</div>
+            <h3 className="font-headline font-semibold text-texto text-sm">Pendentes</h3>
+            <span className="text-xs text-texto-soft">({pendingVacinas.length})</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {pendingVacinas.map(name => {
+              const rec = recomendacoes.find(r => r.nomeVacina === name);
+              const isFromSpecies = vacinasEspecie.includes(name);
+              return (
+                <div key={name} className="bg-coral/[0.04] rounded-2xl p-4 border-2 border-dashed border-coral/30">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-coral/10 flex items-center justify-center text-sm">💉</div>
+                      <div>
+                        <p className="font-semibold text-texto text-sm">{name}</p>
+                        {rec ? (
+                          <p className="text-[11px] text-azul font-medium">📋 Recomendada por {rec.veterinarioNome}</p>
+                        ) : isFromSpecies ? (
+                          <p className="text-[11px] text-texto-soft">Recomendada para {especie.charAt(0) + especie.slice(1).toLowerCase()}</p>
+                        ) : null}
+                        {rec?.nota && <p className="text-[11px] text-texto-soft italic mt-0.5">&ldquo;{rec.nota}&rdquo;</p>}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 mt-3 pl-11">
+                    {isVet ? (
+                      <>
+                        <button
+                          onClick={() => { setAgForm({ nomeVacina: name, dataAgendada: '' }); setShowAgForm(true); }}
+                          className="pt-btn text-[11px] px-3 py-1.5"
+                        >
+                          📅 Agendar
+                        </button>
+                        <button onClick={() => handleLembrar(name)} className="pt-btn-ghost text-[11px] px-3 py-1.5">
+                          🔔 Lembrar tutor
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => { setAgForm({ nomeVacina: name, dataAgendada: '' }); setShowAgForm(true); }}
+                        className="pt-btn text-[11px] px-3 py-1.5"
+                      >
+                        📅 Agendar
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {appliedVacinas.length === 0 && activeAgendamentos.length === 0 && pendingVacinas.length === 0 && (
+        <EmptyState icon="📋" title="Carteira vazia" description="Registre vacinas na aba Vacinas para preencher a carteira do seu pet." />
+      )}
+    </div>
+  );
+}
+
 // ─── Main Saude Page ─────────────────────────────────────────────────────────
 
 export default function SaudePage() {
@@ -940,7 +1469,7 @@ export default function SaudePage() {
   const [plano, setPlano] = useState<PlanoSaude | null>(null);
   const [compromissos, setCompromissos] = useState<Compromisso[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<SubTab>('vacinas');
+  const [activeTab, setActiveTab] = useState<SubTab>('carteira');
 
   // ─── Data loading ──────────────────────────────────────────────────────────
 
@@ -1058,6 +1587,9 @@ export default function SaudePage() {
 
       {/* Tab content */}
       <div>
+        {activeTab === 'carteira' && (
+          <CarteiraTab petId={petId} pet={pet} vacinas={vacinas} especie={pet?.especie || 'OUTRO'} role={pet?.meuRole} onUpdate={loadData} />
+        )}
         {activeTab === 'vacinas' && (
           <VacinasTab petId={petId} especie={pet?.especie || 'OUTRO'} vacinas={vacinas} onUpdate={loadData} />
         )}

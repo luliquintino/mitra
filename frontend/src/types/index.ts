@@ -342,6 +342,29 @@ export interface Registro {
   dados?: Record<string, unknown>;
 }
 
+// ─── Carteira de Vacinacao ─────────────────────────────────────────────────────
+
+export interface RecomendacaoVacina {
+  id: string;
+  petId: string;
+  nomeVacina: string;
+  veterinarioId: string;
+  veterinarioNome: string;
+  nota?: string;
+  criadoEm: string;
+}
+
+export interface AgendamentoVacina {
+  id: string;
+  petId: string;
+  nomeVacina: string;
+  dataAgendada: string;
+  veterinarioId?: string;
+  veterinarioNome?: string;
+  status: 'PENDENTE' | 'CONFIRMADA' | 'REAGENDADA' | 'CANCELADA';
+  criadoEm: string;
+}
+
 // Novos EventoTipos suportados (complementam o tipo string em Evento)
 // 'CONSULTA_REGISTRADA' | 'EXAME_ANEXADO'
 // 'VISITA_REGISTRADA' | 'ALIMENTACAO_REGISTRADA'

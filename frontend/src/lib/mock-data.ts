@@ -13,6 +13,8 @@ import type {
   DashboardData,
   Compromisso,
   VisitantePet,
+  RecomendacaoVacina,
+  AgendamentoVacina,
 } from '@/types';
 
 // ─── Usuários ────────────────────────────────────
@@ -538,6 +540,56 @@ export const mockDashboardMochi: DashboardData = {
     },
   ],
 };
+
+// ─── Recomendacoes de Vacina ─────────────────────────
+export const mockRecomendacoesLuna: RecomendacaoVacina[] = [
+  {
+    id: 'rec-1',
+    petId: 'pet-luna',
+    nomeVacina: 'Leishmaniose',
+    veterinarioId: 'usr-vet',
+    veterinarioNome: 'Dr. Roberto Silva',
+    nota: 'Recomendada pois Luna frequenta areas com risco de mosquitos transmissores.',
+    criadoEm: '2026-02-15T10:00:00Z',
+  },
+  {
+    id: 'rec-2',
+    petId: 'pet-luna',
+    nomeVacina: 'Giardia',
+    veterinarioId: 'usr-vet',
+    veterinarioNome: 'Dr. Roberto Silva',
+    nota: 'Reforco recomendado por contato frequente com outros caes no parque.',
+    criadoEm: '2026-02-20T10:00:00Z',
+  },
+];
+
+export const mockRecomendacoesMochi: RecomendacaoVacina[] = [];
+
+// ─── Agendamentos de Vacina ─────────────────────────
+export const mockAgendamentosLuna: AgendamentoVacina[] = [
+  {
+    id: 'ag-1',
+    petId: 'pet-luna',
+    nomeVacina: 'V10 (Dectupla)',
+    dataAgendada: '2026-04-10T14:00:00Z',
+    veterinarioId: 'usr-vet',
+    veterinarioNome: 'Dr. Roberto Silva',
+    status: 'PENDENTE',
+    criadoEm: '2026-03-15T10:00:00Z',
+  },
+  {
+    id: 'ag-2',
+    petId: 'pet-luna',
+    nomeVacina: 'Leishmaniose',
+    dataAgendada: '2026-04-20T10:00:00Z',
+    veterinarioId: 'usr-vet',
+    veterinarioNome: 'Dr. Roberto Silva',
+    status: 'CONFIRMADA',
+    criadoEm: '2026-03-10T10:00:00Z',
+  },
+];
+
+export const mockAgendamentosMochi: AgendamentoVacina[] = [];
 
 // ─── Notificações ─────────────────────────────────
 export const mockNotificacoes: Notificacao[] = [

@@ -21,6 +21,10 @@ import {
   mockNotificacoes,
   mockCompromissosLuna,
   mockVisitantePets,
+  mockRecomendacoesLuna,
+  mockRecomendacoesMochi,
+  mockAgendamentosLuna,
+  mockAgendamentosMochi,
 } from './mock-data';
 
 import type {
@@ -34,6 +38,8 @@ import type {
   Pet,
   Compromisso,
   VisitantePet,
+  RecomendacaoVacina,
+  AgendamentoVacina,
 } from '@/types';
 
 // ─── State local (simula DB em memória) ──────────────────────────────────────
@@ -85,6 +91,14 @@ let _compromissos: Record<string, Compromisso[]> = {
 };
 
 let _guardasTemporarias: Record<string, any[]> = {};
+let _recomendacoes: Record<string, RecomendacaoVacina[]> = {
+  'pet-luna': [...mockRecomendacoesLuna],
+  'pet-mochi': [...mockRecomendacoesMochi],
+};
+let _agendamentos: Record<string, AgendamentoVacina[]> = {
+  'pet-luna': [...mockAgendamentosLuna],
+  'pet-mochi': [...mockAgendamentosMochi],
+};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -416,6 +430,82 @@ export const mockHealthApi = {
   },
 
   planoSaude: async (petId: string) => delay(_planos[petId]),
+
+  // ─── Carteira de Vacinacao ───────────────────────────────────────────────────
+
+  recomendacoesVacina: async (petId: string) => delay(_recomendacoes[petId] || []),
+
+  recomendarVacina: async (petId: string, data: { nomeVacina: string; nota?: string }) => {
+    const rec: RecomendacaoVacina = {
+      id: uuid(),
+      petId,
+      nomeVacina: data.nomeVacina,
+      veterinarioId: _user.id,
+      veterinarioNome: _user.nome,
+      nota: data.nota,
+      criadoEm: new Date().toISOString(),
+    };
+    if (!_recomendacoes[petId]) _recomendacoes[petId] = [];
+    _recomendacoes[petId].unshift(rec);
+    addEvento(petId, 'VACINA_RECOMENDADA', `Vacina recomendada: ${data.nomeVacina}`, `${_user.nome} recomendou ${data.nomeVacina}. ${data.nota || ''}`);
+    return delay(rec);
+  },
+
+  removerRecomendacao: async (petId: string, recId: string) => {
+    _recomendacoes[petId] = (_recomendacoes[petId] || []).filter((r) => r.id !== recId);
+    return delay({ mensagem: 'Recomendacao removida.' });
+  },
+
+  agendamentosVacina: async (petId: string) => delay(_agendamentos[petId] || []),
+
+  agendarVacina: async (petId: string, data: { nomeVacina: string; dataAgendada: string }) => {
+    const ag: AgendamentoVacina = {
+      id: uuid(),
+      petId,
+      nomeVacina: data.nomeVacina,
+      dataAgendada: data.dataAgendada,
+      veterinarioId: _user.id,
+      veterinarioNome: _user.nome,
+      status: 'PENDENTE',
+      criadoEm: new Date().toISOString(),
+    };
+    if (!_agendamentos[petId]) _agendamentos[petId] = [];
+    _agendamentos[petId].unshift(ag);
+    addEvento(petId, 'VACINA_AGENDADA', `Vacina agendada: ${data.nomeVacina}`, `Agendada para ${new Date(data.dataAgendada).toLocaleDateString('pt-BR')} por ${_user.nome}.`);
+    return delay(ag);
+  },
+
+  confirmarAgendamento: async (petId: string, agId: string) => {
+    _agendamentos[petId] = (_agendamentos[petId] || []).map((a) =>
+      a.id === agId ? { ...a, status: 'CONFIRMADA' as const } : a,
+    );
+    const ag = (_agendamentos[petId] || []).find((a) => a.id === agId);
+    if (ag) addEvento(petId, 'VACINA_CONFIRMADA', `Agendamento confirmado: ${ag.nomeVacina}`, `${_user.nome} confirmou o agendamento.`);
+    return delay(ag);
+  },
+
+  cancelarAgendamento: async (petId: string, agId: string) => {
+    _agendamentos[petId] = (_agendamentos[petId] || []).map((a) =>
+      a.id === agId ? { ...a, status: 'CANCELADA' as const } : a,
+    );
+    return delay({ mensagem: 'Agendamento cancelado.' });
+  },
+
+  lembrarTutorVacina: async (petId: string, nomeVacina: string) => {
+    const pet = _pets.find((p) => p.id === petId);
+    const nome = pet?.nome || 'Pet';
+    _notifications.unshift({
+      id: uuid(),
+      usuarioId: (_tutores[petId] || [])[0]?.usuarioId || _user.id,
+      tipo: 'VACINA_LEMBRETE',
+      titulo: `Lembrete de vacina: ${nomeVacina}`,
+      mensagem: `${_user.nome} lembrou sobre a vacina ${nomeVacina} de ${nome}. Agende o quanto antes!`,
+      lida: false,
+      deepLink: `/pets/${petId}/saude`,
+      criadoEm: new Date().toISOString(),
+    });
+    return delay({ mensagem: `Lembrete enviado ao tutor sobre ${nomeVacina}.` });
+  },
 
   upsertPlano: async (petId: string, data: any) => {
     const plano: PlanoSaude = {
