@@ -224,6 +224,9 @@ export const mockSintomasLuna: Sintoma[] = [
     dataInicio: '2026-02-23T10:00:00Z',
     intensidade: 2,
     observacoes: 'Pode ser reação ao capim do parque',
+    evidencias: [
+      'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300&h=300&fit=crop&auto=format',
+    ],
     criadoEm: '2026-02-23T10:00:00Z',
   },
 ];

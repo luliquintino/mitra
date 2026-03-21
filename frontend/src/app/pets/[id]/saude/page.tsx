@@ -534,14 +534,49 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
 }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ descricao: '', dataInicio: '', dataFim: '', intensidade: '', observacoes: '' });
+  const [fotos, setFotos] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [confirmation, setConfirmation] = useState('');
   const [saveError, setSaveError] = useState('');
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   const handleCancel = () => {
     setShowForm(false);
     setForm({ descricao: '', dataInicio: '', dataFim: '', intensidade: '', observacoes: '' });
+    setFotos([]);
     setSaveError('');
+  };
+
+  const handleFotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const maxFiles = 5;
+    const maxSizeMB = 5;
+
+    Array.from(files).forEach(file => {
+      if (fotos.length >= maxFiles) return;
+      if (file.size > maxSizeMB * 1024 * 1024) {
+        setSaveError(`Arquivo ${file.name} excede ${maxSizeMB}MB.`);
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        setSaveError(`Arquivo ${file.name} nao e uma imagem.`);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setFotos(prev => prev.length < maxFiles ? [...prev, reader.result as string] : prev);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+  };
+
+  const removeFoto = (index: number) => {
+    setFotos(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -556,6 +591,7 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
         dataFim: form.dataFim || undefined,
         intensidade: form.intensidade ? intensidadeMap[form.intensidade] || undefined : undefined,
         observacoes: form.observacoes || undefined,
+        evidencias: fotos.length > 0 ? fotos : undefined,
       });
       setConfirmation((data as any).mensagem || 'Sintoma registrado com sucesso!');
       handleCancel();
@@ -611,6 +647,50 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
             <label className="pt-label">Observacoes</label>
             <textarea className="pt-input resize-none" rows={2} placeholder="Observacoes adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
           </div>
+
+          {/* Photo upload */}
+          <div>
+            <label className="pt-label">Fotos do sintoma</label>
+            <p className="text-[11px] text-texto-soft mb-2">Anexe ate 5 fotos para ajudar a veterinaria a analisar. Max 5MB cada.</p>
+
+            {/* Preview grid */}
+            {fotos.length > 0 && (
+              <div className="flex gap-2 flex-wrap mb-2">
+                {fotos.map((src, idx) => (
+                  <div key={idx} className="relative group">
+                    <img
+                      src={src}
+                      alt={`Foto ${idx + 1}`}
+                      className="w-20 h-20 rounded-xl object-cover border-2 border-creme-dark cursor-pointer hover:border-coral transition-colors"
+                      onClick={() => setLightbox(src)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeFoto(idx)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {fotos.length < 5 && (
+              <label className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-coral/30 bg-coral/[0.03] cursor-pointer hover:border-coral/50 hover:bg-coral/[0.06] transition-all">
+                <span className="text-lg">📷</span>
+                <span className="text-sm text-coral font-medium">{fotos.length === 0 ? 'Adicionar fotos' : `Adicionar mais (${fotos.length}/5)`}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleFotoUpload}
+                />
+              </label>
+            )}
+          </div>
+
           {saveError && <p className="text-xs text-erro">{saveError}</p>}
           <div className="flex gap-2 pt-1">
             <button type="submit" disabled={saving} className="pt-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Registrar sintoma'}</button>
@@ -648,6 +728,21 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
                           )}
                         </div>
                         {s.observacoes && <p className="text-xs text-texto-soft mt-1">{s.observacoes}</p>}
+                        {/* Evidencias / fotos */}
+                        {s.evidencias && s.evidencias.length > 0 && (
+                          <div className="flex gap-2 mt-2 flex-wrap">
+                            {s.evidencias.map((src, idx) => (
+                              <img
+                                key={idx}
+                                src={src}
+                                alt={`Evidencia ${idx + 1}`}
+                                className="w-16 h-16 rounded-lg object-cover border border-creme-dark cursor-pointer hover:border-coral hover:shadow-md transition-all"
+                                onClick={() => setLightbox(src)}
+                              />
+                            ))}
+                            <span className="text-[10px] text-texto-soft self-end pb-1">📷 {s.evidencias.length} foto{s.evidencias.length > 1 ? 's' : ''}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -674,6 +769,20 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
                             </span>
                           )}
                         </div>
+                        {/* Evidencias / fotos */}
+                        {s.evidencias && s.evidencias.length > 0 && (
+                          <div className="flex gap-2 mt-2 flex-wrap">
+                            {s.evidencias.map((src, idx) => (
+                              <img
+                                key={idx}
+                                src={src}
+                                alt={`Evidencia ${idx + 1}`}
+                                className="w-14 h-14 rounded-lg object-cover border border-creme-dark cursor-pointer hover:border-coral transition-all"
+                                onClick={() => setLightbox(src)}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -681,6 +790,24 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
               })}
             </>
           )}
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setLightbox(null)}
+        >
+          <div className="relative max-w-lg max-h-[80vh]" onClick={e => e.stopPropagation()}>
+            <img src={lightbox} alt="Evidencia ampliada" className="max-w-full max-h-[80vh] rounded-2xl object-contain shadow-2xl" />
+            <button
+              onClick={() => setLightbox(null)}
+              className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white text-texto shadow-lg flex items-center justify-center text-sm font-bold hover:bg-creme transition-colors"
+            >
+              &times;
+            </button>
+          </div>
         </div>
       )}
     </div>
