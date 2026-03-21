@@ -55,11 +55,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  AGENDADA: 'bg-amarelo/20 text-amarelo-dark',
-  CONFIRMADA: 'bg-menta/20 text-menta-dark',
-  EM_ANDAMENTO: 'bg-menta/20 text-menta-dark',
-  CONCLUIDA: 'bg-azul/20 text-azul-dark',
-  CANCELADA: 'bg-erro/20 text-erro',
+  AGENDADA: 'bg-amarelo-light text-amarelo',
+  CONFIRMADA: 'bg-menta-light text-menta',
+  EM_ANDAMENTO: 'bg-menta-light text-menta',
+  CONCLUIDA: 'bg-azul-light text-azul',
+  CANCELADA: 'bg-erro/10 text-erro',
 };
 
 const CUSTODY_EVENT_TYPES = [
@@ -195,8 +195,20 @@ export default function GuardaPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-3 border-coral border-t-transparent rounded-full animate-spin" />
+      <div className="space-y-4">
+        <div className="h-6 w-48 pt-skeleton rounded-lg" />
+        <div className="h-4 w-64 pt-skeleton rounded-lg" />
+        <div className="pt-card space-y-4">
+          <div className="h-16 pt-skeleton rounded-xl" />
+        </div>
+        <div className="pt-card space-y-3">
+          <div className="h-14 pt-skeleton rounded-xl" />
+          <div className="h-14 pt-skeleton rounded-xl" />
+        </div>
+        <div className="pt-card space-y-3">
+          <div className="h-14 pt-skeleton rounded-xl" />
+          <div className="h-14 pt-skeleton rounded-xl" />
+        </div>
       </div>
     );
   }
@@ -204,102 +216,106 @@ export default function GuardaPage() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header */}
-      <div className="text-center mb-6">
-        <h2 className="font-headline font-extrabold text-4xl tracking-tighter text-coral mb-1">
-          Guarda
-        </h2>
-        <p className="text-azul font-medium text-base">
-          Gerencie a guarda e custodia do pet
-        </p>
+    <div className="space-y-6 animate-fade-in">
+      {/* Section header */}
+      <div>
+        <h2 className="font-headline text-xl font-bold text-texto">Guarda</h2>
+        <p className="text-sm text-texto-soft font-body">Gerencie a guarda e custodia do pet</p>
       </div>
 
       {/* ── 1. GUARDA ATUAL ──────────────────────────────────────────────────── */}
-      <section>
-        <h3 className="font-headline font-bold text-lg text-menta-dark mb-3 tracking-tight">
-          Guarda Atual
-        </h3>
+      <div className="pt-card space-y-4">
+        <h3 className="font-headline text-lg font-bold text-texto">Guarda Atual</h3>
 
         {guardiao ? (
-          <div className="bg-menta-light border-2 border-menta/30 rounded-2xl p-5 flex items-center gap-4">
+          <div className="bg-creme-dark/30 rounded-xl p-3 flex items-center gap-3">
             {/* Avatar */}
-            <div className="w-14 h-14 rounded-full bg-menta flex items-center justify-center text-white font-bold text-lg shrink-0">
+            <div className="w-10 h-10 rounded-full bg-coral-light flex items-center justify-center flex-shrink-0">
               {guardiao.usuario.avatarUrl ? (
                 <img
                   src={guardiao.usuario.avatarUrl}
                   alt={guardiao.usuario.nome}
-                  className="w-14 h-14 rounded-full object-cover"
+                  className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (
-                initials(guardiao.usuario.nome)
+                <span className="text-coral text-sm font-headline font-bold">
+                  {initials(guardiao.usuario.nome)}
+                </span>
               )}
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-lg text-azul-dark truncate">
+              <p className="text-sm font-headline font-bold text-texto truncate">
                 {guardiao.usuario.nome}
               </p>
-              <span className="inline-block bg-menta/20 text-menta-dark text-xs font-semibold px-2 py-0.5 rounded-full mt-0.5">
-                {ROLE_LABELS[guardiao.role] || guardiao.role}
-              </span>
-              <p className="text-sm text-azul/70 mt-1">
-                Desde: {fmtDate(guardiao.adicionadoEm)}
+              <p className="text-xs text-texto-soft font-body">
+                Desde {fmtDate(guardiao.adicionadoEm)}
               </p>
             </div>
+
+            <span className="px-3 py-1 rounded-full text-xs font-headline font-bold bg-coral-light text-coral flex-shrink-0">
+              {ROLE_LABELS[guardiao.role] || guardiao.role}
+            </span>
           </div>
         ) : (
-          <div className="bg-creme rounded-2xl p-5 text-center text-azul/60">
-            Nenhum tutor principal definido.
-          </div>
+          <p className="text-sm text-texto-soft font-body py-3 text-center">
+            Nenhum tutor principal definido
+          </p>
         )}
-      </section>
+      </div>
 
       {/* ── 2. SOLICITAÇÕES PENDENTES ───────────────────────────────────────── */}
-      <section>
-        <h3 className="font-headline font-bold text-lg text-coral mb-3 tracking-tight">
-          Solicitações Pendentes
+      <div className="pt-card space-y-4">
+        <h3 className="font-headline text-lg font-bold text-texto">
+          Solicitacoes Pendentes
         </h3>
 
         {pendentes.length === 0 ? (
-          <div className="bg-creme rounded-2xl p-5 text-center text-azul/60">
-            Nenhuma solicitação pendente
-          </div>
+          <p className="text-sm text-texto-soft font-body py-3 text-center">
+            Nenhuma solicitacao pendente
+          </p>
         ) : (
           <div className="space-y-3">
             {pendentes.map((sol) => (
               <div
                 key={sol.id}
-                className="bg-white border border-coral/20 rounded-2xl p-5 shadow-sm"
+                className="bg-creme-dark/30 rounded-xl p-4 space-y-3"
               >
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div>
-                    <p className="font-bold text-azul-dark">
-                      {sol.solicitante.nome}
-                    </p>
-                    <span className="text-xs text-azul/60">
-                      {sol.tipo.replace(/_/g, ' ')}
-                    </span>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-full bg-rosa-light flex items-center justify-center flex-shrink-0">
+                      <span className="text-rosa text-sm font-headline font-bold">
+                        {initials(sol.solicitante.nome)}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-headline font-bold text-texto truncate">
+                        {sol.solicitante.nome}
+                      </p>
+                      <p className="text-xs text-texto-soft font-body">
+                        {sol.tipo.replace(/_/g, ' ')}
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-xs text-azul/50 whitespace-nowrap">
+                  <span className="text-xs text-texto-soft font-body whitespace-nowrap flex-shrink-0">
                     {fmtDateShort(sol.criadoEm)}
                   </span>
                 </div>
 
                 {sol.justificativa && (
-                  <p className="text-sm text-azul/80 bg-creme rounded-xl p-3 mb-3">
-                    {sol.justificativa}
-                  </p>
+                  <div className="bg-creme-dark/40 rounded-xl px-4 py-3">
+                    <p className="text-sm text-texto font-body">{sol.justificativa}</p>
+                  </div>
                 )}
 
-                <p className="text-xs text-azul/50 mb-3">
+                <p className="text-xs text-texto-soft font-body">
                   Expira em: {fmtDate(sol.expiradoEm)}
                 </p>
 
                 {respondendo === sol.id && (
-                  <div className="mb-3">
+                  <div>
                     <textarea
-                      className="w-full border border-azul/20 rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-menta/50"
+                      className="pt-input resize-none"
                       rows={2}
                       placeholder="Mensagem (opcional)..."
                       value={mensagemResposta}
@@ -313,28 +329,28 @@ export default function GuardaPage() {
                     <>
                       <button
                         onClick={() => handleResponder(sol.id, 'APROVAR')}
-                        className="px-4 py-2 bg-menta text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                        className="pt-btn text-sm"
                       >
-                        Confirmar Aprovação
+                        Confirmar Aprovacao
                       </button>
                       <button
                         onClick={() => handleResponder(sol.id, 'RECUSAR')}
-                        className="px-4 py-2 bg-erro text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                        className="pt-btn-secondary text-sm"
                       >
                         Confirmar Recusa
                       </button>
                       <button
                         onClick={() => handleResponder(sol.id, 'SUGERIR')}
-                        className="px-4 py-2 bg-azul text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                        className="pt-btn-ghost text-sm"
                       >
-                        Enviar Sugestão
+                        Enviar Sugestao
                       </button>
                       <button
                         onClick={() => {
                           setRespondendo(null);
                           setMensagemResposta('');
                         }}
-                        className="px-4 py-2 bg-creme text-azul/70 text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                        className="pt-btn-ghost text-sm"
                       >
                         Cancelar
                       </button>
@@ -343,19 +359,19 @@ export default function GuardaPage() {
                     <>
                       <button
                         onClick={() => handleResponder(sol.id, 'APROVAR')}
-                        className="px-4 py-2 bg-menta text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                        className="pt-btn text-sm"
                       >
                         Aprovar
                       </button>
                       <button
                         onClick={() => handleResponder(sol.id, 'RECUSAR')}
-                        className="px-4 py-2 bg-erro text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                        className="pt-btn-secondary text-sm"
                       >
                         Recusar
                       </button>
                       <button
                         onClick={() => setRespondendo(sol.id)}
-                        className="px-4 py-2 bg-azul text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                        className="pt-btn-ghost text-sm"
                       >
                         Sugerir
                       </button>
@@ -366,31 +382,30 @@ export default function GuardaPage() {
             ))}
           </div>
         )}
-      </section>
+      </div>
 
       {/* ── 3. GUARDAS TEMPORÁRIAS ──────────────────────────────────────────── */}
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-headline font-bold text-lg text-azul-dark tracking-tight">
-            Guardas Temporárias
+      <div className="pt-card space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-headline text-lg font-bold text-texto">
+            Guardas Temporarias
           </h3>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-3 py-1.5 bg-azul text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-opacity"
+            className="pt-btn-ghost text-sm"
           >
-            {showForm ? 'Cancelar' : '+ Nova guarda temporária'}
+            {showForm ? 'Cancelar' : '+ Nova'}
           </button>
         </div>
 
         {/* Inline form */}
         {showForm && (
-          <div className="bg-azul-light border border-azul/20 rounded-2xl p-5 mb-4 space-y-3">
+          <div className="space-y-3 bg-azul-light/30 rounded-xl p-5">
+            <h4 className="font-headline font-bold text-texto text-sm">Nova guarda temporaria</h4>
             <div>
-              <label className="block text-xs font-semibold text-azul-dark mb-1">
-                Responsável (selecionar)
-              </label>
+              <label className="pt-label">Responsavel</label>
               <select
-                className="w-full border border-azul/20 rounded-xl p-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-azul/50"
+                className="pt-input"
                 value={formData.responsavelId}
                 onChange={(e) =>
                   setFormData({ ...formData, responsavelId: e.target.value })
@@ -409,12 +424,10 @@ export default function GuardaPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-azul-dark mb-1">
-                  Data Início
-                </label>
+                <label className="pt-label">Data Inicio</label>
                 <input
                   type="date"
-                  className="w-full border border-azul/20 rounded-xl p-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-azul/50"
+                  className="pt-input"
                   value={formData.dataInicio}
                   onChange={(e) =>
                     setFormData({ ...formData, dataInicio: e.target.value })
@@ -422,12 +435,10 @@ export default function GuardaPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-azul-dark mb-1">
-                  Data Fim
-                </label>
+                <label className="pt-label">Data Fim</label>
                 <input
                   type="date"
-                  className="w-full border border-azul/20 rounded-xl p-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-azul/50"
+                  className="pt-input"
                   value={formData.dataFim}
                   onChange={(e) =>
                     setFormData({ ...formData, dataFim: e.target.value })
@@ -437,13 +448,11 @@ export default function GuardaPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-azul-dark mb-1">
-                Observações
-              </label>
+              <label className="pt-label">Observacoes</label>
               <textarea
-                className="w-full border border-azul/20 rounded-xl p-2.5 text-sm resize-none bg-white focus:outline-none focus:ring-2 focus:ring-azul/50"
+                className="pt-input resize-none"
                 rows={2}
-                placeholder="Observações opcionais..."
+                placeholder="Observacoes opcionais..."
                 value={formData.observacoes}
                 onChange={(e) =>
                   setFormData({ ...formData, observacoes: e.target.value })
@@ -455,24 +464,23 @@ export default function GuardaPage() {
               onClick={handleCriarTemporaria}
               disabled={formLoading || !formData.dataInicio || !formData.dataFim}
               className={cn(
-                'w-full py-2.5 text-white text-sm font-semibold rounded-xl transition-opacity',
-                formLoading || !formData.dataInicio || !formData.dataFim
-                  ? 'bg-azul/40 cursor-not-allowed'
-                  : 'bg-azul hover:opacity-90',
+                'pt-btn w-full text-sm',
+                (formLoading || !formData.dataInicio || !formData.dataFim) &&
+                  'opacity-40 cursor-not-allowed',
               )}
             >
-              {formLoading ? 'Criando...' : 'Criar Guarda Temporária'}
+              {formLoading ? 'Criando...' : 'Criar Guarda Temporaria'}
             </button>
           </div>
         )}
 
         {/* List */}
         {temporarias.length === 0 && !showForm ? (
-          <div className="bg-creme rounded-2xl p-5 text-center text-azul/60">
-            Nenhuma guarda temporária registrada
-          </div>
+          <p className="text-sm text-texto-soft font-body py-3 text-center">
+            Nenhuma guarda temporaria registrada
+          </p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {temporarias.map((gt) => {
               const nome =
                 gt.responsavel?.nome ||
@@ -482,41 +490,49 @@ export default function GuardaPage() {
               return (
                 <div
                   key={gt.id}
-                  className="bg-white border border-azul/15 rounded-2xl p-4 shadow-sm"
+                  className="bg-creme-dark/30 rounded-xl p-3 space-y-2"
                 >
-                  <div className="flex items-center justify-between gap-3 mb-2">
-                    <p className="font-bold text-azul-dark">{nome}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-azul-light flex items-center justify-center flex-shrink-0">
+                        <span className="text-azul text-sm font-headline font-bold">
+                          {initials(nome)}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-headline font-bold text-texto truncate">{nome}</p>
+                        <p className="text-xs text-texto-soft font-body">
+                          {fmtDateShort(gt.dataInicio)} — {fmtDateShort(gt.dataFim)}
+                        </p>
+                      </div>
+                    </div>
                     <span
                       className={cn(
-                        'text-xs font-semibold px-2 py-0.5 rounded-full',
-                        STATUS_COLORS[statusKey] || 'bg-creme text-azul/60',
+                        'px-3 py-1 rounded-full text-xs font-headline font-bold flex-shrink-0',
+                        STATUS_COLORS[statusKey] || 'bg-creme-dark text-texto-soft',
                       )}
                     >
                       {STATUS_LABELS[statusKey] || statusKey}
                     </span>
                   </div>
 
-                  <p className="text-sm text-azul/70">
-                    {fmtDateShort(gt.dataInicio)} — {fmtDateShort(gt.dataFim)}
-                  </p>
-
                   {gt.observacoes && (
-                    <p className="text-xs text-azul/60 mt-1">{gt.observacoes}</p>
+                    <p className="text-xs text-texto-soft font-body pl-13">{gt.observacoes}</p>
                   )}
 
                   {(statusKey === 'AGENDADA' || statusKey === 'CONFIRMADA' || statusKey === 'EM_ANDAMENTO') && (
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 pl-13">
                       {statusKey === 'AGENDADA' && (
                         <button
                           onClick={() => handleConfirmarTemporaria(gt.id)}
-                          className="px-3 py-1.5 bg-menta text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                          className="pt-btn text-sm"
                         >
                           Confirmar
                         </button>
                       )}
                       <button
                         onClick={() => handleCancelarTemporaria(gt.id)}
-                        className="px-3 py-1.5 bg-erro text-white text-xs font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                        className="pt-btn-secondary text-sm"
                       >
                         Cancelar
                       </button>
@@ -527,44 +543,44 @@ export default function GuardaPage() {
             })}
           </div>
         )}
-      </section>
+      </div>
 
       {/* ── 4. HISTÓRICO DE TROCAS ──────────────────────────────────────────── */}
-      <section>
-        <h3 className="font-headline font-bold text-lg text-rosa-dark mb-3 tracking-tight">
-          Histórico de Trocas
+      <div className="pt-card space-y-4">
+        <h3 className="font-headline text-lg font-bold text-texto">
+          Historico de Trocas
         </h3>
 
         {historico.length === 0 ? (
-          <div className="bg-creme rounded-2xl p-5 text-center text-azul/60">
+          <p className="text-sm text-texto-soft font-body py-3 text-center">
             Nenhum evento de guarda registrado
-          </div>
+          </p>
         ) : (
           <div className="relative pl-6">
             {/* Timeline line */}
-            <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-rosa/30" />
+            <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-creme-dark" />
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {historico.map((evt) => (
                 <div key={evt.id} className="relative">
                   {/* Dot */}
-                  <div className="absolute -left-[18px] top-1.5 w-3 h-3 rounded-full bg-rosa border-2 border-white" />
+                  <div className="absolute -left-[18px] top-1.5 w-3 h-3 rounded-full bg-coral border-2 border-white" />
 
-                  <div className="bg-white border border-rosa/15 rounded-2xl p-4 shadow-sm">
+                  <div className="bg-creme-dark/30 rounded-xl p-3 space-y-1">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="font-semibold text-sm text-azul-dark">
+                      <p className="text-sm font-headline font-bold text-texto">
                         {evt.titulo}
                       </p>
-                      <span className="text-xs text-azul/50 whitespace-nowrap shrink-0">
+                      <span className="text-xs text-texto-soft font-body whitespace-nowrap flex-shrink-0">
                         {fmtDateShort(evt.criadoEm)}
                       </span>
                     </div>
                     {evt.descricao && (
-                      <p className="text-xs text-azul/70 mt-1">
+                      <p className="text-xs text-texto-soft font-body">
                         {evt.descricao}
                       </p>
                     )}
-                    <span className="inline-block text-[10px] font-medium text-rosa/70 bg-rosa/10 px-1.5 py-0.5 rounded mt-1.5">
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-headline font-bold bg-coral-light text-coral">
                       {evt.tipo.replace(/_/g, ' ')}
                     </span>
                   </div>
@@ -573,7 +589,7 @@ export default function GuardaPage() {
             </div>
           </div>
         )}
-      </section>
+      </div>
     </div>
   );
 }

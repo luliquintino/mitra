@@ -180,8 +180,15 @@ export default function HistoricoPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-3 border-coral border-t-transparent rounded-full animate-spin" />
+      <div className="space-y-4 animate-fade-in">
+        <div className="flex gap-2">
+          {[1, 2].map((i) => (
+            <div key={i} className="h-9 w-24 pt-skeleton rounded-xl flex-shrink-0" />
+          ))}
+        </div>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-24 pt-skeleton rounded-2xl" />
+        ))}
       </div>
     );
   }
@@ -189,31 +196,32 @@ export default function HistoricoPage() {
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      {/* Sub-tab Switcher */}
-      <div className="flex gap-2 p-1 bg-creme-dark/40 rounded-2xl">
-        <button
-          onClick={() => setActiveTab('timeline')}
-          className={cn(
-            'flex-1 py-2.5 px-4 rounded-xl font-headline font-bold text-sm transition-all duration-200',
-            activeTab === 'timeline'
-              ? 'bg-white text-coral shadow-sm'
-              : 'text-texto-soft hover:text-texto',
-          )}
-        >
-          Timeline
-        </button>
-        <button
-          onClick={() => setActiveTab('diario')}
-          className={cn(
-            'flex-1 py-2.5 px-4 rounded-xl font-headline font-bold text-sm transition-all duration-200',
-            activeTab === 'diario'
-              ? 'bg-white text-coral shadow-sm'
-              : 'text-texto-soft hover:text-texto',
-          )}
-        >
-          Diario
-        </button>
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div>
+        <h1 className="font-headline text-xl font-bold text-texto">Historico</h1>
+        <p className="text-sm text-texto-soft mt-0.5">Acompanhe todos os eventos e momentos do seu pet</p>
+      </div>
+
+      {/* Sub-tab pills */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {[
+          { id: 'timeline' as SubTab, label: 'Timeline' },
+          { id: 'diario' as SubTab, label: 'Diario' },
+        ].map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={cn(
+              'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
+              activeTab === t.id
+                ? 'bg-coral text-white shadow-sm'
+                : 'bg-white text-texto-soft hover:bg-creme-dark',
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       {/* ─── TIMELINE TAB ─────────────────────────────────────────────────────── */}
@@ -226,7 +234,7 @@ export default function HistoricoPage() {
                 key={pill.key}
                 onClick={() => toggleFilter(pill.key)}
                 className={cn(
-                  'px-4 py-1.5 rounded-full text-xs font-bold font-label uppercase tracking-wider transition-all duration-200',
+                  'px-3 py-1.5 rounded-full text-xs font-headline font-bold transition-all',
                   activeFilters.has(pill.key)
                     ? pill.color
                     : 'bg-creme-dark/50 text-texto-soft hover:bg-creme-dark',
@@ -246,13 +254,13 @@ export default function HistoricoPage() {
 
           {/* Empty State */}
           {filteredEventos.length === 0 ? (
-            <div className="text-center py-16 space-y-4">
-              <div className="text-4xl">📋</div>
+            <div className="pt-card text-center py-10 space-y-3">
+              <div className="text-3xl">📋</div>
               <div>
-                <p className="font-headline font-bold text-texto text-lg">
+                <p className="font-semibold text-texto text-sm">
                   Linha do tempo vazia
                 </p>
-                <p className="text-sm text-texto-soft mt-1 max-w-xs mx-auto">
+                <p className="text-xs text-texto-soft mt-1 max-w-xs mx-auto">
                   A linha do tempo da vida do seu pet aparecera aqui conforme os
                   eventos forem registrados.
                 </p>
@@ -264,8 +272,7 @@ export default function HistoricoPage() {
                 <div key={mesAno} className="space-y-1">
                   {/* Month separator */}
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="h-px flex-1 bg-creme-dark/30" />
-                    <span className="font-headline font-bold text-coral text-xs uppercase tracking-widest whitespace-nowrap capitalize">
+                    <span className="font-headline font-bold text-texto-soft text-xs uppercase tracking-wider whitespace-nowrap capitalize">
                       {mesAno}
                     </span>
                     <div className="h-px flex-1 bg-creme-dark/30" />
@@ -274,7 +281,7 @@ export default function HistoricoPage() {
                   {/* Timeline */}
                   <div className="relative pl-12">
                     {/* Vertical line */}
-                    <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-gradient-to-b from-coral/40 via-rosa/30 to-coral/10 rounded-full" />
+                    <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-creme-dark/40 rounded-full" />
 
                     <div className="space-y-4">
                       {monthEvents.map((evento, i) => (
@@ -317,7 +324,7 @@ export default function HistoricoPage() {
                                 {/* Meta row */}
                                 <div className="flex items-center gap-2 mt-2 flex-wrap">
                                   {evento.autorId && (
-                                    <span className="inline-flex items-center gap-1 text-[10px] font-label uppercase tracking-wider bg-creme-dark/40 text-texto-soft px-2 py-0.5 rounded-full">
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-creme-dark/40 text-texto-soft px-2 py-0.5 rounded-full">
                                       Registrado
                                     </span>
                                   )}
@@ -353,42 +360,41 @@ export default function HistoricoPage() {
       {/* ─── DIARIO TAB ───────────────────────────────────────────────────────── */}
       {activeTab === 'diario' && (
         <div className="space-y-6">
-          {/* Hero Title */}
-          <div className="mb-6 text-center relative">
-            <h2 className="font-headline font-extrabold text-4xl tracking-tighter text-amarelo mb-2">
-              Diario de Aventuras
-            </h2>
-            <p className="text-azul font-medium text-base">
-              Colecione momentos felizes com seu melhor amigo!
-            </p>
-            {/* Floating stickers */}
-            <div className="absolute -top-4 -left-2 opacity-20 pointer-events-none">
-              <span className="text-5xl text-rosa">🐾</span>
+          {/* Section heading */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-headline text-lg font-bold text-texto">Diario de Aventuras</h2>
+              <p className="text-sm text-texto-soft mt-0.5">Colecione momentos felizes com seu melhor amigo</p>
             </div>
-            <div className="absolute top-8 -right-4 opacity-20 pointer-events-none rotate-12">
-              <span className="text-6xl text-amarelo">🍎</span>
-            </div>
-          </div>
-
-          {/* CTA Button */}
-          <div className="flex justify-center mb-8">
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('mitra:register-event'))}
-              className="group relative bg-amarelo-light text-amarelo px-8 py-5 rounded-full font-headline font-bold text-lg flex items-center gap-3 shadow-lg hover:scale-105 active:scale-95 transition-all duration-300"
+              className="px-4 py-2 rounded-xl bg-coral text-white text-sm font-medium shadow-sm hover:opacity-90 transition-all"
             >
-              <div className="bg-white p-2.5 rounded-full group-hover:rotate-12 transition-transform">
-                <span className="text-amarelo text-2xl">📸</span>
-              </div>
-              Adicionar Nova Foto
-              <div className="absolute -top-3 -right-3 bg-rosa text-white px-3 py-1 rounded-full text-xs font-bold rotate-12">
-                NOVO
-              </div>
+              Adicionar Foto
             </button>
           </div>
 
-          {/* Bento Mural Gallery */}
+          {/* Stats */}
+          {eventos.length > 0 && (
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-rosa-light/50 rounded-2xl p-4 text-center">
+                <p className="text-2xl font-headline font-bold text-texto">{eventos.length}</p>
+                <p className="text-[11px] text-texto-soft mt-1 leading-tight">Total</p>
+              </div>
+              <div className="bg-azul-light/50 rounded-2xl p-4 text-center">
+                <p className="text-2xl font-headline font-bold text-texto">{thisMonthCount}</p>
+                <p className="text-[11px] text-texto-soft mt-1 leading-tight">Este mes</p>
+              </div>
+              <div className="bg-amarelo-light/50 rounded-2xl p-4 text-center">
+                <p className="text-2xl font-headline font-bold text-texto">{uniqueTypes}</p>
+                <p className="text-[11px] text-texto-soft mt-1 leading-tight">Tipos</p>
+              </div>
+            </div>
+          )}
+
+          {/* Gallery Grid */}
           {eventos.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {eventos.map((evento, i) => {
                 const isFirst = i === 0;
                 const isWide = i % 5 === 4;
@@ -400,33 +406,20 @@ export default function HistoricoPage() {
                   <div
                     key={evento.id}
                     className={cn(
-                      'relative group',
-                      isFirst && 'md:col-span-2 md:row-span-2',
+                      'relative',
+                      isFirst && 'md:col-span-2',
                       isWide && !isFirst && 'md:col-span-2',
                     )}
-                    style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
                   >
-                    <div
-                      className={cn(
-                        color,
-                        'p-4 rounded-2xl shadow-sm transition-transform duration-500 animate-fade-in',
-                        rotation,
-                        'group-hover:rotate-0',
-                      )}
-                      style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
-                    >
+                    <div className="bg-white rounded-2xl p-4 shadow-sm animate-fade-in">
                       {/* Event card content */}
-                      <div className="relative overflow-hidden rounded-xl aspect-square mb-3 bg-creme-dark flex items-center justify-center">
-                        <span className="text-6xl opacity-20">{sticker}</span>
-                        {/* Sticker overlay */}
-                        <div className="absolute top-2 right-2 rotate-12">
-                          <span className="text-rosa text-2xl">{sticker}</span>
-                        </div>
+                      <div className="relative overflow-hidden rounded-xl aspect-square mb-3 bg-creme-dark/30 flex items-center justify-center">
+                        <span className="text-4xl opacity-20">{sticker}</span>
                       </div>
-                      <p className="font-headline font-bold text-texto px-1">
+                      <p className="font-headline font-bold text-sm text-texto">
                         {evento.descricao || evento.tipo}
                       </p>
-                      <p className="font-body text-sm text-texto-soft/60 px-1">
+                      <p className="text-xs text-texto-soft mt-1">
                         {new Date(evento.criadoEm).toLocaleDateString('pt-BR', {
                           day: 'numeric',
                           month: 'short',
@@ -440,47 +433,17 @@ export default function HistoricoPage() {
             </div>
           ) : (
             /* Empty State */
-            <div className="text-center py-20">
-              <span className="text-8xl opacity-20 mb-4 block">🐾</span>
-              <p className="font-headline font-bold text-2xl text-texto-soft/40 mb-2">
-                Nenhuma aventura ainda!
-              </p>
-              <p className="text-texto-soft/40">Registre o primeiro momento do seu pet</p>
-            </div>
-          )}
-
-          {/* Stats Section */}
-          {eventos.length > 0 && (
-            <section className="mt-12 mb-8 p-8 bg-creme-dark rounded-2xl relative overflow-hidden">
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div>
-                  <h3 className="font-headline font-bold text-2xl text-amarelo mb-2">
-                    Estatisticas da Diversao
-                  </h3>
-                  <p className="text-azul">Acompanhe as aventuras!</p>
-                </div>
-                <div className="flex gap-4">
-                  <div className="bg-white/80 backdrop-blur px-5 py-3 rounded-2xl text-center min-w-[100px]">
-                    <p className="text-3xl font-headline font-bold text-rosa">{eventos.length}</p>
-                    <p className="text-xs font-label uppercase tracking-widest text-texto-soft">
-                      Total
-                    </p>
-                  </div>
-                  <div className="bg-white/80 backdrop-blur px-5 py-3 rounded-2xl text-center min-w-[100px]">
-                    <p className="text-3xl font-headline font-bold text-azul">{thisMonthCount}</p>
-                    <p className="text-xs font-label uppercase tracking-widest text-texto-soft">
-                      Este mes
-                    </p>
-                  </div>
-                  <div className="bg-white/80 backdrop-blur px-5 py-3 rounded-2xl text-center min-w-[100px]">
-                    <p className="text-3xl font-headline font-bold text-amarelo">{uniqueTypes}</p>
-                    <p className="text-xs font-label uppercase tracking-widest text-texto-soft">
-                      Tipos
-                    </p>
-                  </div>
-                </div>
+            <div className="pt-card text-center py-10 space-y-3">
+              <div className="text-3xl">📷</div>
+              <div>
+                <p className="font-semibold text-texto text-sm">
+                  Nenhuma aventura ainda
+                </p>
+                <p className="text-xs text-texto-soft mt-1 max-w-xs mx-auto">
+                  Registre o primeiro momento do seu pet
+                </p>
               </div>
-            </section>
+            </div>
           )}
         </div>
       )}
