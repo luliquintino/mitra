@@ -23,6 +23,29 @@ import {
 import { formatRelative, eventoIcon, cn } from '@/lib/utils';
 import { CalendarMonth } from '@/components/CalendarMonth';
 import { RegisterEventModal } from '@/components/RegisterEventModal';
+import {
+  AlertCircle,
+  Calendar,
+  Clock,
+  Plus,
+  Pill,
+  Syringe,
+  Activity,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Home,
+  ClipboardList,
+  PawPrint,
+  Archive,
+  Sparkles,
+  Stethoscope,
+  Heart,
+  FileText,
+  Users,
+  Shield,
+  Eye,
+} from 'lucide-react';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -50,7 +73,40 @@ type AlertItem = {
   detail: string;
   color: string;
   bgColor: string;
+  borderColor: string;
+  IconComponent: React.ElementType;
 };
+
+// ─── Event tipo → Lucide icon mapping ───────────────────────────────────────
+
+function eventLucideIcon(tipo: string) {
+  const map: Record<string, React.ElementType> = {
+    PET_CRIADO: PawPrint,
+    PET_ARQUIVADO: Archive,
+    PET_REATIVADO: Sparkles,
+    VACINA_REGISTRADA: Syringe,
+    VACINA_ATUALIZADA: Syringe,
+    MEDICAMENTO_ADMINISTRADO: Pill,
+    SINTOMA_REGISTRADO: Stethoscope,
+    CONSULTA_VETERINARIA: Stethoscope,
+    SAUDE_GERAL: Heart,
+    COMPROMISSO_CRIADO: Calendar,
+    COMPROMISSO_ATUALIZADO: Calendar,
+    DOCUMENTO_ADICIONADO: FileText,
+    TUTOR_ADICIONADO: Users,
+    GUARDA_TRANSFERIDA: Shield,
+    PERMISSAO_ATUALIZADA: Eye,
+  };
+  return map[tipo] || Activity;
+}
+
+function eventIconColor(tipo: string): string {
+  if (tipo?.includes('VACINA')) return 'text-rose bg-rose/10';
+  if (tipo?.includes('MEDICAMENTO') || tipo?.includes('SINTOMA')) return 'text-teal bg-teal/10';
+  if (tipo?.includes('COMPROMISSO')) return 'text-amber bg-amber/10';
+  if (tipo?.includes('GUARDA') || tipo?.includes('TUTOR')) return 'text-primary bg-primary/10';
+  return 'text-info bg-info/10';
+}
 
 // ─── Main Page ──────────────────────────────────────────────────────────────
 
@@ -210,8 +266,10 @@ export default function PetHomePage() {
         icon: '💉',
         label: vacinasVencendo.length === 1 ? 'Vacina vencendo' : `${vacinasVencendo.length} vacinas vencendo`,
         detail: vacinasVencendo.map((v) => v.nome).join(', '),
-        color: 'text-rosa',
-        bgColor: 'bg-rosa-light',
+        color: 'text-rose',
+        bgColor: 'bg-rose/5',
+        borderColor: 'border-rose',
+        IconComponent: Syringe,
       });
     }
     if (solicitacoesPendentes > 0) {
@@ -219,8 +277,10 @@ export default function PetHomePage() {
         icon: '📋',
         label: `${solicitacoesPendentes} solicitaç${solicitacoesPendentes === 1 ? 'ão' : 'ões'}`,
         detail: 'Aguardando aprovação',
-        color: 'text-amarelo',
-        bgColor: 'bg-amarelo-light',
+        color: 'text-amber',
+        bgColor: 'bg-amber/5',
+        borderColor: 'border-amber',
+        IconComponent: ClipboardList,
       });
     }
     if (medProximaDose.length > 0) {
@@ -228,8 +288,10 @@ export default function PetHomePage() {
         icon: '💊',
         label: `${medProximaDose.length} medicamento${medProximaDose.length > 1 ? 's' : ''} ativo${medProximaDose.length > 1 ? 's' : ''}`,
         detail: medProximaDose.slice(0, 2).map((m) => m.nome).join(', '),
-        color: 'text-azul',
-        bgColor: 'bg-azul-light',
+        color: 'text-teal',
+        bgColor: 'bg-teal/5',
+        borderColor: 'border-teal',
+        IconComponent: Pill,
       });
     }
     return items;
@@ -245,19 +307,19 @@ export default function PetHomePage() {
     return (
       <div className="space-y-4">
         {/* Alert skeleton */}
-        <div className="h-14 pt-skeleton rounded-2xl" />
+        <div className="h-14 mg-skeleton rounded-2xl" />
         {/* Stats skeleton */}
         <div className="grid grid-cols-4 gap-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-20 pt-skeleton rounded-2xl" />
+            <div key={i} className="h-20 mg-skeleton rounded-2xl" />
           ))}
         </div>
         {/* Calendar skeleton */}
-        <div className="h-12 pt-skeleton rounded-2xl" />
+        <div className="h-12 mg-skeleton rounded-2xl" />
         {/* Activity skeleton */}
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-16 pt-skeleton rounded-xl" />
+            <div key={i} className="h-16 mg-skeleton rounded-xl" />
           ))}
         </div>
       </div>
@@ -269,43 +331,48 @@ export default function PetHomePage() {
   return (
     <div className="space-y-5 pb-24">
       {/* ─────────────────────────────────────────────────────────────────────
-          1. ALERTAS — compact horizontal scroll
+          1. ALERTAS — glass cards with colored left border
       ───────────────────────────────────────────────────────────────────── */}
       {alerts.length > 0 && (
         <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
-          {alerts.map((alert, i) => (
-            <div
-              key={i}
-              className={cn(
-                'flex items-center gap-2.5 px-4 py-2.5 rounded-2xl shrink-0 transition-all',
-                alert.bgColor,
-              )}
-            >
-              <span className="text-lg">{alert.icon}</span>
-              <div className="min-w-0">
-                <p className={cn('font-headline font-bold text-xs', alert.color)}>
-                  {alert.label}
-                </p>
-                <p className="text-[10px] font-body text-texto-soft truncate max-w-[140px]">
-                  {alert.detail}
-                </p>
+          {alerts.map((alert, i) => {
+            const Icon = alert.IconComponent;
+            return (
+              <div
+                key={i}
+                className={cn(
+                  'mg-card-solid flex items-center gap-2.5 px-4 py-2.5 rounded-2xl shrink-0 transition-all border-l-4',
+                  alert.borderColor,
+                )}
+              >
+                <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', alert.bgColor)}>
+                  <Icon className={alert.color} size={16} />
+                </div>
+                <div className="min-w-0">
+                  <p className={cn('font-headline font-bold text-xs', alert.color)}>
+                    {alert.label}
+                  </p>
+                  <p className="text-[10px] font-body text-texto-soft truncate max-w-[140px]">
+                    {alert.detail}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────────────────
-          2. RESUMO RAPIDO — 4 compact stat pills
+          2. RESUMO RAPIDO — 4 glass stat cards with Lucide icons
       ───────────────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-4 gap-2">
         {/* Vacinas */}
         <button
           onClick={() => window.location.href = `/pets/${petId}/saude`}
-          className="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all text-center"
+          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
         >
-          <div className="w-9 h-9 rounded-xl bg-rosa-light flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
-            <span className="text-base">💉</span>
+          <div className="w-9 h-9 rounded-xl bg-rose/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
+            <Syringe className="text-rose" size={18} />
           </div>
           <p className="font-headline font-bold text-lg text-texto leading-none">
             {vacinasEmDia}
@@ -318,26 +385,26 @@ export default function PetHomePage() {
         {/* Medicamentos */}
         <button
           onClick={() => window.location.href = `/pets/${petId}/saude`}
-          className="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all text-center"
+          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
         >
-          <div className="w-9 h-9 rounded-xl bg-azul-light flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
-            <span className="text-base">💊</span>
+          <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
+            <Pill className="text-teal" size={18} />
           </div>
           <p className="font-headline font-bold text-lg text-texto leading-none">
             {medicamentosAtivos}
           </p>
           <p className="text-[10px] font-body text-texto-soft mt-0.5">
-            {medicamentosAtivos === 1 ? 'remédio' : 'remédios'}
+            {medicamentosAtivos === 1 ? 'remedio' : 'remedios'}
           </p>
         </button>
 
         {/* Guarda */}
         <button
           onClick={() => window.location.href = `/pets/${petId}/guarda`}
-          className="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all text-center"
+          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
         >
-          <div className="w-9 h-9 rounded-xl bg-menta-light flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
-            <span className="text-base">🏠</span>
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
+            <Home className="text-primary" size={18} />
           </div>
           <p className="font-headline font-bold text-xs text-texto leading-tight truncate px-1">
             {guardaAtual.split(' ')[0]}
@@ -347,13 +414,13 @@ export default function PetHomePage() {
           </p>
         </button>
 
-        {/* Próximo */}
+        {/* Proximo */}
         <button
           onClick={() => window.location.href = `/pets/${petId}/saude`}
-          className="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-md transition-all text-center"
+          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
         >
-          <div className="w-9 h-9 rounded-xl bg-amarelo-light flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
-            <span className="text-base">📅</span>
+          <div className="w-9 h-9 rounded-xl bg-amber/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
+            <Calendar className="text-amber" size={18} />
           </div>
           {proximoCompromisso ? (
             <>
@@ -363,34 +430,34 @@ export default function PetHomePage() {
                   : ''}
               </p>
               <p className="text-[10px] font-body text-texto-soft mt-0.5 truncate">
-                próximo
+                proximo
               </p>
             </>
           ) : (
             <>
               <p className="font-headline font-bold text-xs text-texto-soft leading-tight">—</p>
-              <p className="text-[10px] font-body text-texto-soft mt-0.5">próximo</p>
+              <p className="text-[10px] font-body text-texto-soft mt-0.5">proximo</p>
             </>
           )}
         </button>
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────────
-          3. CALENDARIO — collapsible
+          3. CALENDARIO — collapsible mg-card
       ───────────────────────────────────────────────────────────────────── */}
-      <div className="pt-card !p-0 overflow-hidden">
+      <div className="mg-card !p-0 overflow-hidden">
         {/* Calendar toggle header */}
         <button
           onClick={() => setCalendarOpen(!calendarOpen)}
-          className="w-full flex items-center justify-between px-5 py-4 hover:bg-creme-dark/30 transition-colors"
+          className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface-muted/30 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-coral-light flex items-center justify-center">
-              <span className="text-lg">📆</span>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Calendar className="text-primary" size={20} />
             </div>
             <div className="text-left">
               <p className="font-headline font-bold text-sm text-texto">
-                Calendário
+                Calendario
               </p>
               <p className="text-xs font-body text-texto-soft">
                 {todayEventCount > 0
@@ -401,26 +468,15 @@ export default function PetHomePage() {
           </div>
           <div className="flex items-center gap-2">
             {todayEventCount > 0 && (
-              <span className="w-5 h-5 rounded-full bg-coral text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
                 {todayEventCount}
               </span>
             )}
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={cn(
-                'text-texto-soft transition-transform duration-300',
-                calendarOpen && 'rotate-180',
-              )}
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
+            {calendarOpen ? (
+              <ChevronUp className="text-texto-soft transition-transform duration-300" size={18} />
+            ) : (
+              <ChevronDown className="text-texto-soft transition-transform duration-300" size={18} />
+            )}
           </div>
         </button>
 
@@ -448,11 +504,11 @@ export default function PetHomePage() {
           {/* Events for selected date */}
           <div className="px-5 pb-5">
             <div className="flex items-center gap-2 mb-2">
-              <div className="h-px flex-1 bg-creme-dark" />
+              <div className="h-px flex-1 bg-surface-muted" />
               <span className="text-[10px] font-headline font-bold text-texto-soft uppercase tracking-wider whitespace-nowrap">
                 {formatDateLabel(selectedDate)}
               </span>
-              <div className="h-px flex-1 bg-creme-dark" />
+              <div className="h-px flex-1 bg-surface-muted" />
             </div>
 
             {selectedEvents.length === 0 ? (
@@ -464,7 +520,7 @@ export default function PetHomePage() {
                 {selectedEvents.map((ev, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2.5 py-2 px-3 rounded-xl bg-creme-dark/40"
+                    className="flex items-center gap-2.5 py-2 px-3 rounded-xl bg-surface-muted/40"
                   >
                     <span className={cn('w-2 h-2 rounded-full shrink-0', ev.color)} />
                     <span className="text-xs font-body text-texto">{ev.label}</span>
@@ -487,59 +543,61 @@ export default function PetHomePage() {
           {eventos.length > 5 && (
             <a
               href={`/pets/${petId}/historico`}
-              className="text-xs font-headline font-semibold text-coral hover:opacity-70 transition-opacity"
+              className="text-xs font-headline font-semibold text-primary hover:opacity-70 transition-opacity flex items-center gap-1"
             >
-              Ver tudo →
+              Ver tudo
+              <ChevronRight size={14} />
             </a>
           )}
         </div>
 
         {eventos.length === 0 ? (
-          <div className="pt-card text-center py-8">
-            <span className="text-2xl block mb-2">📋</span>
+          <div className="mg-card text-center py-8">
+            <ClipboardList className="mx-auto text-texto-soft mb-2" size={28} />
             <p className="text-sm font-body text-texto-soft">
               Nenhuma atividade registrada
             </p>
           </div>
         ) : (
           <div className="space-y-2">
-            {eventos.slice(0, 5).map((ev: any, i: number) => (
-              <div
-                key={ev.id}
-                className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white shadow-sm hover:shadow-md transition-all"
-                style={{ animationDelay: `${i * 50}ms` }}
-              >
-                <div className="w-9 h-9 rounded-xl bg-creme-dark flex items-center justify-center shrink-0">
-                  <span className="text-base">{eventoIcon(ev.tipo)}</span>
+            {eventos.slice(0, 5).map((ev: any, i: number) => {
+              const IconComp = eventLucideIcon(ev.tipo);
+              const iconColorClasses = eventIconColor(ev.tipo);
+              const [textClass, bgClass] = iconColorClasses.split(' ');
+              return (
+                <div
+                  key={ev.id}
+                  className="mg-card-solid flex items-center gap-3 px-4 py-3 rounded-2xl transition-all"
+                  style={{ animationDelay: `${i * 50}ms` }}
+                >
+                  <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', bgClass)}>
+                    <IconComp className={textClass} size={16} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-headline font-semibold text-xs text-texto truncate">
+                      {ev.descricao || ev.titulo || ev.tipo}
+                    </p>
+                    <p className="text-[10px] font-body text-texto-soft">
+                      {formatRelative(ev.criadoEm)}
+                    </p>
+                  </div>
+                  <ChevronRight className="text-texto-muted shrink-0" size={16} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-headline font-semibold text-xs text-texto truncate">
-                    {ev.descricao || ev.titulo || ev.tipo}
-                  </p>
-                  <p className="text-[10px] font-body text-texto-soft">
-                    {formatRelative(ev.criadoEm)}
-                  </p>
-                </div>
-                <div className="w-1 h-8 rounded-full bg-creme-dark shrink-0" />
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────────
-          5. FAB BUTTON — Registrar evento
+          5. FAB BUTTON — violet gradient with Plus icon
       ───────────────────────────────────────────────────────────────────── */}
       <button
         onClick={() => setShowRegisterModal(true)}
-        className="fixed bottom-6 right-6 z-50 bg-coral text-white w-14 h-14 rounded-2xl shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center"
-        style={{ boxShadow: '0 4px 20px rgba(255, 111, 97, 0.35)' }}
+        className="fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary to-primary-dark text-white w-14 h-14 rounded-full shadow-lg hover:shadow-glow-primary hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center"
         aria-label="Registrar evento"
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
+        <Plus size={24} strokeWidth={2.5} />
       </button>
 
       {/* RegisterEventModal */}

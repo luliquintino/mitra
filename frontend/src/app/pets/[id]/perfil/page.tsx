@@ -16,6 +16,27 @@ import {
 } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { PetImage } from '@/components/PetImage';
+import {
+  Shield,
+  Users,
+  Clock,
+  Calendar,
+  FileText,
+  Plus,
+  Check,
+  X,
+  ChevronRight,
+  AlertCircle,
+  Camera,
+  Edit,
+  Trash2,
+  Heart,
+  User,
+  MapPin,
+  Weight,
+  Ruler,
+  Tag,
+} from 'lucide-react';
 
 export default function PerfilPage() {
   const params = useParams();
@@ -230,16 +251,16 @@ export default function PerfilPage() {
   if (loading || !pet) {
     return (
       <div className="space-y-4">
-        <div className="h-6 w-48 pt-skeleton rounded-lg" />
-        <div className="h-4 w-32 pt-skeleton rounded-lg" />
-        <div className="pt-card space-y-4">
-          <div className="h-20 pt-skeleton rounded-xl" />
-          <div className="h-20 pt-skeleton rounded-xl" />
+        <div className="h-6 w-48 mg-skeleton rounded-lg" />
+        <div className="h-4 w-32 mg-skeleton rounded-lg" />
+        <div className="mg-card space-y-4">
+          <div className="h-20 mg-skeleton rounded-xl" />
+          <div className="h-20 mg-skeleton rounded-xl" />
         </div>
-        <div className="pt-card space-y-3">
-          <div className="h-14 pt-skeleton rounded-xl" />
-          <div className="h-14 pt-skeleton rounded-xl" />
-          <div className="h-14 pt-skeleton rounded-xl" />
+        <div className="mg-card space-y-3">
+          <div className="h-14 mg-skeleton rounded-xl" />
+          <div className="h-14 mg-skeleton rounded-xl" />
+          <div className="h-14 mg-skeleton rounded-xl" />
         </div>
       </div>
     );
@@ -265,54 +286,64 @@ export default function PerfilPage() {
     <div className="space-y-6 animate-fade-in">
       {/* Confirmation banner */}
       {confirmation && (
-        <div className="rounded-xl bg-creme-dark px-4 py-3 flex items-center gap-2 animate-fade-in">
-          <span className="text-texto-soft text-sm">&#10003;</span>
+        <div className="mg-card-solid rounded-xl px-4 py-3 flex items-center gap-2 animate-fade-in border-l-4 border-teal">
+          <Check className="w-4 h-4 text-teal flex-shrink-0" />
           <span className="text-sm text-texto font-medium font-body">{confirmation}</span>
         </div>
       )}
 
       {/* Section header */}
       <div>
-        <h2 className="font-headline text-xl font-bold text-texto">Perfil do Pet</h2>
+        <h2 className="font-headline font-bold text-xl text-texto">Perfil do Pet</h2>
         <p className="text-sm text-texto-soft font-body">Dados cadastrais, rede de cuidado e configuracoes</p>
       </div>
 
       {/* Section 1: Pet Info Card */}
-      <div className="pt-card">
+      <div className="mg-card">
         <div className="flex items-center gap-4">
           <PetImage
             fotoUrl={pet.fotoUrl}
             nome={pet.nome}
             especie={pet.especie}
             className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0"
-            fallbackClassName="bg-gradient-to-br from-coral-light to-azul-light"
+            fallbackClassName="bg-gradient-to-br from-primary/20 to-teal/20"
           />
           <div className="flex-1 min-w-0">
             <h3 className="font-headline text-lg font-bold text-texto truncate">{pet.nome}</h3>
-            <span className="inline-block mt-1 px-3 py-1 rounded-full text-xs font-headline font-bold bg-azul-light text-azul">
+            <span className="mg-badge mg-badge-info mt-1">
               {especieLabel(pet.especie)}{pet.raca ? ` · ${pet.raca}` : ''}
             </span>
           </div>
           <button
             onClick={() => router.push(`/pets/${petId}/editar`)}
-            className="pt-btn-ghost text-sm flex-shrink-0"
+            className="mg-btn-ghost text-sm flex-shrink-0"
           >
+            <Edit className="w-3.5 h-3.5" />
             Editar
           </button>
         </div>
 
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-3 mt-4">
-          <div className="bg-azul-light/50 rounded-2xl p-4 text-center">
+          <div className="mg-card-solid rounded-2xl p-4 text-center">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2">
+              <Calendar className="w-4 h-4 text-primary" />
+            </div>
             <p className="text-2xl font-bold font-headline text-texto">{ageYears ?? '--'}</p>
             <p className="text-xs text-texto-soft font-body mt-0.5">anos pet</p>
           </div>
-          <div className="bg-rosa-light/50 rounded-2xl p-4 text-center">
-            <p className="text-2xl font-bold font-headline text-rosa">{humanYears ?? '--'}</p>
+          <div className="mg-card-solid rounded-2xl p-4 text-center">
+            <div className="w-8 h-8 rounded-lg bg-rose/10 flex items-center justify-center mx-auto mb-2">
+              <Heart className="w-4 h-4 text-rose" />
+            </div>
+            <p className="text-2xl font-bold font-headline text-rose">{humanYears ?? '--'}</p>
             <p className="text-xs text-texto-soft font-body mt-0.5">anos humanos</p>
           </div>
-          <div className="bg-coral-light/50 rounded-2xl p-4 text-center">
-            <p className="text-2xl font-bold font-headline text-coral">{pesoNum ?? '--'}</p>
+          <div className="mg-card-solid rounded-2xl p-4 text-center">
+            <div className="w-8 h-8 rounded-lg bg-teal/10 flex items-center justify-center mx-auto mb-2">
+              <Weight className="w-4 h-4 text-teal" />
+            </div>
+            <p className="text-2xl font-bold font-headline text-teal">{pesoNum ?? '--'}</p>
             <p className="text-xs text-texto-soft font-body mt-0.5">kg</p>
           </div>
         </div>
@@ -324,9 +355,9 @@ export default function PerfilPage() {
         )}
 
         {pet.status === 'ARQUIVADO' && (
-          <div className="bg-azul-light rounded-xl px-4 py-3 mt-3">
-            <p className="text-sm text-azul font-headline font-bold">Pet arquivado</p>
-            <p className="text-xs text-azul/70 mt-0.5 font-body">
+          <div className="mg-card-solid rounded-xl px-4 py-3 mt-3 border-l-4 border-primary">
+            <p className="text-sm text-primary font-headline font-bold">Pet arquivado</p>
+            <p className="text-xs text-primary/70 mt-0.5 font-body">
               Para reativar, todos os tutores precisam confirmar.
             </p>
           </div>
@@ -334,8 +365,13 @@ export default function PerfilPage() {
       </div>
 
       {/* Section 2: Dados do Pet */}
-      <div className="pt-card space-y-4">
-        <h3 className="font-headline text-lg font-bold text-texto">Dados do Pet</h3>
+      <div className="mg-card space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-teal/10 flex items-center justify-center">
+            <FileText className="w-4 h-4 text-teal" />
+          </div>
+          <h3 className="font-headline text-lg font-bold text-texto">Dados do Pet</h3>
+        </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm">
           {pet.genero && <Field label="Genero" value={generoLabel(pet.genero)} />}
@@ -345,8 +381,8 @@ export default function PerfilPage() {
         </div>
 
         {pet.observacoes && (
-          <div className="bg-creme-dark/40 rounded-xl px-4 py-3">
-            <p className="pt-label mb-1">Observacoes</p>
+          <div className="mg-card-solid rounded-xl px-4 py-3">
+            <p className="mg-label mb-1">Observacoes</p>
             <p className="text-sm text-texto font-body">{pet.observacoes}</p>
           </div>
         )}
@@ -358,11 +394,14 @@ export default function PerfilPage() {
         {/* AirTag */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="pt-label">Localizacao (AirTag)</p>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-primary" />
+              <p className="mg-label">Localizacao (AirTag)</p>
+            </div>
             {!editingAirTag && (
               <button
                 onClick={() => { setAirTagInput(pet.airTagUrl ?? ''); setEditingAirTag(true); }}
-                className="pt-btn-ghost text-sm"
+                className="mg-btn-ghost text-sm"
               >
                 {pet.airTagUrl ? 'Alterar' : 'Cadastrar'}
               </button>
@@ -370,13 +409,13 @@ export default function PerfilPage() {
           </div>
 
           {editingAirTag ? (
-            <div className="space-y-3 bg-azul-light/30 rounded-xl p-4">
+            <div className="space-y-3 mg-card-solid rounded-xl p-4">
               <p className="text-xs text-texto-soft font-body">
                 Cole o link de compartilhamento do Apple Find My (gerado pelo app no iPhone).
               </p>
               <input
                 type="url"
-                className="pt-input"
+                className="mg-input"
                 placeholder="https://findmy.apple.com/..."
                 value={airTagInput}
                 onChange={(e) => { setAirTagInput(e.target.value); setAirTagError(''); }}
@@ -387,13 +426,13 @@ export default function PerfilPage() {
                 <button
                   onClick={handleSaveAirTag}
                   disabled={airTagSaving}
-                  className="pt-btn flex-1 text-sm"
+                  className="mg-btn flex-1 text-sm"
                 >
                   {airTagSaving ? 'Salvando...' : 'Salvar'}
                 </button>
                 <button
                   onClick={() => { setEditingAirTag(false); setAirTagError(''); }}
-                  className="pt-btn-secondary text-sm px-4"
+                  className="mg-btn-secondary text-sm px-4"
                 >
                   Cancelar
                 </button>
@@ -406,8 +445,9 @@ export default function PerfilPage() {
                 href={pet.airTagUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="pt-btn-secondary flex items-center justify-center gap-2 w-full text-sm"
+                className="mg-btn-secondary flex items-center justify-center gap-2 w-full text-sm"
               >
+                <MapPin className="w-3.5 h-3.5" />
                 Ver localizacao no Find My
               </a>
             </div>
@@ -420,9 +460,9 @@ export default function PerfilPage() {
 
         {/* Plano de saude resumo */}
         {plano && (
-          <div className="bg-rosa-light/30 rounded-xl px-4 py-3 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-rosa-light flex items-center justify-center flex-shrink-0">
-              <span className="text-lg">+</span>
+          <div className="mg-card-solid rounded-xl px-4 py-3 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-rose/10 flex items-center justify-center flex-shrink-0">
+              <Heart className="w-5 h-5 text-rose" />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-headline font-bold text-texto truncate">{plano.operadora}</p>
@@ -435,10 +475,15 @@ export default function PerfilPage() {
       </div>
 
       {/* Section 3: Rede de Cuidado */}
-      <div className="pt-card space-y-6">
+      <div className="mg-card space-y-6">
         <div>
-          <h3 className="font-headline text-lg font-bold text-texto">Rede de Cuidado</h3>
-          <p className="text-sm text-texto-soft font-body">Pessoas com acesso ao perfil de {pet.nome}</p>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Users className="w-4 h-4 text-primary" />
+            </div>
+            <h3 className="font-headline text-lg font-bold text-texto">Rede de Cuidado</h3>
+          </div>
+          <p className="text-sm text-texto-soft font-body mt-1">Pessoas com acesso ao perfil de {pet.nome}</p>
         </div>
 
         {/* === Tutores === */}
@@ -449,20 +494,21 @@ export default function PerfilPage() {
             </p>
             <button
               onClick={() => { setShowAddTutor(!showAddTutor); setShowAddPrestador(false); setShowAddVisitante(false); }}
-              className="pt-btn-ghost text-sm"
+              className="mg-btn-ghost text-sm"
             >
-              + Convidar
+              <Plus className="w-3.5 h-3.5" />
+              Convidar
             </button>
           </div>
 
           {showAddTutor && (
-            <form onSubmit={handleAddTutor} className="space-y-3 bg-azul-light/30 rounded-xl p-5">
+            <form onSubmit={handleAddTutor} className="space-y-3 mg-card-solid rounded-xl p-5">
               <h4 className="font-headline font-bold text-texto text-sm">Convidar tutor</h4>
               <div>
-                <label className="pt-label">E-mail *</label>
+                <label className="mg-label">E-mail *</label>
                 <input
                   type="email"
-                  className="pt-input"
+                  className="mg-input"
                   placeholder="email@exemplo.com"
                   value={tutorForm.email}
                   onChange={(e) => setTutorForm((f) => ({ ...f, email: e.target.value }))}
@@ -471,9 +517,9 @@ export default function PerfilPage() {
                 />
               </div>
               <div>
-                <label className="pt-label">Papel</label>
+                <label className="mg-label">Papel</label>
                 <select
-                  className="pt-input"
+                  className="mg-select"
                   value={tutorForm.role}
                   onChange={(e) => setTutorForm((f) => ({ ...f, role: e.target.value }))}
                 >
@@ -482,10 +528,10 @@ export default function PerfilPage() {
               </div>
               {tutorError && <p className="text-xs text-erro font-body">{tutorError}</p>}
               <div className="flex gap-3">
-                <button type="submit" disabled={tutorSaving} className="pt-btn flex-1 text-sm">
+                <button type="submit" disabled={tutorSaving} className="mg-btn flex-1 text-sm">
                   {tutorSaving ? 'Adicionando...' : 'Enviar convite'}
                 </button>
-                <button type="button" onClick={() => setShowAddTutor(false)} className="pt-btn-secondary text-sm px-4">
+                <button type="button" onClick={() => setShowAddTutor(false)} className="mg-btn-secondary text-sm px-4">
                   Cancelar
                 </button>
               </div>
@@ -493,7 +539,10 @@ export default function PerfilPage() {
           )}
 
           {tutoresList.length === 0 ? (
-            <p className="text-sm text-texto-soft font-body py-3 text-center">Nenhum tutor vinculado</p>
+            <div className="mg-card-solid rounded-xl py-6 flex flex-col items-center gap-2">
+              <User className="w-6 h-6 text-texto-soft/40" />
+              <p className="text-sm text-texto-soft font-body text-center">Nenhum tutor vinculado</p>
+            </div>
           ) : (
             <div className="space-y-2">
               {tutoresList.map((pu) => (
@@ -503,7 +552,7 @@ export default function PerfilPage() {
           )}
         </div>
 
-        <hr className="border-creme-dark" />
+        <hr className="border-surface-muted" />
 
         {/* === Prestadores === */}
         <div className="space-y-3">
@@ -513,20 +562,21 @@ export default function PerfilPage() {
             </p>
             <button
               onClick={() => { setShowAddPrestador(!showAddPrestador); setShowAddTutor(false); setShowAddVisitante(false); }}
-              className="pt-btn-ghost text-sm"
+              className="mg-btn-ghost text-sm"
             >
-              + Convidar
+              <Plus className="w-3.5 h-3.5" />
+              Convidar
             </button>
           </div>
 
           {showAddPrestador && (
-            <form onSubmit={handleAddPrestador} className="space-y-3 bg-rosa-light/30 rounded-xl p-5">
+            <form onSubmit={handleAddPrestador} className="space-y-3 mg-card-solid rounded-xl p-5">
               <h4 className="font-headline font-bold text-texto text-sm">Convidar prestador</h4>
               <div>
-                <label className="pt-label">E-mail *</label>
+                <label className="mg-label">E-mail *</label>
                 <input
                   type="email"
-                  className="pt-input"
+                  className="mg-input"
                   placeholder="veterinario@email.com"
                   value={prestadorForm.email}
                   onChange={(e) => setPrestadorForm((f) => ({ ...f, email: e.target.value }))}
@@ -536,10 +586,10 @@ export default function PerfilPage() {
               </div>
               {prestadorError && <p className="text-xs text-erro font-body">{prestadorError}</p>}
               <div className="flex gap-3">
-                <button type="submit" disabled={prestadorSaving} className="pt-btn flex-1 text-sm">
+                <button type="submit" disabled={prestadorSaving} className="mg-btn flex-1 text-sm">
                   {prestadorSaving ? 'Convidando...' : 'Enviar convite'}
                 </button>
-                <button type="button" onClick={() => setShowAddPrestador(false)} className="pt-btn-secondary text-sm px-4">
+                <button type="button" onClick={() => setShowAddPrestador(false)} className="mg-btn-secondary text-sm px-4">
                   Cancelar
                 </button>
               </div>
@@ -547,7 +597,10 @@ export default function PerfilPage() {
           )}
 
           {prestadoresList.length === 0 ? (
-            <p className="text-sm text-texto-soft font-body py-3 text-center">Nenhum prestador vinculado</p>
+            <div className="mg-card-solid rounded-xl py-6 flex flex-col items-center gap-2">
+              <Users className="w-6 h-6 text-texto-soft/40" />
+              <p className="text-sm text-texto-soft font-body text-center">Nenhum prestador vinculado</p>
+            </div>
           ) : (
             <div className="space-y-2">
               {prestadoresList.map((pu) => (
@@ -557,7 +610,7 @@ export default function PerfilPage() {
           )}
         </div>
 
-        <hr className="border-creme-dark" />
+        <hr className="border-surface-muted" />
 
         {/* === Visitantes === */}
         <div className="space-y-3">
@@ -567,23 +620,24 @@ export default function PerfilPage() {
             </p>
             <button
               onClick={() => { setShowAddVisitante(!showAddVisitante); setShowAddTutor(false); setShowAddPrestador(false); }}
-              className="pt-btn-ghost text-sm"
+              className="mg-btn-ghost text-sm"
             >
-              + Convidar
+              <Plus className="w-3.5 h-3.5" />
+              Convidar
             </button>
           </div>
 
           {showAddVisitante && (
-            <form onSubmit={handleAddVisitante} className="space-y-3 bg-coral-light/30 rounded-xl p-5">
+            <form onSubmit={handleAddVisitante} className="space-y-3 mg-card-solid rounded-xl p-5">
               <h4 className="font-headline font-bold text-texto text-sm">Convidar visitante</h4>
               <p className="text-xs text-texto-soft font-body">
                 Visitantes tem acesso somente-leitura com permissoes configuraveis.
               </p>
               <div>
-                <label className="pt-label">E-mail *</label>
+                <label className="mg-label">E-mail *</label>
                 <input
                   type="email"
-                  className="pt-input"
+                  className="mg-input"
                   placeholder="visitante@email.com"
                   value={visitanteForm.email}
                   onChange={(e) => setVisitanteForm((f) => ({ ...f, email: e.target.value }))}
@@ -592,17 +646,17 @@ export default function PerfilPage() {
                 />
               </div>
               <div>
-                <label className="pt-label">Relacao</label>
+                <label className="mg-label">Relacao</label>
                 <input
                   type="text"
-                  className="pt-input"
+                  className="mg-input"
                   placeholder="Ex: Avo, Vizinho, Dogsitter..."
                   value={visitanteForm.relacao}
                   onChange={(e) => setVisitanteForm((f) => ({ ...f, relacao: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="pt-label">Permissoes</label>
+                <label className="mg-label">Permissoes</label>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {PERMISSAO_OPTIONS.map((p) => (
                     <button
@@ -612,8 +666,8 @@ export default function PerfilPage() {
                       className={cn(
                         'px-3 py-1.5 rounded-full text-xs font-headline font-bold transition-all',
                         visitanteForm.permissoes.includes(p.value)
-                          ? 'bg-coral text-white'
-                          : 'bg-creme-dark text-texto-soft',
+                          ? 'bg-primary text-white'
+                          : 'bg-surface-muted text-texto-soft',
                         p.value === 'STATUS_SAUDE' && 'opacity-60 cursor-not-allowed',
                       )}
                       disabled={p.value === 'STATUS_SAUDE'}
@@ -626,10 +680,10 @@ export default function PerfilPage() {
               </div>
               {visitanteError && <p className="text-xs text-erro font-body">{visitanteError}</p>}
               <div className="flex gap-3">
-                <button type="submit" disabled={visitanteSaving} className="pt-btn flex-1 text-sm">
+                <button type="submit" disabled={visitanteSaving} className="mg-btn flex-1 text-sm">
                   {visitanteSaving ? 'Convidando...' : 'Enviar convite'}
                 </button>
-                <button type="button" onClick={() => setShowAddVisitante(false)} className="pt-btn-secondary text-sm px-4">
+                <button type="button" onClick={() => setShowAddVisitante(false)} className="mg-btn-secondary text-sm px-4">
                   Cancelar
                 </button>
               </div>
@@ -639,11 +693,14 @@ export default function PerfilPage() {
           {visitantesLoading ? (
             <div className="space-y-2">
               {[1, 2].map((i) => (
-                <div key={i} className="h-14 pt-skeleton rounded-xl" />
+                <div key={i} className="h-14 mg-skeleton rounded-xl" />
               ))}
             </div>
           ) : visitantes.length === 0 ? (
-            <p className="text-sm text-texto-soft font-body py-3 text-center">Nenhum visitante vinculado</p>
+            <div className="mg-card-solid rounded-xl py-6 flex flex-col items-center gap-2">
+              <User className="w-6 h-6 text-texto-soft/40" />
+              <p className="text-sm text-texto-soft font-body text-center">Nenhum visitante vinculado</p>
+            </div>
           ) : (
             <div className="space-y-2">
               {visitantes.map((v) => (
@@ -655,29 +712,34 @@ export default function PerfilPage() {
       </div>
 
       {/* Section 4: Acoes */}
-      <div className="pt-card space-y-3">
-        <h3 className="font-headline text-lg font-bold text-texto">Acoes</h3>
+      <div className="mg-card space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-amber/10 flex items-center justify-center">
+            <AlertCircle className="w-4 h-4 text-amber" />
+          </div>
+          <h3 className="font-headline text-lg font-bold text-texto">Acoes</h3>
+        </div>
 
         <button
           onClick={() => setShowFeedback(!showFeedback)}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-creme-dark/30 active:scale-[0.98] transition-all text-left"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-muted/30 active:scale-[0.98] transition-all text-left"
         >
-          <div className="w-10 h-10 rounded-full bg-azul-light flex items-center justify-center flex-shrink-0">
-            <span className="text-sm text-azul font-bold">?</span>
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-headline font-bold text-texto">Enviar feedback</p>
             <p className="text-xs text-texto-soft font-body">Compartilhe sua experiencia</p>
           </div>
-          <svg className="text-texto-soft flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          <ChevronRight className="w-4 h-4 text-texto-soft flex-shrink-0" />
         </button>
 
         {showFeedback && (
-          <form onSubmit={handleFeedback} className="space-y-3 bg-azul-light/30 rounded-xl p-5">
+          <form onSubmit={handleFeedback} className="space-y-3 mg-card-solid rounded-xl p-5">
             <div>
-              <label className="pt-label">Tipo</label>
+              <label className="mg-label">Tipo</label>
               <select
-                className="pt-input"
+                className="mg-select"
                 value={feedbackForm.tipo}
                 onChange={(e) =>
                   setFeedbackForm((f) => ({ ...f, tipo: e.target.value }))
@@ -690,9 +752,9 @@ export default function PerfilPage() {
               </select>
             </div>
             <div>
-              <label className="pt-label">Mensagem *</label>
+              <label className="mg-label">Mensagem *</label>
               <textarea
-                className="pt-input resize-none"
+                className="mg-input resize-none"
                 rows={3}
                 value={feedbackForm.mensagem}
                 onChange={(e) =>
@@ -705,14 +767,14 @@ export default function PerfilPage() {
               <button
                 type="submit"
                 disabled={feedbackSaving}
-                className="pt-btn flex-1 text-sm"
+                className="mg-btn flex-1 text-sm"
               >
                 {feedbackSaving ? 'Enviando...' : 'Enviar'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowFeedback(false)}
-                className="pt-btn-secondary text-sm px-4"
+                className="mg-btn-secondary text-sm px-4"
               >
                 Cancelar
               </button>
@@ -721,8 +783,8 @@ export default function PerfilPage() {
         )}
 
         <div className="flex items-center gap-2 px-4 py-2">
-          <span className="inline-flex items-center gap-1.5 bg-coral-light text-coral text-xs px-3 py-1 rounded-full font-headline font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-coral animate-pulse" />
+          <span className="mg-badge mg-badge-primary flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
             Beta
           </span>
           <p className="text-xs text-texto-soft font-body">
@@ -732,8 +794,9 @@ export default function PerfilPage() {
 
         <button
           onClick={() => router.push(`/pets/${petId}/editar`)}
-          className="pt-btn w-full text-sm"
+          className="mg-btn w-full text-sm"
         >
+          <Edit className="w-3.5 h-3.5" />
           Editar Perfil
         </button>
       </div>
@@ -742,29 +805,29 @@ export default function PerfilPage() {
       <BottomSheet open={showGuardaForm} onClose={() => setShowGuardaForm(false)} title="Solicitar alteracao de guarda">
         <form onSubmit={handleGuardaSubmit} className="space-y-4">
           <div>
-            <label className="pt-label">Tipo</label>
-            <select className="pt-input" value={guardaForm.tipo} onChange={e => setGuardaForm(f => ({...f, tipo: e.target.value}))}>
+            <label className="mg-label">Tipo</label>
+            <select className="mg-select" value={guardaForm.tipo} onChange={e => setGuardaForm(f => ({...f, tipo: e.target.value}))}>
               <option value="TEMPORARIA">Guarda temporaria</option>
               <option value="DEFINITIVA">Alteracao definitiva</option>
             </select>
           </div>
           <div>
-            <label className="pt-label">Motivo</label>
-            <textarea className="pt-input resize-none" rows={3} value={guardaForm.motivo} onChange={e => setGuardaForm(f => ({...f, motivo: e.target.value}))} placeholder="Descreva o motivo..." required />
+            <label className="mg-label">Motivo</label>
+            <textarea className="mg-input resize-none" rows={3} value={guardaForm.motivo} onChange={e => setGuardaForm(f => ({...f, motivo: e.target.value}))} placeholder="Descreva o motivo..." required />
           </div>
           {guardaForm.tipo === 'TEMPORARIA' && (
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="pt-label">Data inicio</label>
-                <input type="date" className="pt-input" value={guardaForm.dataInicio} onChange={e => setGuardaForm(f => ({...f, dataInicio: e.target.value}))} required />
+                <label className="mg-label">Data inicio</label>
+                <input type="date" className="mg-input" value={guardaForm.dataInicio} onChange={e => setGuardaForm(f => ({...f, dataInicio: e.target.value}))} required />
               </div>
               <div>
-                <label className="pt-label">Data fim</label>
-                <input type="date" className="pt-input" value={guardaForm.dataFim} onChange={e => setGuardaForm(f => ({...f, dataFim: e.target.value}))} required />
+                <label className="mg-label">Data fim</label>
+                <input type="date" className="mg-input" value={guardaForm.dataFim} onChange={e => setGuardaForm(f => ({...f, dataFim: e.target.value}))} required />
               </div>
             </div>
           )}
-          <button type="submit" disabled={guardaSaving} className="pt-btn w-full">
+          <button type="submit" disabled={guardaSaving} className="mg-btn w-full">
             {guardaSaving ? 'Enviando...' : 'Enviar solicitacao'}
           </button>
         </form>
@@ -775,8 +838,8 @@ export default function PerfilPage() {
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-creme-dark/40 rounded-xl px-4 py-3">
-      <p className="pt-label mb-0.5">{label}</p>
+    <div className="mg-card-solid rounded-xl px-4 py-3">
+      <p className="mg-label mb-0.5">{label}</p>
       <p className="text-sm font-headline font-bold text-texto">{value}</p>
     </div>
   );
@@ -796,15 +859,15 @@ const PERMISSAO_LABELS: Record<string, string> = Object.fromEntries(
   PERMISSAO_OPTIONS.map((p) => [p.value, p.label]),
 );
 
-const ROLE_BADGE: Record<string, { bg: string; text: string }> = {
-  TUTOR_PRINCIPAL:  { bg: 'bg-coral-light',    text: 'text-coral'    },
-  TUTOR_EMERGENCIA: { bg: 'bg-rosa-light',   text: 'text-rosa'   },
-  VETERINARIO:      { bg: 'bg-azul-light',  text: 'text-azul'  },
-  ADESTRADOR:       { bg: 'bg-rosa-light',   text: 'text-rosa'   },
-  PASSEADOR:        { bg: 'bg-coral-light',    text: 'text-coral'    },
-  FAMILIAR:         { bg: 'bg-creme-dark', text: 'text-texto-soft'    },
-  AMIGO:            { bg: 'bg-creme-dark', text: 'text-texto-soft'    },
-  OUTRO:            { bg: 'bg-creme-dark', text: 'text-texto-soft'    },
+const ROLE_BADGE: Record<string, string> = {
+  TUTOR_PRINCIPAL:  'mg-badge-primary',
+  TUTOR_EMERGENCIA: 'mg-badge-warning',
+  VETERINARIO:      'mg-badge-info',
+  ADESTRADOR:       'mg-badge-success',
+  PASSEADOR:        'mg-badge-primary',
+  FAMILIAR:         'mg-badge',
+  AMIGO:            'mg-badge',
+  OUTRO:            'mg-badge',
 };
 
 function TutorRow({
@@ -814,11 +877,11 @@ function TutorRow({
   pu: PetUsuario;
   isMe: boolean;
 }) {
-  const badge = ROLE_BADGE[pu.role] ?? { bg: 'bg-creme-dark', text: 'text-texto-soft' };
+  const badgeClass = ROLE_BADGE[pu.role] ?? 'mg-badge';
   return (
-    <div className="bg-creme-dark/30 rounded-xl p-3 flex items-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-coral-light flex items-center justify-center flex-shrink-0">
-        <span className="text-coral text-sm font-headline font-bold">
+    <div className="mg-card-solid rounded-xl p-3 flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+        <span className="text-primary text-sm font-headline font-bold">
           {getInitials(pu.usuario.nome)}
         </span>
       </div>
@@ -833,7 +896,7 @@ function TutorRow({
         </p>
         <p className="text-xs text-texto-soft font-body">{pu.usuario.email}</p>
       </div>
-      <span className={cn('px-3 py-1 rounded-full text-xs font-headline font-bold flex-shrink-0', badge.bg, badge.text)}>
+      <span className={cn('mg-badge flex-shrink-0', badgeClass)}>
         {roleLabel(pu.role)}
       </span>
     </div>
@@ -845,10 +908,10 @@ function VisitanteRow({ visitante, onRemove }: { visitante: PetVisitante; onRemo
   const permissoes = visitante.permissoesVisualizacao || [];
 
   return (
-    <div className="bg-creme-dark/30 rounded-xl p-3 space-y-2">
+    <div className="mg-card-solid rounded-xl p-3 space-y-2">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-rosa-light flex items-center justify-center flex-shrink-0">
-          <span className="text-rosa text-sm font-headline font-bold">
+        <div className="w-10 h-10 rounded-full bg-rose/10 flex items-center justify-center flex-shrink-0">
+          <span className="text-rose text-sm font-headline font-bold">
             {getInitials(nome)}
           </span>
         </div>
@@ -860,9 +923,10 @@ function VisitanteRow({ visitante, onRemove }: { visitante: PetVisitante; onRemo
         </div>
         <button
           onClick={onRemove}
-          className="text-xs text-erro hover:text-erro/80 font-headline font-bold px-3 py-1 rounded-full bg-erro/10 flex-shrink-0 transition-colors"
+          className="mg-badge mg-badge-error flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
           title="Remover acesso"
         >
+          <Trash2 className="w-3 h-3" />
           Remover
         </button>
       </div>
@@ -871,7 +935,7 @@ function VisitanteRow({ visitante, onRemove }: { visitante: PetVisitante; onRemo
           {permissoes.map((p) => (
             <span
               key={p}
-              className="px-2 py-0.5 rounded-full text-xs font-headline font-bold bg-coral-light text-coral"
+              className="mg-badge mg-badge-primary"
             >
               {PERMISSAO_LABELS[p] || p}
             </span>
@@ -891,20 +955,27 @@ function CodigoPetDisplay({ codigo, nome }: { codigo: string; nome: string }) {
   };
 
   return (
-    <div className="bg-creme-dark/40 rounded-xl px-4 py-3">
+    <div className="mg-card-solid rounded-xl px-4 py-3">
       <div className="flex items-center justify-between">
         <div>
-          <p className="pt-label mb-0.5">Codigo do pet</p>
+          <p className="mg-label mb-0.5">Codigo do pet</p>
           <p className="text-sm font-mono font-bold text-texto tracking-wider">
             {codigo}
           </p>
         </div>
         <button
           onClick={handleCopy}
-          className="pt-btn-ghost text-sm"
+          className="mg-btn-ghost text-sm"
           title="Copiar codigo"
         >
-          {copied ? 'Copiado!' : 'Copiar'}
+          {copied ? (
+            <>
+              <Check className="w-3.5 h-3.5" />
+              Copiado!
+            </>
+          ) : (
+            'Copiar'
+          )}
         </button>
       </div>
       <p className="text-xs text-texto-soft mt-1 font-body">

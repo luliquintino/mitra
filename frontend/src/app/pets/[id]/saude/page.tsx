@@ -1,10 +1,30 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { petsApi, healthApi, compromissosApi } from '@/lib/api';
 import { Pet, Vacina, Medicamento, Sintoma, PlanoSaude, Compromisso, RecomendacaoVacina, AgendamentoVacina } from '@/types';
 import { formatDate, cn } from '@/lib/utils';
+import {
+  Heart,
+  Syringe,
+  Pill,
+  Activity,
+  Calendar,
+  Plus,
+  Check,
+  X,
+  AlertCircle,
+  Clock,
+  ChevronDown,
+  Stethoscope,
+  Shield,
+  Award,
+  Star,
+  Bell,
+  Send,
+  Camera,
+} from 'lucide-react';
 
 // ─── Species-specific data ──────────────────────────────────────────────────
 
@@ -91,9 +111,9 @@ const INTENSIDADE_OPTIONS = [
 function intensidadeBadge(intensidade: number | string | undefined | null) {
   if (!intensidade) return null;
   const num = typeof intensidade === 'string' ? parseInt(intensidade) : intensidade;
-  if (num <= 2) return { label: 'Leve', className: 'bg-green-100 text-green-700' };
-  if (num <= 3) return { label: 'Moderado', className: 'bg-yellow-100 text-yellow-700' };
-  return { label: 'Grave', className: 'bg-red-100 text-red-700' };
+  if (num <= 2) return { label: 'Leve', className: 'mg-badge mg-badge-success' };
+  if (num <= 3) return { label: 'Moderado', className: 'mg-badge mg-badge-warning' };
+  return { label: 'Grave', className: 'mg-badge mg-badge-error' };
 }
 
 // ─── Vaccine alert helper ────────────────────────────────────────────────────
@@ -113,11 +133,11 @@ function vacinaAlertStatus(proximaDose: string | undefined): 'overdue' | 'soon' 
 
 function EmptyState({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
-    <div className="pt-card text-center py-10 space-y-3">
+    <div className="mg-card text-center py-10 space-y-3">
       <div className="text-3xl">{icon}</div>
       <div>
-        <p className="font-semibold text-texto text-sm">{title}</p>
-        <p className="text-xs text-texto-soft mt-1 max-w-xs mx-auto">{description}</p>
+        <p className="font-headline font-semibold text-texto text-sm">{title}</p>
+        <p className="text-xs text-texto-soft mt-1 max-w-xs mx-auto font-body">{description}</p>
       </div>
     </div>
   );
@@ -126,9 +146,9 @@ function EmptyState({ icon, title, description }: { icon: string; title: string;
 function ConfirmationBanner({ message }: { message: string }) {
   if (!message) return null;
   return (
-    <div className="rounded-xl bg-creme-dark px-4 py-3 flex items-center gap-2 animate-fade-in">
-      <span className="text-texto-soft text-sm">&#10003;</span>
-      <span className="text-sm text-texto font-medium">{message}</span>
+    <div className="rounded-xl bg-surface-muted px-4 py-3 flex items-center gap-2 animate-fade-in">
+      <Check className="w-4 h-4 text-teal" />
+      <span className="text-sm text-texto font-medium font-body">{message}</span>
     </div>
   );
 }
@@ -196,72 +216,73 @@ function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       <ConfirmationBanner message={confirmation} />
 
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-texto">
+        <p className="text-sm font-headline font-semibold text-texto">
           {initialVacinas.length} {initialVacinas.length === 1 ? 'vacina' : 'vacinas'}
         </p>
-        <button onClick={() => setShowForm(!showForm)} className="pt-btn text-sm">
-          + Vacina
+        <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
+          <Plus className="w-4 h-4" />
+          Vacina
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSave} className="pt-card space-y-3 bg-coral-light/30">
+        <form onSubmit={handleSave} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Nova vacina</h3>
           <div className="space-y-2">
-            <label className="pt-label">Nome da vacina *</label>
+            <label className="mg-label">Nome da vacina *</label>
             {vacinasDisponiveis.length > 0 ? (
               <>
-                <select className="pt-input" value={form.nome} onChange={(e) => handleNomeChange(e.target.value)} required={!isOutraVacina}>
+                <select className="mg-select" value={form.nome} onChange={(e) => handleNomeChange(e.target.value)} required={!isOutraVacina}>
                   <option value="">Selecione a vacina</option>
                   {vacinasDisponiveis.map((v) => <option key={v} value={v}>{v}</option>)}
                   <option value="__OUTRA__">Outra vacina...</option>
                 </select>
                 {isOutraVacina && (
-                  <input className="pt-input" placeholder="Nome da vacina..." value={nomeManual} onChange={(e) => setNomeManual(e.target.value)} autoFocus required />
+                  <input className="mg-input" placeholder="Nome da vacina..." value={nomeManual} onChange={(e) => setNomeManual(e.target.value)} autoFocus required />
                 )}
               </>
             ) : (
-              <input className="pt-input" placeholder="V10, Antirrabica..." value={form.nome} onChange={(e) => setForm(f => ({ ...f, nome: e.target.value }))} required />
+              <input className="mg-input" placeholder="V10, Antirrabica..." value={form.nome} onChange={(e) => setForm(f => ({ ...f, nome: e.target.value }))} required />
             )}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="pt-label">Data de aplicacao *</label>
-              <input type="date" className="pt-input" value={form.dataAplicacao} onChange={(e) => setForm(f => ({ ...f, dataAplicacao: e.target.value }))} required />
+              <label className="mg-label">Data de aplicacao *</label>
+              <input type="date" className="mg-input" value={form.dataAplicacao} onChange={(e) => setForm(f => ({ ...f, dataAplicacao: e.target.value }))} required />
             </div>
             <div>
-              <label className="pt-label">Proxima dose</label>
-              <input type="date" className="pt-input" value={form.proximaDose} onChange={(e) => setForm(f => ({ ...f, proximaDose: e.target.value }))} />
+              <label className="mg-label">Proxima dose</label>
+              <input type="date" className="mg-input" value={form.proximaDose} onChange={(e) => setForm(f => ({ ...f, proximaDose: e.target.value }))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="pt-label">Veterinario</label>
-              <input className="pt-input" placeholder="Dr. Silva" value={form.veterinario} onChange={(e) => setForm(f => ({ ...f, veterinario: e.target.value }))} />
+              <label className="mg-label">Veterinario</label>
+              <input className="mg-input" placeholder="Dr. Silva" value={form.veterinario} onChange={(e) => setForm(f => ({ ...f, veterinario: e.target.value }))} />
             </div>
             <div>
-              <label className="pt-label">CRMV</label>
-              <input className="pt-input" placeholder="12345-SP" value={form.crmv} onChange={(e) => setForm(f => ({ ...f, crmv: e.target.value }))} />
+              <label className="mg-label">CRMV</label>
+              <input className="mg-input" placeholder="12345-SP" value={form.crmv} onChange={(e) => setForm(f => ({ ...f, crmv: e.target.value }))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="pt-label">Lote</label>
-              <input className="pt-input" placeholder="ABC123" value={form.lote} onChange={(e) => setForm(f => ({ ...f, lote: e.target.value }))} />
+              <label className="mg-label">Lote</label>
+              <input className="mg-input" placeholder="ABC123" value={form.lote} onChange={(e) => setForm(f => ({ ...f, lote: e.target.value }))} />
             </div>
             <div>
-              <label className="pt-label">Clinica</label>
-              <input className="pt-input" placeholder="VetCare" value={form.clinica} onChange={(e) => setForm(f => ({ ...f, clinica: e.target.value }))} />
+              <label className="mg-label">Clinica</label>
+              <input className="mg-input" placeholder="VetCare" value={form.clinica} onChange={(e) => setForm(f => ({ ...f, clinica: e.target.value }))} />
             </div>
           </div>
-          {saveError && <p className="text-xs text-erro">{saveError}</p>}
+          {saveError && <p className="text-xs text-rose-500">{saveError}</p>}
           <div className="flex gap-2 pt-1">
-            <button type="submit" disabled={saving} className="pt-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Registrar vacina'}</button>
-            <button type="button" onClick={handleCancel} className="pt-btn-secondary text-sm px-4">Cancelar</button>
+            <button type="submit" disabled={saving} className="mg-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Registrar vacina'}</button>
+            <button type="button" onClick={handleCancel} className="mg-btn-secondary text-sm px-4">Cancelar</button>
           </div>
         </form>
       )}
@@ -274,35 +295,37 @@ function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
             const alert = vacinaAlertStatus(v.proximaDose);
             return (
               <div key={v.id} className={cn(
-                'bg-white rounded-2xl p-4',
-                alert === 'overdue' && 'ring-2 ring-red-400',
-                alert === 'soon' && 'ring-2 ring-yellow-400',
+                'mg-card-solid rounded-xl p-4',
+                alert === 'overdue' && 'ring-2 ring-rose-400',
+                alert === 'soon' && 'ring-2 ring-amber-400',
               )}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-rosa-light flex items-center justify-center text-base flex-shrink-0">&#128137;</div>
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Syringe className="w-4 h-4 text-primary" />
+                    </div>
                     <div>
-                      <p className="font-semibold text-texto text-sm">{v.nome}</p>
-                      <p className="text-xs text-texto-soft mt-0.5">Aplicada em {formatDate(v.dataAplicacao)}</p>
+                      <p className="font-headline font-semibold text-texto text-sm">{v.nome}</p>
+                      <p className="text-xs text-texto-soft font-body mt-0.5">Aplicada em {formatDate(v.dataAplicacao)}</p>
                       {v.veterinario && (
-                        <p className="text-xs text-texto-soft">
+                        <p className="text-xs text-texto-soft font-body">
                           {v.veterinario}{v.crmv ? ` (CRMV ${v.crmv})` : ''}{(v as any).clinica ? ` \u00B7 ${(v as any).clinica}` : ''}
                         </p>
                       )}
-                      {v.lote && <p className="text-xs text-texto-soft">Lote: {v.lote}</p>}
+                      {v.lote && <p className="text-xs text-texto-soft font-body">Lote: {v.lote}</p>}
                     </div>
                   </div>
                   {v.proximaDose && (
                     <div className="text-right flex-shrink-0">
-                      <p className="text-xs text-texto-soft">Proxima dose</p>
+                      <p className="text-xs text-texto-soft font-body">Proxima dose</p>
                       <p className={cn(
                         'text-xs font-semibold mt-0.5',
-                        alert === 'overdue' ? 'text-red-600' : alert === 'soon' ? 'text-yellow-600' : 'text-coral',
+                        alert === 'overdue' ? 'text-rose-500' : alert === 'soon' ? 'text-amber-500' : 'text-primary',
                       )}>
                         {formatDate(v.proximaDose)}
                       </p>
-                      {alert === 'overdue' && <p className="text-[10px] text-red-500 font-medium mt-0.5">Vencida</p>}
-                      {alert === 'soon' && <p className="text-[10px] text-yellow-600 font-medium mt-0.5">Em breve</p>}
+                      {alert === 'overdue' && <p className="text-[10px] text-rose-500 font-medium mt-0.5">Vencida</p>}
+                      {alert === 'soon' && <p className="text-[10px] text-amber-500 font-medium mt-0.5">Em breve</p>}
                     </div>
                   )}
                 </div>
@@ -394,14 +417,17 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
   const displayList = medFilter === 'ATIVO' ? ativos : inativos;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       <ConfirmationBanner message={confirmation} />
 
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-texto">
+        <p className="text-sm font-headline font-semibold text-texto">
           {initialMeds.length} {initialMeds.length === 1 ? 'medicamento' : 'medicamentos'}
         </p>
-        <button onClick={() => setShowForm(!showForm)} className="pt-btn text-sm">+ Medicamento</button>
+        <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
+          <Plus className="w-4 h-4" />
+          Medicamento
+        </button>
       </div>
 
       {/* Active / Completed filter */}
@@ -410,7 +436,7 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
           onClick={() => setMedFilter('ATIVO')}
           className={cn(
             'px-4 py-1.5 rounded-xl text-xs font-medium transition-all',
-            medFilter === 'ATIVO' ? 'bg-coral text-white' : 'bg-white text-texto-soft',
+            medFilter === 'ATIVO' ? 'bg-primary text-white' : 'mg-card-solid text-texto-soft',
           )}
         >
           Ativos ({ativos.length})
@@ -419,7 +445,7 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
           onClick={() => setMedFilter('HISTORICO')}
           className={cn(
             'px-4 py-1.5 rounded-xl text-xs font-medium transition-all',
-            medFilter === 'HISTORICO' ? 'bg-coral text-white' : 'bg-white text-texto-soft',
+            medFilter === 'HISTORICO' ? 'bg-primary text-white' : 'mg-card-solid text-texto-soft',
           )}
         >
           Concluidos ({inativos.length})
@@ -427,60 +453,60 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
       </div>
 
       {showForm && (
-        <form onSubmit={handleSave} className="pt-card space-y-3 bg-coral-light/30">
+        <form onSubmit={handleSave} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Novo medicamento</h3>
           <div className="space-y-2">
-            <label className="pt-label">Nome *</label>
+            <label className="mg-label">Nome *</label>
             {medsDisponiveis.length > 0 ? (
               <>
-                <select className="pt-input" value={form.nome} onChange={(e) => handleMedChange(e.target.value)} required={!isOutroMed}>
+                <select className="mg-select" value={form.nome} onChange={(e) => handleMedChange(e.target.value)} required={!isOutroMed}>
                   <option value="">Selecione o medicamento</option>
                   {medsDisponiveis.map((m) => <option key={m.nome} value={m.nome}>{m.nome}</option>)}
                   <option value="__OUTRO__">Outro medicamento...</option>
                 </select>
                 {isOutroMed && (
-                  <input className="pt-input" placeholder="Nome do medicamento..." value={nomeManual} onChange={(e) => setNomeManual(e.target.value)} autoFocus required />
+                  <input className="mg-input" placeholder="Nome do medicamento..." value={nomeManual} onChange={(e) => setNomeManual(e.target.value)} autoFocus required />
                 )}
               </>
             ) : (
-              <input className="pt-input" placeholder="Bravecto, Simparica..." value={form.nome} onChange={(e) => setForm(f => ({ ...f, nome: e.target.value }))} required />
+              <input className="mg-input" placeholder="Bravecto, Simparica..." value={form.nome} onChange={(e) => setForm(f => ({ ...f, nome: e.target.value }))} required />
             )}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="pt-label">Dosagem *{selectedMedInfo && <span className="ml-1 text-coral font-normal">(bula)</span>}</label>
-              <input className="pt-input" placeholder="1 comprimido" value={form.dosagem} onChange={(e) => setForm(f => ({ ...f, dosagem: e.target.value }))} required />
+              <label className="mg-label">Dosagem *{selectedMedInfo && <span className="ml-1 text-primary font-normal">(bula)</span>}</label>
+              <input className="mg-input" placeholder="1 comprimido" value={form.dosagem} onChange={(e) => setForm(f => ({ ...f, dosagem: e.target.value }))} required />
             </div>
             <div>
-              <label className="pt-label">Frequencia *{selectedMedInfo && <span className="ml-1 text-coral font-normal">(bula)</span>}</label>
-              <input className="pt-input" placeholder="A cada 3 meses" value={form.frequencia} onChange={(e) => setForm(f => ({ ...f, frequencia: e.target.value }))} required />
+              <label className="mg-label">Frequencia *{selectedMedInfo && <span className="ml-1 text-primary font-normal">(bula)</span>}</label>
+              <input className="mg-input" placeholder="A cada 3 meses" value={form.frequencia} onChange={(e) => setForm(f => ({ ...f, frequencia: e.target.value }))} required />
             </div>
           </div>
           <div>
-            <label className="pt-label">Data de inicio *</label>
-            <input type="date" className="pt-input" value={form.dataInicio} onChange={(e) => setForm(f => ({ ...f, dataInicio: e.target.value }))} required />
+            <label className="mg-label">Data de inicio *</label>
+            <input type="date" className="mg-input" value={form.dataInicio} onChange={(e) => setForm(f => ({ ...f, dataInicio: e.target.value }))} required />
           </div>
           <div className="space-y-2">
-            <label className="pt-label">Motivo</label>
+            <label className="mg-label">Motivo</label>
             {motivosDisponiveis.length > 0 ? (
               <>
-                <select className="pt-input" value={form.motivo} onChange={(e) => { setForm(f => ({ ...f, motivo: e.target.value })); setMotivoManual(''); }}>
+                <select className="mg-select" value={form.motivo} onChange={(e) => { setForm(f => ({ ...f, motivo: e.target.value })); setMotivoManual(''); }}>
                   <option value="">Selecione o motivo</option>
                   {motivosDisponiveis.map((m) => <option key={m} value={m}>{m}</option>)}
                   <option value="__OUTRO__">Outro motivo...</option>
                 </select>
                 {isOutroMotivo && (
-                  <input className="pt-input" placeholder="Descreva o motivo..." value={motivoManual} onChange={(e) => setMotivoManual(e.target.value)} autoFocus />
+                  <input className="mg-input" placeholder="Descreva o motivo..." value={motivoManual} onChange={(e) => setMotivoManual(e.target.value)} autoFocus />
                 )}
               </>
             ) : (
-              <input className="pt-input" placeholder="Prevencao, tratamento..." value={form.motivo} onChange={(e) => setForm(f => ({ ...f, motivo: e.target.value }))} />
+              <input className="mg-input" placeholder="Prevencao, tratamento..." value={form.motivo} onChange={(e) => setForm(f => ({ ...f, motivo: e.target.value }))} />
             )}
           </div>
-          {saveError && <p className="text-xs text-erro">{saveError}</p>}
+          {saveError && <p className="text-xs text-rose-500">{saveError}</p>}
           <div className="flex gap-2 pt-1">
-            <button type="submit" disabled={saving} className="pt-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Registrar'}</button>
-            <button type="button" onClick={handleCancel} className="pt-btn-secondary text-sm px-4">Cancelar</button>
+            <button type="submit" disabled={saving} className="mg-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Registrar'}</button>
+            <button type="button" onClick={handleCancel} className="mg-btn-secondary text-sm px-4">Cancelar</button>
           </div>
         </form>
       )}
@@ -494,27 +520,29 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
       ) : (
         <div className="space-y-3">
           {displayList.map((m) => (
-            <div key={m.id} className={cn('bg-white rounded-2xl p-4', medFilter !== 'ATIVO' && 'opacity-60')}>
+            <div key={m.id} className={cn('mg-card-solid rounded-xl p-4', medFilter !== 'ATIVO' && 'opacity-60')}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0', medFilter === 'ATIVO' ? 'bg-azul-light' : 'bg-creme-dark')}>&#128138;</div>
+                  <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0', medFilter === 'ATIVO' ? 'bg-teal/10' : 'bg-surface-muted')}>
+                    <Pill className={cn('w-4 h-4', medFilter === 'ATIVO' ? 'text-teal' : 'text-texto-soft')} />
+                  </div>
                   <div>
-                    <p className="font-semibold text-texto text-sm">{m.nome}</p>
-                    <p className="text-xs text-texto-soft mt-0.5">{m.dosagem} &middot; {m.frequencia}</p>
-                    {m.motivo && <p className="text-xs text-texto-soft mt-0.5">{m.motivo}</p>}
+                    <p className="font-headline font-semibold text-texto text-sm">{m.nome}</p>
+                    <p className="text-xs text-texto-soft font-body mt-0.5">{m.dosagem} &middot; {m.frequencia}</p>
+                    {m.motivo && <p className="text-xs text-texto-soft font-body mt-0.5">{m.motivo}</p>}
                     {medFilter !== 'ATIVO' && (
-                      <p className="text-xs text-texto-soft mt-0.5">{m.status === 'CONCLUIDO' ? 'Concluido' : 'Cancelado'} &middot; {formatDate(m.dataInicio)}</p>
+                      <p className="text-xs text-texto-soft font-body mt-0.5">{m.status === 'CONCLUIDO' ? 'Concluido' : 'Cancelado'} &middot; {formatDate(m.dataInicio)}</p>
                     )}
                     <span className={cn(
-                      'inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full font-medium',
-                      m.status === 'ATIVO' ? 'bg-green-100 text-green-700' : m.status === 'CONCLUIDO' ? 'bg-gray-100 text-gray-600' : 'bg-red-100 text-red-600',
+                      'inline-block mt-1 mg-badge text-[10px]',
+                      m.status === 'ATIVO' ? 'mg-badge-success' : m.status === 'CONCLUIDO' ? 'mg-badge-info' : 'mg-badge-error',
                     )}>
                       {m.status === 'ATIVO' ? 'Ativo' : m.status === 'CONCLUIDO' ? 'Concluido' : 'Cancelado'}
                     </span>
                   </div>
                 </div>
                 {m.status === 'ATIVO' && (
-                  <button onClick={() => handleAdministrar(m.id)} className="text-xs pt-btn-secondary py-1.5 px-3 flex-shrink-0">
+                  <button onClick={() => handleAdministrar(m.id)} className="mg-btn-teal text-xs py-1.5 px-3 flex-shrink-0">
                     Administrar dose
                   </button>
                 )}
@@ -609,49 +637,52 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
   const fechados = initialSintomas.filter(s => !!s.dataFim);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       <ConfirmationBanner message={confirmation} />
 
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-texto">
+        <p className="text-sm font-headline font-semibold text-texto">
           {initialSintomas.length} {initialSintomas.length === 1 ? 'sintoma' : 'sintomas'}
         </p>
-        <button onClick={() => setShowForm(!showForm)} className="pt-btn text-sm">+ Sintoma</button>
+        <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
+          <Plus className="w-4 h-4" />
+          Sintoma
+        </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSave} className="pt-card space-y-3 bg-coral-light/30">
+        <form onSubmit={handleSave} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Novo sintoma</h3>
           <div>
-            <label className="pt-label">Descricao *</label>
-            <textarea className="pt-input resize-none" rows={2} placeholder="Descreva o sintoma..." value={form.descricao} onChange={(e) => setForm(f => ({ ...f, descricao: e.target.value }))} required />
+            <label className="mg-label">Descricao *</label>
+            <textarea className="mg-input resize-none" rows={2} placeholder="Descreva o sintoma..." value={form.descricao} onChange={(e) => setForm(f => ({ ...f, descricao: e.target.value }))} required />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="pt-label">Data de inicio *</label>
-              <input type="date" className="pt-input" value={form.dataInicio} onChange={(e) => setForm(f => ({ ...f, dataInicio: e.target.value }))} required />
+              <label className="mg-label">Data de inicio *</label>
+              <input type="date" className="mg-input" value={form.dataInicio} onChange={(e) => setForm(f => ({ ...f, dataInicio: e.target.value }))} required />
             </div>
             <div>
-              <label className="pt-label">Data fim</label>
-              <input type="date" className="pt-input" value={form.dataFim} onChange={(e) => setForm(f => ({ ...f, dataFim: e.target.value }))} />
+              <label className="mg-label">Data fim</label>
+              <input type="date" className="mg-input" value={form.dataFim} onChange={(e) => setForm(f => ({ ...f, dataFim: e.target.value }))} />
             </div>
           </div>
           <div>
-            <label className="pt-label">Intensidade</label>
-            <select className="pt-input" value={form.intensidade} onChange={(e) => setForm(f => ({ ...f, intensidade: e.target.value }))}>
+            <label className="mg-label">Intensidade</label>
+            <select className="mg-select" value={form.intensidade} onChange={(e) => setForm(f => ({ ...f, intensidade: e.target.value }))}>
               <option value="">Selecione</option>
               {INTENSIDADE_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="pt-label">Observacoes</label>
-            <textarea className="pt-input resize-none" rows={2} placeholder="Observacoes adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
+            <label className="mg-label">Observacoes</label>
+            <textarea className="mg-input resize-none" rows={2} placeholder="Observacoes adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
           </div>
 
           {/* Photo upload */}
           <div>
-            <label className="pt-label">Fotos do sintoma</label>
-            <p className="text-[11px] text-texto-soft mb-2">Anexe ate 5 fotos para ajudar a veterinaria a analisar. Max 5MB cada.</p>
+            <label className="mg-label">Fotos do sintoma</label>
+            <p className="text-[11px] text-texto-soft font-body mb-2">Anexe ate 5 fotos para ajudar a veterinaria a analisar. Max 5MB cada.</p>
 
             {/* Preview grid */}
             {fotos.length > 0 && (
@@ -661,15 +692,15 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
                     <img
                       src={src}
                       alt={`Foto ${idx + 1}`}
-                      className="w-20 h-20 rounded-xl object-cover border-2 border-creme-dark cursor-pointer hover:border-coral transition-colors"
+                      className="w-20 h-20 rounded-xl object-cover border-2 border-white/50 cursor-pointer hover:border-primary transition-colors"
                       onClick={() => setLightbox(src)}
                     />
                     <button
                       type="button"
                       onClick={() => removeFoto(idx)}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
                     >
-                      &times;
+                      <X className="w-3 h-3" />
                     </button>
                   </div>
                 ))}
@@ -677,9 +708,9 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
             )}
 
             {fotos.length < 5 && (
-              <label className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-coral/30 bg-coral/[0.03] cursor-pointer hover:border-coral/50 hover:bg-coral/[0.06] transition-all">
-                <span className="text-lg">📷</span>
-                <span className="text-sm text-coral font-medium">{fotos.length === 0 ? 'Adicionar fotos' : `Adicionar mais (${fotos.length}/5)`}</span>
+              <label className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-primary/30 bg-primary/[0.03] cursor-pointer hover:border-primary/50 hover:bg-primary/[0.06] transition-all">
+                <Camera className="w-5 h-5 text-primary" />
+                <span className="text-sm text-primary font-medium">{fotos.length === 0 ? 'Adicionar fotos' : `Adicionar mais (${fotos.length}/5)`}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -691,10 +722,10 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
             )}
           </div>
 
-          {saveError && <p className="text-xs text-erro">{saveError}</p>}
+          {saveError && <p className="text-xs text-rose-500">{saveError}</p>}
           <div className="flex gap-2 pt-1">
-            <button type="submit" disabled={saving} className="pt-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Registrar sintoma'}</button>
-            <button type="button" onClick={handleCancel} className="pt-btn-secondary text-sm px-4">Cancelar</button>
+            <button type="submit" disabled={saving} className="mg-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Registrar sintoma'}</button>
+            <button type="button" onClick={handleCancel} className="mg-btn-secondary text-sm px-4">Cancelar</button>
           </div>
         </form>
       )}
@@ -705,29 +736,36 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
         <div className="space-y-3">
           {abertos.length > 0 && (
             <>
-              <p className="text-xs text-texto-soft font-medium uppercase tracking-wider">Abertos</p>
+              <p className="text-xs text-texto-soft font-headline font-medium uppercase tracking-wider">Abertos</p>
               {abertos.map((s) => {
                 const badge = intensidadeBadge(s.intensidade);
                 return (
-                  <div key={s.id} className="bg-white rounded-2xl p-4">
+                  <div key={s.id} className="mg-card-solid rounded-xl p-4">
                     <div className="flex items-start gap-3">
                       <div className={cn(
-                        'w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0',
-                        !s.intensidade ? 'bg-amarelo-light' :
-                        (typeof s.intensidade === 'number' ? s.intensidade : parseInt(String(s.intensidade))) <= 2 ? 'bg-green-100' :
-                        (typeof s.intensidade === 'number' ? s.intensidade : parseInt(String(s.intensidade))) <= 3 ? 'bg-yellow-100' : 'bg-red-100',
-                      )}>&#129658;</div>
+                        'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0',
+                        !s.intensidade ? 'bg-amber/10' :
+                        (typeof s.intensidade === 'number' ? s.intensidade : parseInt(String(s.intensidade))) <= 2 ? 'bg-teal/10' :
+                        (typeof s.intensidade === 'number' ? s.intensidade : parseInt(String(s.intensidade))) <= 3 ? 'bg-amber/10' : 'bg-rose/10',
+                      )}>
+                        <Activity className={cn(
+                          'w-4 h-4',
+                          !s.intensidade ? 'text-amber' :
+                          (typeof s.intensidade === 'number' ? s.intensidade : parseInt(String(s.intensidade))) <= 2 ? 'text-teal' :
+                          (typeof s.intensidade === 'number' ? s.intensidade : parseInt(String(s.intensidade))) <= 3 ? 'text-amber' : 'text-rose',
+                        )} />
+                      </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-texto">{s.descricao}</p>
+                        <p className="text-sm font-headline font-medium text-texto">{s.descricao}</p>
                         <div className="flex items-center gap-3 mt-1 flex-wrap">
-                          <p className="text-xs text-texto-soft">Inicio: {formatDate(s.dataInicio)}</p>
+                          <p className="text-xs text-texto-soft font-body">Inicio: {formatDate(s.dataInicio)}</p>
                           {badge && (
-                            <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', badge.className)}>
+                            <span className={badge.className}>
                               {badge.label}
                             </span>
                           )}
                         </div>
-                        {s.observacoes && <p className="text-xs text-texto-soft mt-1">{s.observacoes}</p>}
+                        {s.observacoes && <p className="text-xs text-texto-soft font-body mt-1">{s.observacoes}</p>}
                         {/* Evidencias / fotos */}
                         {s.evidencias && s.evidencias.length > 0 && (
                           <div className="flex gap-2 mt-2 flex-wrap">
@@ -736,11 +774,13 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
                                 key={idx}
                                 src={src}
                                 alt={`Evidencia ${idx + 1}`}
-                                className="w-16 h-16 rounded-lg object-cover border border-creme-dark cursor-pointer hover:border-coral hover:shadow-md transition-all"
+                                className="w-16 h-16 rounded-lg object-cover border border-white/50 cursor-pointer hover:border-primary hover:shadow-md transition-all"
                                 onClick={() => setLightbox(src)}
                               />
                             ))}
-                            <span className="text-[10px] text-texto-soft self-end pb-1">📷 {s.evidencias.length} foto{s.evidencias.length > 1 ? 's' : ''}</span>
+                            <span className="text-[10px] text-texto-soft font-body self-end pb-1 flex items-center gap-1">
+                              <Camera className="w-3 h-3" /> {s.evidencias.length} foto{s.evidencias.length > 1 ? 's' : ''}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -752,19 +792,21 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
           )}
           {fechados.length > 0 && (
             <>
-              <p className="text-xs text-texto-soft font-medium uppercase tracking-wider mt-2">Resolvidos</p>
+              <p className="text-xs text-texto-soft font-headline font-medium uppercase tracking-wider mt-2">Resolvidos</p>
               {fechados.map((s) => {
                 const badge = intensidadeBadge(s.intensidade);
                 return (
-                  <div key={s.id} className="bg-white rounded-2xl p-4 opacity-60">
+                  <div key={s.id} className="mg-card-solid rounded-xl p-4 opacity-60">
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-creme-dark flex items-center justify-center text-sm flex-shrink-0">&#129658;</div>
+                      <div className="w-8 h-8 rounded-xl bg-surface-muted flex items-center justify-center flex-shrink-0">
+                        <Activity className="w-3.5 h-3.5 text-texto-soft" />
+                      </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-texto">{s.descricao}</p>
+                        <p className="text-sm font-headline font-medium text-texto">{s.descricao}</p>
                         <div className="flex items-center gap-3 mt-1 flex-wrap">
-                          <p className="text-xs text-texto-soft">{formatDate(s.dataInicio)} &ndash; {formatDate(s.dataFim)}</p>
+                          <p className="text-xs text-texto-soft font-body">{formatDate(s.dataInicio)} &ndash; {formatDate(s.dataFim)}</p>
                           {badge && (
-                            <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', badge.className)}>
+                            <span className={badge.className}>
                               {badge.label}
                             </span>
                           )}
@@ -777,7 +819,7 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
                                 key={idx}
                                 src={src}
                                 alt={`Evidencia ${idx + 1}`}
-                                className="w-14 h-14 rounded-lg object-cover border border-creme-dark cursor-pointer hover:border-coral transition-all"
+                                className="w-14 h-14 rounded-lg object-cover border border-white/30 cursor-pointer hover:border-primary transition-all"
                                 onClick={() => setLightbox(src)}
                               />
                             ))}
@@ -796,16 +838,16 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
       {/* Lightbox */}
       {lightbox && (
         <div
-          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
           onClick={() => setLightbox(null)}
         >
           <div className="relative max-w-lg max-h-[80vh]" onClick={e => e.stopPropagation()}>
             <img src={lightbox} alt="Evidencia ampliada" className="max-w-full max-h-[80vh] rounded-2xl object-contain shadow-2xl" />
             <button
               onClick={() => setLightbox(null)}
-              className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white text-texto shadow-lg flex items-center justify-center text-sm font-bold hover:bg-creme transition-colors"
+              className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm text-texto shadow-lg flex items-center justify-center hover:bg-white transition-colors"
             >
-              &times;
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -876,57 +918,59 @@ function PlanoSaudeTab({ petId, plano, onUpdate }: {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       <ConfirmationBanner message={confirmation} />
 
       {!editing ? (
         <>
           {plano ? (
-            <div className="bg-white rounded-2xl p-5 space-y-3">
+            <div className="mg-card space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-menta/20 flex items-center justify-center text-lg">&#127973;</div>
+                  <div className="w-10 h-10 rounded-xl bg-teal/10 flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-teal" />
+                  </div>
                   <div>
                     <p className="font-headline font-semibold text-texto">{plano.operadora}</p>
-                    {plano.plano && <p className="text-xs text-texto-soft">Plano: {plano.plano}</p>}
+                    {plano.plano && <p className="text-xs text-texto-soft font-body">Plano: {plano.plano}</p>}
                   </div>
                 </div>
-                <button onClick={startEdit} className="pt-btn-secondary text-xs py-1.5 px-3">Editar</button>
+                <button onClick={startEdit} className="mg-btn-secondary text-xs py-1.5 px-3">Editar</button>
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {plano.numeroCartao && (
                   <div>
-                    <p className="text-xs text-texto-soft">Numero do cartao</p>
+                    <p className="text-xs text-texto-soft font-body">Numero do cartao</p>
                     <p className="font-medium text-texto">{plano.numeroCartao}</p>
                   </div>
                 )}
                 {plano.dataVigencia && (
                   <div>
-                    <p className="text-xs text-texto-soft">Vigencia</p>
+                    <p className="text-xs text-texto-soft font-body">Vigencia</p>
                     <p className="font-medium text-texto">{formatDate(plano.dataVigencia)}</p>
                   </div>
                 )}
                 {plano.dataExpiracao && (
                   <div>
-                    <p className="text-xs text-texto-soft">Validade</p>
+                    <p className="text-xs text-texto-soft font-body">Validade</p>
                     <p className="font-medium text-texto">{formatDate(plano.dataExpiracao)}</p>
                   </div>
                 )}
               </div>
               {plano.coberturas && plano.coberturas.length > 0 && (
                 <div>
-                  <p className="text-xs text-texto-soft mb-1">Coberturas</p>
+                  <p className="text-xs text-texto-soft font-body mb-1">Coberturas</p>
                   <div className="flex flex-wrap gap-1">
                     {plano.coberturas.map((c, i) => (
-                      <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-menta/20 text-menta font-medium">{c}</span>
+                      <span key={i} className="mg-badge mg-badge-success text-xs">{c}</span>
                     ))}
                   </div>
                 </div>
               )}
               {plano.observacoes && (
                 <div>
-                  <p className="text-xs text-texto-soft">Observacoes</p>
-                  <p className="text-sm text-texto">{plano.observacoes}</p>
+                  <p className="text-xs text-texto-soft font-body">Observacoes</p>
+                  <p className="text-sm text-texto font-body">{plano.observacoes}</p>
                 </div>
               )}
             </div>
@@ -934,48 +978,51 @@ function PlanoSaudeTab({ petId, plano, onUpdate }: {
             <EmptyState icon="&#127973;" title="Nenhum plano de saude cadastrado" description="Cadastre o plano de saude do seu pet." />
           )}
           {!plano && (
-            <button onClick={startEdit} className="pt-btn w-full text-sm">+ Cadastrar plano de saude</button>
+            <button onClick={startEdit} className="mg-btn w-full text-sm flex items-center justify-center gap-1.5">
+              <Plus className="w-4 h-4" />
+              Cadastrar plano de saude
+            </button>
           )}
         </>
       ) : (
-        <form onSubmit={handleSave} className="pt-card space-y-3 bg-coral-light/30">
+        <form onSubmit={handleSave} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">{plano ? 'Editar plano de saude' : 'Novo plano de saude'}</h3>
           <div>
-            <label className="pt-label">Operadora *</label>
-            <input className="pt-input" placeholder="Porto Seguro, SulAmerica..." value={form.operadora} onChange={(e) => setForm(f => ({ ...f, operadora: e.target.value }))} required />
+            <label className="mg-label">Operadora *</label>
+            <input className="mg-input" placeholder="Porto Seguro, SulAmerica..." value={form.operadora} onChange={(e) => setForm(f => ({ ...f, operadora: e.target.value }))} required />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="pt-label">Numero do cartao</label>
-              <input className="pt-input" placeholder="1234-5678" value={form.numeroCartao} onChange={(e) => setForm(f => ({ ...f, numeroCartao: e.target.value }))} />
+              <label className="mg-label">Numero do cartao</label>
+              <input className="mg-input" placeholder="1234-5678" value={form.numeroCartao} onChange={(e) => setForm(f => ({ ...f, numeroCartao: e.target.value }))} />
             </div>
             <div>
-              <label className="pt-label">Nome do plano</label>
-              <input className="pt-input" placeholder="Plano Gold..." value={form.plano} onChange={(e) => setForm(f => ({ ...f, plano: e.target.value }))} />
+              <label className="mg-label">Nome do plano</label>
+              <input className="mg-input" placeholder="Plano Gold..." value={form.plano} onChange={(e) => setForm(f => ({ ...f, plano: e.target.value }))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="pt-label">Vigencia</label>
-              <input type="date" className="pt-input" value={form.dataVigencia} onChange={(e) => setForm(f => ({ ...f, dataVigencia: e.target.value }))} />
+              <label className="mg-label">Vigencia</label>
+              <input type="date" className="mg-input" value={form.dataVigencia} onChange={(e) => setForm(f => ({ ...f, dataVigencia: e.target.value }))} />
             </div>
             <div>
-              <label className="pt-label">Validade</label>
-              <input type="date" className="pt-input" value={form.dataExpiracao} onChange={(e) => setForm(f => ({ ...f, dataExpiracao: e.target.value }))} />
+              <label className="mg-label">Validade</label>
+              <input type="date" className="mg-input" value={form.dataExpiracao} onChange={(e) => setForm(f => ({ ...f, dataExpiracao: e.target.value }))} />
             </div>
           </div>
           <div>
-            <label className="pt-label">Coberturas (separadas por virgula)</label>
-            <input className="pt-input" placeholder="Consultas, exames, cirurgias..." value={form.coberturas} onChange={(e) => setForm(f => ({ ...f, coberturas: e.target.value }))} />
+            <label className="mg-label">Coberturas (separadas por virgula)</label>
+            <input className="mg-input" placeholder="Consultas, exames, cirurgias..." value={form.coberturas} onChange={(e) => setForm(f => ({ ...f, coberturas: e.target.value }))} />
           </div>
           <div>
-            <label className="pt-label">Observacoes</label>
-            <textarea className="pt-input resize-none" rows={2} placeholder="Observacoes adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
+            <label className="mg-label">Observacoes</label>
+            <textarea className="mg-input resize-none" rows={2} placeholder="Observacoes adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
           </div>
-          {saveError && <p className="text-xs text-erro">{saveError}</p>}
+          {saveError && <p className="text-xs text-rose-500">{saveError}</p>}
           <div className="flex gap-2 pt-1">
-            <button type="submit" disabled={saving} className="pt-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Salvar'}</button>
-            <button type="button" onClick={handleCancel} className="pt-btn-secondary text-sm px-4">Cancelar</button>
+            <button type="submit" disabled={saving} className="mg-btn flex-1 text-sm">{saving ? 'Salvando...' : 'Salvar'}</button>
+            <button type="button" onClick={handleCancel} className="mg-btn-secondary text-sm px-4">Cancelar</button>
           </div>
         </form>
       )}
@@ -1001,29 +1048,33 @@ function ConsultasTab({ compromissos }: { compromissos: Compromisso[] }) {
 
   if (consultas.length === 0) {
     return (
-      <EmptyState icon="&#127973;" title="Nenhuma consulta encontrada" description="Consultas agendadas na aba Agenda aparecem aqui automaticamente." />
+      <div className="animate-fade-in">
+        <EmptyState icon="&#127973;" title="Nenhuma consulta encontrada" description="Consultas agendadas na aba Agenda aparecem aqui automaticamente." />
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       {upcoming.length > 0 && (
         <>
-          <p className="text-xs text-texto-soft font-medium uppercase tracking-wider">Proximas consultas</p>
+          <p className="text-xs text-texto-soft font-headline font-medium uppercase tracking-wider">Proximas consultas</p>
           <div className="space-y-3">
             {upcoming.map(c => (
-              <div key={c.id} className="bg-white rounded-2xl p-4">
+              <div key={c.id} className="mg-card-solid rounded-xl p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-azul-light flex items-center justify-center text-base flex-shrink-0">&#127973;</div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-texto text-sm">{c.titulo}</p>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      {c.dataInicio && <p className="text-xs text-texto-soft">{formatDate(c.dataInicio)}</p>}
-                      {c.horarioInicio && <p className="text-xs text-texto-soft">&middot; {c.horarioInicio}{c.horarioFim ? ` - ${c.horarioFim}` : ''}</p>}
-                    </div>
-                    {c.responsavelNome && <p className="text-xs text-texto-soft mt-0.5">{c.responsavelNome}</p>}
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Stethoscope className="w-4 h-4 text-primary" />
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-azul-light text-azul font-medium flex-shrink-0">Agendada</span>
+                  <div className="flex-1">
+                    <p className="font-headline font-semibold text-texto text-sm">{c.titulo}</p>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      {c.dataInicio && <p className="text-xs text-texto-soft font-body">{formatDate(c.dataInicio)}</p>}
+                      {c.horarioInicio && <p className="text-xs text-texto-soft font-body">&middot; {c.horarioInicio}{c.horarioFim ? ` - ${c.horarioFim}` : ''}</p>}
+                    </div>
+                    {c.responsavelNome && <p className="text-xs text-texto-soft font-body mt-0.5">{c.responsavelNome}</p>}
+                  </div>
+                  <span className="mg-badge mg-badge-primary flex-shrink-0">Agendada</span>
                 </div>
               </div>
             ))}
@@ -1033,18 +1084,20 @@ function ConsultasTab({ compromissos }: { compromissos: Compromisso[] }) {
 
       {past.length > 0 && (
         <>
-          <p className="text-xs text-texto-soft font-medium uppercase tracking-wider mt-2">Consultas anteriores</p>
+          <p className="text-xs text-texto-soft font-headline font-medium uppercase tracking-wider mt-2">Consultas anteriores</p>
           <div className="space-y-3">
             {past.map(c => (
-              <div key={c.id} className="bg-white rounded-2xl p-4 opacity-60">
+              <div key={c.id} className="mg-card-solid rounded-xl p-4 opacity-60">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-creme-dark flex items-center justify-center text-sm flex-shrink-0">&#127973;</div>
-                  <div className="flex-1">
-                    <p className="font-medium text-texto text-sm">{c.titulo}</p>
-                    <p className="text-xs text-texto-soft mt-0.5">{formatDate(c.dataInicio)}{c.horarioInicio ? ` &middot; ${c.horarioInicio}` : ''}</p>
-                    {c.responsavelNome && <p className="text-xs text-texto-soft">{c.responsavelNome}</p>}
+                  <div className="w-8 h-8 rounded-xl bg-surface-muted flex items-center justify-center flex-shrink-0">
+                    <Stethoscope className="w-3.5 h-3.5 text-texto-soft" />
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-creme-dark text-texto-soft font-medium flex-shrink-0">Realizada</span>
+                  <div className="flex-1">
+                    <p className="font-headline font-medium text-texto text-sm">{c.titulo}</p>
+                    <p className="text-xs text-texto-soft font-body mt-0.5">{formatDate(c.dataInicio)}{c.horarioInicio ? ` &middot; ${c.horarioInicio}` : ''}</p>
+                    {c.responsavelNome && <p className="text-xs text-texto-soft font-body">{c.responsavelNome}</p>}
+                  </div>
+                  <span className="mg-badge mg-badge-info flex-shrink-0">Realizada</span>
                 </div>
               </div>
             ))}
@@ -1068,10 +1121,10 @@ function ProtectionRing({ percentage }: { percentage: number }) {
   const r = 44;
   const circ = 2 * Math.PI * r;
   const offset = circ - (percentage / 100) * circ;
-  const color = percentage < 40 ? '#F28B6E' : percentage < 70 ? '#E8C547' : '#7ECBA1';
+  const color = percentage < 40 ? '#F43F5E' : percentage < 70 ? '#F59E0B' : '#14B8A6';
   return (
     <svg width="100" height="100" viewBox="0 0 100 100" className="transform -rotate-90">
-      <circle cx="50" cy="50" r={r} fill="none" stroke="#f0ebe4" strokeWidth="8" />
+      <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(124,58,237,0.1)" strokeWidth="8" />
       <circle
         cx="50" cy="50" r={r} fill="none"
         stroke={color} strokeWidth="8" strokeLinecap="round"
@@ -1237,9 +1290,9 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
   if (loadingCarteira) {
     return (
       <div className="space-y-4">
-        <div className="pt-card"><div className="h-32 pt-skeleton rounded-xl" /></div>
-        <div className="flex gap-3">{[1,2,3,4].map(i => <div key={i} className="h-16 w-16 pt-skeleton rounded-xl" />)}</div>
-        {[1,2,3].map(i => <div key={i} className="pt-card"><div className="h-20 pt-skeleton rounded-xl" /></div>)}
+        <div className="mg-card"><div className="h-32 mg-skeleton rounded-xl" /></div>
+        <div className="flex gap-3">{[1,2,3,4].map(i => <div key={i} className="h-16 w-16 mg-skeleton rounded-xl" />)}</div>
+        {[1,2,3].map(i => <div key={i} className="mg-card"><div className="h-20 mg-skeleton rounded-xl" /></div>)}
       </div>
     );
   }
@@ -1247,7 +1300,7 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
   const vacinasDisponiveisForm = Array.from(new Set([...vacinasEspecie, ...pendingVacinas])).filter(Boolean);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-fade-in">
       <ConfirmationBanner message={confirmation} />
 
       {/* Confetti */}
@@ -1272,10 +1325,10 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
       )}
 
       {/* ── Capa da Caderneta ──────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl p-5 relative overflow-hidden">
+      <div className="mg-card relative overflow-hidden">
         {/* Dot grid background */}
         <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(circle, #7C3AED 1px, transparent 1px)',
           backgroundSize: '16px 16px',
         }} />
 
@@ -1287,7 +1340,7 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
               {pet?.fotoUrl ? (
                 <img src={pet.fotoUrl} alt={pet.nome} className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" />
               ) : (
-                <div className="w-16 h-16 rounded-full bg-creme flex items-center justify-center text-2xl border-2 border-white">
+                <div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center text-2xl border-2 border-white">
                   {pet?.especie === 'GATO' ? '🐱' : '🐶'}
                 </div>
               )}
@@ -1300,21 +1353,21 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
               <h3 className="font-headline font-bold text-texto text-lg truncate">{pet?.nome || 'Pet'}</h3>
               <span className="text-base">{protectionEmoji}</span>
             </div>
-            <p className="text-sm text-texto-soft">{pet?.especie ? pet.especie.charAt(0) + pet.especie.slice(1).toLowerCase() : ''} {pet?.raca ? `\u00B7 ${pet.raca}` : ''}</p>
+            <p className="text-sm text-texto-soft font-body">{pet?.especie ? pet.especie.charAt(0) + pet.especie.slice(1).toLowerCase() : ''} {pet?.raca ? `\u00B7 ${pet.raca}` : ''}</p>
 
             <div className="mt-2 flex items-center gap-2">
               <span className={cn(
                 'text-2xl font-headline font-bold',
-                percentage < 40 ? 'text-coral' : percentage < 70 ? 'text-yellow-600' : 'text-menta',
+                percentage < 40 ? 'text-rose' : percentage < 70 ? 'text-amber' : 'text-teal',
               )}>{percentage}%</span>
-              <span className="text-xs text-texto-soft">{protectionLabel}</span>
+              <span className="text-xs text-texto-soft font-body">{protectionLabel}</span>
             </div>
 
             {/* Next upcoming */}
             {(nextVacina || nextAgendamento) && (
-              <div className="mt-2 px-3 py-1.5 bg-creme rounded-lg inline-flex items-center gap-2">
-                <span className="text-xs">📅</span>
-                <span className="text-[11px] text-texto font-medium">
+              <div className="mt-2 px-3 py-1.5 bg-surface-muted rounded-lg inline-flex items-center gap-2">
+                <Calendar className="w-3 h-3 text-primary" />
+                <span className="text-[11px] text-texto font-medium font-body">
                   {nextAgendamento
                     ? `${nextAgendamento.nomeVacina} em ${formatDate(nextAgendamento.dataAgendada)}`
                     : nextVacina
@@ -1334,14 +1387,14 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
           <div
             key={b.id}
             className={cn(
-              'flex flex-col items-center gap-1.5 min-w-[72px] px-3 py-3 rounded-xl border transition-all',
+              'flex flex-col items-center gap-1.5 min-w-[72px] px-3 py-3 rounded-xl transition-all',
               b.earned
-                ? 'bg-white border-menta/30 shadow-sm'
-                : 'bg-creme-dark/50 border-transparent opacity-40 grayscale',
+                ? 'mg-card-solid shadow-sm ring-1 ring-teal/20'
+                : 'bg-surface-muted/50 opacity-40 grayscale',
             )}
           >
             <span className="text-2xl">{b.icon}</span>
-            <span className="text-[10px] text-texto-soft font-medium text-center leading-tight">{b.label}</span>
+            <span className="text-[10px] text-texto-soft font-medium font-body text-center leading-tight">{b.label}</span>
           </div>
         ))}
       </div>
@@ -1349,55 +1402,57 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
       {/* ── Vet Actions ────────────────────────────────────────────────────── */}
       {isVet && (
         <div className="flex gap-2">
-          <button onClick={() => setShowRecForm(!showRecForm)} className="pt-btn text-sm flex-1">
-            📋 Recomendar vacina
+          <button onClick={() => setShowRecForm(!showRecForm)} className="mg-btn-teal text-sm flex-1 flex items-center justify-center gap-1.5">
+            <Send className="w-4 h-4" />
+            Recomendar vacina
           </button>
-          <button onClick={() => setShowAgForm(!showAgForm)} className="pt-btn-secondary text-sm flex-1">
-            📅 Agendar vacina
+          <button onClick={() => setShowAgForm(!showAgForm)} className="mg-btn text-sm flex-1 flex items-center justify-center gap-1.5">
+            <Calendar className="w-4 h-4" />
+            Agendar vacina
           </button>
         </div>
       )}
 
       {/* Rec form */}
       {showRecForm && (
-        <form onSubmit={handleRecomendar} className="pt-card space-y-3 bg-azul-light/30">
+        <form onSubmit={handleRecomendar} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Recomendar vacina</h3>
           <div>
-            <label className="pt-label">Vacina *</label>
-            <select className="pt-input" value={recForm.nomeVacina} onChange={e => setRecForm(f => ({ ...f, nomeVacina: e.target.value }))} required>
+            <label className="mg-label">Vacina *</label>
+            <select className="mg-select" value={recForm.nomeVacina} onChange={e => setRecForm(f => ({ ...f, nomeVacina: e.target.value }))} required>
               <option value="">Selecione...</option>
               {vacinasDisponiveisForm.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
           </div>
           <div>
-            <label className="pt-label">Nota para o tutor</label>
-            <input className="pt-input" placeholder="Ex: Recomendada por contato com outros caes..." value={recForm.nota} onChange={e => setRecForm(f => ({ ...f, nota: e.target.value }))} />
+            <label className="mg-label">Nota para o tutor</label>
+            <input className="mg-input" placeholder="Ex: Recomendada por contato com outros caes..." value={recForm.nota} onChange={e => setRecForm(f => ({ ...f, nota: e.target.value }))} />
           </div>
           <div className="flex gap-2">
-            <button type="submit" disabled={saving} className="pt-btn text-sm flex-1">{saving ? 'Enviando...' : 'Recomendar'}</button>
-            <button type="button" onClick={() => setShowRecForm(false)} className="pt-btn-secondary text-sm px-4">Cancelar</button>
+            <button type="submit" disabled={saving} className="mg-btn-teal text-sm flex-1">{saving ? 'Enviando...' : 'Recomendar'}</button>
+            <button type="button" onClick={() => setShowRecForm(false)} className="mg-btn-secondary text-sm px-4">Cancelar</button>
           </div>
         </form>
       )}
 
       {/* Ag form */}
       {showAgForm && (
-        <form onSubmit={handleAgendar} className="pt-card space-y-3 bg-amarelo-light/30">
+        <form onSubmit={handleAgendar} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Agendar vacina</h3>
           <div>
-            <label className="pt-label">Vacina *</label>
-            <select className="pt-input" value={agForm.nomeVacina} onChange={e => setAgForm(f => ({ ...f, nomeVacina: e.target.value }))} required>
+            <label className="mg-label">Vacina *</label>
+            <select className="mg-select" value={agForm.nomeVacina} onChange={e => setAgForm(f => ({ ...f, nomeVacina: e.target.value }))} required>
               <option value="">Selecione...</option>
               {vacinasDisponiveisForm.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
           </div>
           <div>
-            <label className="pt-label">Data *</label>
-            <input type="date" className="pt-input" value={agForm.dataAgendada} onChange={e => setAgForm(f => ({ ...f, dataAgendada: e.target.value }))} required />
+            <label className="mg-label">Data *</label>
+            <input type="date" className="mg-input" value={agForm.dataAgendada} onChange={e => setAgForm(f => ({ ...f, dataAgendada: e.target.value }))} required />
           </div>
           <div className="flex gap-2">
-            <button type="submit" disabled={saving} className="pt-btn text-sm flex-1">{saving ? 'Agendando...' : 'Agendar'}</button>
-            <button type="button" onClick={() => setShowAgForm(false)} className="pt-btn-secondary text-sm px-4">Cancelar</button>
+            <button type="submit" disabled={saving} className="mg-btn text-sm flex-1">{saving ? 'Agendando...' : 'Agendar'}</button>
+            <button type="button" onClick={() => setShowAgForm(false)} className="mg-btn-secondary text-sm px-4">Cancelar</button>
           </div>
         </form>
       )}
@@ -1405,13 +1460,15 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
       {/* ── Aplicadas (selos carimbados) ───────────────────────────────────── */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-6 h-6 rounded-full bg-menta/20 flex items-center justify-center text-xs">✅</div>
+          <div className="w-6 h-6 rounded-full bg-teal/10 flex items-center justify-center">
+            <Check className="w-3 h-3 text-teal" />
+          </div>
           <h3 className="font-headline font-semibold text-texto text-sm">Aplicadas</h3>
-          <span className="text-xs text-texto-soft">({appliedVacinas.length})</span>
+          <span className="text-xs text-texto-soft font-body">({appliedVacinas.length})</span>
         </div>
 
         {appliedVacinas.length === 0 ? (
-          <p className="text-xs text-texto-soft pl-8">Nenhuma vacina aplicada ainda.</p>
+          <p className="text-xs text-texto-soft font-body pl-8">Nenhuma vacina aplicada ainda.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {appliedVacinas.map((v, idx) => {
@@ -1419,34 +1476,40 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
               const rotation = idx % 3 === 0 ? 'rotate-[1deg]' : idx % 3 === 1 ? '-rotate-[1deg]' : 'rotate-[0.5deg]';
               return (
                 <div key={v.id} className={cn(
-                  'bg-white rounded-2xl p-4 border-2 transition-all hover:shadow-md',
+                  'mg-card-solid rounded-xl p-4 border-l-4 transition-all hover:shadow-md',
                   rotation,
-                  alert === 'overdue' ? 'border-red-300' : alert === 'soon' ? 'border-yellow-300' : 'border-menta/40',
+                  alert === 'overdue' ? 'border-l-rose-400' : alert === 'soon' ? 'border-l-amber-400' : 'border-l-teal',
                 )}>
                   {/* Stamp header */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <div className={cn(
-                        'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold',
-                        alert === 'overdue' ? 'bg-red-100 text-red-600' : alert === 'soon' ? 'bg-yellow-100 text-yellow-600' : 'bg-menta/20 text-menta',
+                        'w-8 h-8 rounded-lg flex items-center justify-center',
+                        alert === 'overdue' ? 'bg-rose/10' : alert === 'soon' ? 'bg-amber/10' : 'bg-teal/10',
                       )}>
-                        {alert === 'overdue' ? '!' : alert === 'soon' ? '⏰' : '✓'}
+                        {alert === 'overdue' ? (
+                          <AlertCircle className="w-4 h-4 text-rose" />
+                        ) : alert === 'soon' ? (
+                          <Clock className="w-4 h-4 text-amber" />
+                        ) : (
+                          <Check className="w-4 h-4 text-teal" />
+                        )}
                       </div>
                       <div>
-                        <p className="font-semibold text-texto text-sm leading-tight">{v.nome}</p>
-                        <p className="text-[11px] text-texto-soft">{formatDate(v.dataAplicacao)}</p>
+                        <p className="font-headline font-semibold text-texto text-sm leading-tight">{v.nome}</p>
+                        <p className="text-[11px] text-texto-soft font-body">{formatDate(v.dataAplicacao)}</p>
                       </div>
                     </div>
-                    {alert === 'overdue' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">Vencida</span>}
-                    {alert === 'soon' && <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-600 font-medium">Em breve</span>}
+                    {alert === 'overdue' && <span className="mg-badge mg-badge-error text-[10px]">Vencida</span>}
+                    {alert === 'soon' && <span className="mg-badge mg-badge-warning text-[10px]">Em breve</span>}
                   </div>
 
                   {/* Details */}
                   <div className="mt-2 pl-10 space-y-0.5">
-                    {v.veterinario && <p className="text-[11px] text-texto-soft">🩺 {v.veterinario}{v.clinica ? ` \u00B7 ${v.clinica}` : ''}</p>}
-                    {v.lote && <p className="text-[11px] text-texto-soft">📦 Lote {v.lote}</p>}
+                    {v.veterinario && <p className="text-[11px] text-texto-soft font-body flex items-center gap-1"><Stethoscope className="w-3 h-3" /> {v.veterinario}{v.clinica ? ` \u00B7 ${v.clinica}` : ''}</p>}
+                    {v.lote && <p className="text-[11px] text-texto-soft font-body">Lote {v.lote}</p>}
                     {v.proximaDose && (
-                      <p className={cn('text-[11px] font-medium', alert === 'overdue' ? 'text-red-500' : alert === 'soon' ? 'text-yellow-600' : 'text-menta')}>
+                      <p className={cn('text-[11px] font-medium', alert === 'overdue' ? 'text-rose' : alert === 'soon' ? 'text-amber' : 'text-teal')}>
                         Proxima: {formatDate(v.proximaDose)}
                       </p>
                     )}
@@ -1454,8 +1517,8 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
 
                   {/* Vet lembrar button */}
                   {isVet && (alert === 'overdue' || alert === 'soon') && (
-                    <button onClick={() => handleLembrar(v.nome)} className="mt-2 ml-10 text-[11px] text-coral font-medium hover:underline">
-                      🔔 Lembrar tutor
+                    <button onClick={() => handleLembrar(v.nome)} className="mt-2 ml-10 text-[11px] text-primary font-medium hover:underline flex items-center gap-1">
+                      <Bell className="w-3 h-3" /> Lembrar tutor
                     </button>
                   )}
                 </div>
@@ -1469,9 +1532,11 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
       {activeAgendamentos.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 rounded-full bg-amarelo/20 flex items-center justify-center text-xs">📅</div>
+            <div className="w-6 h-6 rounded-full bg-amber/10 flex items-center justify-center">
+              <Calendar className="w-3 h-3 text-amber" />
+            </div>
             <h3 className="font-headline font-semibold text-texto text-sm">Agendadas</h3>
-            <span className="text-xs text-texto-soft">({activeAgendamentos.length})</span>
+            <span className="text-xs text-texto-soft font-body">({activeAgendamentos.length})</span>
           </div>
 
           <div className="space-y-3">
@@ -1479,24 +1544,26 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
               const daysUntil = Math.ceil((new Date(ag.dataAgendada).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
               const isPast = daysUntil < 0;
               return (
-                <div key={ag.id} className="bg-white rounded-2xl p-4 border-2 border-dashed border-amarelo/50">
+                <div key={ag.id} className="mg-card-solid rounded-xl p-4 border-2 border-dashed border-amber/40">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-amarelo/20 flex items-center justify-center text-sm">📅</div>
+                      <div className="w-8 h-8 rounded-lg bg-amber/10 flex items-center justify-center">
+                        <Calendar className="w-4 h-4 text-amber" />
+                      </div>
                       <div>
-                        <p className="font-semibold text-texto text-sm">{ag.nomeVacina}</p>
-                        <p className="text-[11px] text-texto-soft">{formatDate(ag.dataAgendada)}</p>
-                        {ag.veterinarioNome && <p className="text-[11px] text-texto-soft">🩺 {ag.veterinarioNome}</p>}
+                        <p className="font-headline font-semibold text-texto text-sm">{ag.nomeVacina}</p>
+                        <p className="text-[11px] text-texto-soft font-body">{formatDate(ag.dataAgendada)}</p>
+                        {ag.veterinarioNome && <p className="text-[11px] text-texto-soft font-body flex items-center gap-1"><Stethoscope className="w-3 h-3" /> {ag.veterinarioNome}</p>}
                       </div>
                     </div>
                     <div className="text-right">
                       <span className={cn(
-                        'text-[10px] px-2 py-0.5 rounded-full font-medium',
-                        ag.status === 'CONFIRMADA' ? 'bg-menta/20 text-menta' : 'bg-amarelo/20 text-yellow-700',
+                        'mg-badge text-[10px]',
+                        ag.status === 'CONFIRMADA' ? 'mg-badge-success' : 'mg-badge-warning',
                       )}>
                         {ag.status === 'CONFIRMADA' ? 'Confirmada' : 'Aguardando'}
                       </span>
-                      <p className={cn('text-[11px] font-medium mt-1', isPast ? 'text-red-500' : 'text-amarelo')}>
+                      <p className={cn('text-[11px] font-medium mt-1', isPast ? 'text-rose' : 'text-amber')}>
                         {isPast ? 'Atrasada' : `Em ${daysUntil} dia${daysUntil === 1 ? '' : 's'}`}
                       </p>
                     </div>
@@ -1505,8 +1572,8 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
                   {/* Actions */}
                   {ag.status === 'PENDENTE' && (
                     <div className="flex gap-2 mt-3 pl-11">
-                      <button onClick={() => handleConfirmar(ag.id)} className="pt-btn text-[11px] px-3 py-1.5">Confirmar</button>
-                      <button onClick={() => handleCancelar(ag.id)} className="pt-btn-ghost text-[11px] px-3 py-1.5 text-red-500">Cancelar</button>
+                      <button onClick={() => handleConfirmar(ag.id)} className="mg-btn text-[11px] px-3 py-1.5">Confirmar</button>
+                      <button onClick={() => handleCancelar(ag.id)} className="mg-btn-ghost text-[11px] px-3 py-1.5 text-rose-500">Cancelar</button>
                     </div>
                   )}
                 </div>
@@ -1520,9 +1587,11 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
       {pendingVacinas.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 rounded-full bg-coral/20 flex items-center justify-center text-xs">⚠️</div>
+            <div className="w-6 h-6 rounded-full bg-rose/10 flex items-center justify-center">
+              <AlertCircle className="w-3 h-3 text-rose" />
+            </div>
             <h3 className="font-headline font-semibold text-texto text-sm">Pendentes</h3>
-            <span className="text-xs text-texto-soft">({pendingVacinas.length})</span>
+            <span className="text-xs text-texto-soft font-body">({pendingVacinas.length})</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1530,18 +1599,20 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
               const rec = recomendacoes.find(r => r.nomeVacina === name);
               const isFromSpecies = vacinasEspecie.includes(name);
               return (
-                <div key={name} className="bg-coral/[0.04] rounded-2xl p-4 border-2 border-dashed border-coral/30">
+                <div key={name} className="mg-card-solid rounded-xl p-4 border-2 border-dashed border-rose/30">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-coral/10 flex items-center justify-center text-sm">💉</div>
+                      <div className="w-8 h-8 rounded-lg bg-rose/10 flex items-center justify-center">
+                        <Syringe className="w-4 h-4 text-rose" />
+                      </div>
                       <div>
-                        <p className="font-semibold text-texto text-sm">{name}</p>
+                        <p className="font-headline font-semibold text-texto text-sm">{name}</p>
                         {rec ? (
-                          <p className="text-[11px] text-azul font-medium">📋 Recomendada por {rec.veterinarioNome}</p>
+                          <p className="text-[11px] text-primary font-medium font-body flex items-center gap-1"><Send className="w-3 h-3" /> Recomendada por {rec.veterinarioNome}</p>
                         ) : isFromSpecies ? (
-                          <p className="text-[11px] text-texto-soft">Recomendada para {especie.charAt(0) + especie.slice(1).toLowerCase()}</p>
+                          <p className="text-[11px] text-texto-soft font-body">Recomendada para {especie.charAt(0) + especie.slice(1).toLowerCase()}</p>
                         ) : null}
-                        {rec?.nota && <p className="text-[11px] text-texto-soft italic mt-0.5">&ldquo;{rec.nota}&rdquo;</p>}
+                        {rec?.nota && <p className="text-[11px] text-texto-soft font-body italic mt-0.5">&ldquo;{rec.nota}&rdquo;</p>}
                       </div>
                     </div>
                   </div>
@@ -1551,20 +1622,20 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
                       <>
                         <button
                           onClick={() => { setAgForm({ nomeVacina: name, dataAgendada: '' }); setShowAgForm(true); }}
-                          className="pt-btn text-[11px] px-3 py-1.5"
+                          className="mg-btn text-[11px] px-3 py-1.5 flex items-center gap-1"
                         >
-                          📅 Agendar
+                          <Calendar className="w-3 h-3" /> Agendar
                         </button>
-                        <button onClick={() => handleLembrar(name)} className="pt-btn-ghost text-[11px] px-3 py-1.5">
-                          🔔 Lembrar tutor
+                        <button onClick={() => handleLembrar(name)} className="mg-btn-ghost text-[11px] px-3 py-1.5 flex items-center gap-1">
+                          <Bell className="w-3 h-3" /> Lembrar tutor
                         </button>
                       </>
                     ) : (
                       <button
                         onClick={() => { setAgForm({ nomeVacina: name, dataAgendada: '' }); setShowAgForm(true); }}
-                        className="pt-btn text-[11px] px-3 py-1.5"
+                        className="mg-btn text-[11px] px-3 py-1.5 flex items-center gap-1"
                       >
-                        📅 Agendar
+                        <Calendar className="w-3 h-3" /> Agendar
                       </button>
                     )}
                   </div>
@@ -1597,6 +1668,35 @@ export default function SaudePage() {
   const [compromissos, setCompromissos] = useState<Compromisso[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<SubTab>('carteira');
+
+  // Sliding indicator for sub-tabs
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+
+  const updateIndicator = useCallback(() => {
+    const el = tabRefs.current[activeTab];
+    const container = tabsContainerRef.current;
+    if (el && container) {
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      setIndicatorStyle({
+        left: elRect.left - containerRect.left + container.scrollLeft,
+        width: elRect.width,
+      });
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    updateIndicator();
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [updateIndicator, loading]);
+
+  useEffect(() => {
+    const el = tabRefs.current[activeTab];
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [activeTab]);
 
   // ─── Data loading ──────────────────────────────────────────────────────────
 
@@ -1646,21 +1746,21 @@ export default function SaudePage() {
       <div className="space-y-4 animate-fade-in">
         <div className="grid grid-cols-3 gap-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="pt-card">
-              <div className="h-16 pt-skeleton rounded-xl" />
+            <div key={i} className="mg-card">
+              <div className="h-16 mg-skeleton rounded-xl" />
             </div>
           ))}
         </div>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-9 w-24 pt-skeleton rounded-xl flex-shrink-0" />
+            <div key={i} className="h-9 w-24 mg-skeleton rounded-xl flex-shrink-0" />
           ))}
         </div>
         {[1, 2, 3].map((i) => (
-          <div key={i} className="pt-card">
+          <div key={i} className="mg-card">
             <div className="space-y-2">
-              <div className="h-4 pt-skeleton w-2/3" />
-              <div className="h-3 pt-skeleton w-1/3" />
+              <div className="h-4 mg-skeleton w-2/3" />
+              <div className="h-3 mg-skeleton w-1/3" />
             </div>
           </div>
         ))}
@@ -1675,41 +1775,64 @@ export default function SaudePage() {
       {/* Header */}
       <div>
         <h1 className="font-headline text-xl font-bold text-texto">Saude</h1>
-        <p className="text-sm text-texto-soft mt-0.5">Painel de saude de {pet?.nome || 'seu pet'}</p>
+        <p className="text-sm text-texto-soft font-body mt-0.5">Painel de saude de {pet?.nome || 'seu pet'}</p>
       </div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-rosa-light rounded-2xl p-4 text-center">
+        <div className="mg-card-solid rounded-xl p-4 text-center">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2">
+            <Heart className="w-4 h-4 text-primary" />
+          </div>
           <p className="text-2xl font-headline font-bold text-texto">{vacinasEmDia}</p>
-          <p className="text-[11px] text-texto-soft mt-1 leading-tight">Vacinas em dia</p>
+          <p className="text-[11px] text-texto-soft font-body mt-1 leading-tight">Vacinas em dia</p>
         </div>
-        <div className="bg-azul-light rounded-2xl p-4 text-center">
+        <div className="mg-card-solid rounded-xl p-4 text-center">
+          <div className="w-8 h-8 rounded-lg bg-teal/10 flex items-center justify-center mx-auto mb-2">
+            <Pill className="w-4 h-4 text-teal" />
+          </div>
           <p className="text-2xl font-headline font-bold text-texto">{medicamentosAtivos}</p>
-          <p className="text-[11px] text-texto-soft mt-1 leading-tight">Medicamentos ativos</p>
+          <p className="text-[11px] text-texto-soft font-body mt-1 leading-tight">Medicamentos ativos</p>
         </div>
-        <div className="bg-amarelo-light rounded-2xl p-4 text-center">
+        <div className="mg-card-solid rounded-xl p-4 text-center">
+          <div className="w-8 h-8 rounded-lg bg-amber/10 flex items-center justify-center mx-auto mb-2">
+            <Activity className="w-4 h-4 text-amber" />
+          </div>
           <p className="text-2xl font-headline font-bold text-texto">{sintomasAbertos}</p>
-          <p className="text-[11px] text-texto-soft mt-1 leading-tight">Sintomas abertos</p>
+          <p className="text-[11px] text-texto-soft font-body mt-1 leading-tight">Sintomas abertos</p>
         </div>
       </div>
 
-      {/* Sub-tab pills */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {SUBTABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id)}
-            className={cn(
-              'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
-              activeTab === t.id
-                ? 'bg-coral text-white shadow-sm'
-                : 'bg-white text-texto-soft hover:bg-creme-dark',
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
+      {/* Sub-tab bar with sliding indicator */}
+      <div className="relative" ref={tabsContainerRef}>
+        <div className="flex gap-0 overflow-x-auto scrollbar-hide border-b border-gray-100/50">
+          {SUBTABS.map((t) => {
+            const isActive = activeTab === t.id;
+            return (
+              <button
+                key={t.id}
+                ref={(el) => { tabRefs.current[t.id] = el; }}
+                onClick={() => setActiveTab(t.id)}
+                className={cn(
+                  'px-4 py-2.5 text-sm font-headline whitespace-nowrap transition-all duration-200 flex-shrink-0',
+                  isActive
+                    ? 'text-primary font-bold'
+                    : 'text-texto-soft font-medium hover:text-primary',
+                )}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+        {/* Sliding indicator */}
+        <div
+          className="absolute bottom-0 h-[2px] bg-primary rounded-full transition-all duration-300 ease-out"
+          style={{
+            left: indicatorStyle.left,
+            width: indicatorStyle.width,
+          }}
+        />
       </div>
 
       {/* Tab content */}

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { prestadoresApi } from '@/lib/api';
 import { PetImage } from '@/components/PetImage';
 import { especieLabel, petAge, formatDate } from '@/lib/utils';
+import { ChevronRight } from 'lucide-react';
 
 export default function PrestadorPetsPage() {
   const [pets, setPets] = useState<any[]>([]);
@@ -68,7 +69,7 @@ export default function PrestadorPetsPage() {
         <Link
           key={pet.id}
           href={`/prestador/pets/${pet.id}`}
-          className="pt-card hover:bg-coral-light/30 hover:shadow-card-hover active:scale-[0.98] transition-all cursor-pointer"
+          className="pt-card hover:bg-primary/5 hover:shadow-card-hover active:scale-[0.98] transition-all cursor-pointer"
         >
           <div className="flex items-center gap-4">
             <PetImage
@@ -76,7 +77,7 @@ export default function PrestadorPetsPage() {
               nome={pet.nome}
               especie={pet.especie}
               className="w-16 h-16 flex-shrink-0"
-              fallbackClassName="bg-creme-dark"
+              fallbackClassName="bg-surface-muted"
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -97,7 +98,7 @@ export default function PrestadorPetsPage() {
                 {pet.permissoes && pet.permissoes.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {pet.permissoes.includes('REGISTRAR_SERVICO') && (
-                      <span className="inline-block bg-coral-light text-coral text-xs px-2 py-1 rounded-full">
+                      <span className="inline-block bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">
                         Serviços
                       </span>
                     )}
@@ -115,7 +116,7 @@ export default function PrestadorPetsPage() {
                 )}
               </div>
             </div>
-            <span className="text-texto-muted flex-shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+            <span className="text-texto-muted flex-shrink-0"><ChevronRight size={16} /></span>
           </div>
         </Link>
       ))}

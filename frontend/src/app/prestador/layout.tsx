@@ -16,7 +16,7 @@ export default function PrestadorLayout({
   // Redirecionar se não for prestador
   if (user && user.tipoUsuario !== 'PRESTADOR' && user.tipoUsuario !== 'AMBOS') {
     return (
-      <div className="min-h-screen bg-creme flex items-center justify-center p-4">
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
         <div className="pt-card text-center max-w-md">
           <p className="text-lg font-semibold text-texto mb-2">Acesso restrito</p>
           <p className="text-sm text-texto-soft mb-6">Você precisa ser um prestador de serviços para acessar esta área.</p>
@@ -29,7 +29,7 @@ export default function PrestadorLayout({
   }
 
   return (
-    <div className="min-h-screen bg-creme">
+    <div className="min-h-screen bg-surface">
       <div className="max-w-2xl mx-auto">
         {/* Header com navegação */}
         <div className="bg-white/70 backdrop-blur-xl">

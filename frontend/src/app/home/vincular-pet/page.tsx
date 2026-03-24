@@ -7,6 +7,7 @@ import { petsApi } from '@/lib/api';
 import { PetResumoCodigo } from '@/types';
 import { especieLabel } from '@/lib/utils';
 import { PetImage } from '@/components/PetImage';
+import { ChevronLeft } from 'lucide-react';
 
 const ROLE_OPTIONS_BASE = [
   { value: 'TUTOR_EMERGENCIA', label: 'Tutor de emergência', desc: 'Cuida em emergências' },
@@ -71,9 +72,9 @@ export default function VincularPetPage() {
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => router.back()}
-            className="w-8 h-8 rounded-lg bg-creme-dark hover:bg-white flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg bg-surface-muted hover:bg-white flex items-center justify-center transition-colors"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15,18 9,12 15,6" /></svg>
+            <ChevronLeft size={18} />
           </button>
           <h1 className="text-xl font-semibold text-texto">Vincular pet</h1>
         </div>
@@ -130,8 +131,8 @@ export default function VincularPetPage() {
                 fotoUrl={petSummary.fotoUrl}
                 nome={petSummary.nome}
                 especie={petSummary.especie}
-                className="w-16 h-16 bg-gradient-to-br from-coral-light to-coral-light/60"
-                fallbackClassName="bg-gradient-to-br from-coral-light to-coral-light/60"
+                className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10"
+                fallbackClassName="bg-gradient-to-br from-primary/20 to-primary/10"
               />
               <div>
                 <h3 className="text-lg font-bold text-texto">{petSummary.nome}</h3>
@@ -140,7 +141,7 @@ export default function VincularPetPage() {
                   {petSummary.raca ? ` · ${petSummary.raca}` : ''}
                 </p>
                 {petSummary.tipoGuarda === 'CONJUNTA' && (
-                  <span className="inline-flex items-center gap-1 mt-1 text-xs text-coral bg-coral-light px-2 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 mt-1 text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                     👥 Guarda compartilhada
                   </span>
                 )}
@@ -157,19 +158,19 @@ export default function VincularPetPage() {
                     onClick={() => setRole(opt.value)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
                       role === opt.value
-                        ? 'bg-coral-light text-coral'
-                        : 'bg-white text-texto-soft hover:bg-creme-dark'
+                        ? 'bg-primary/10 text-primary'
+                        : 'bg-white text-texto-soft hover:bg-surface-muted'
                     }`}
                   >
                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                      role === opt.value ? 'border-coral' : 'border-creme-dark'
+                      role === opt.value ? 'border-primary' : 'border-surface-muted'
                     }`}>
                       {role === opt.value && (
-                        <div className="w-2 h-2 rounded-full bg-coral" />
+                        <div className="w-2 h-2 rounded-full bg-primary" />
                       )}
                     </div>
                     <div>
-                      <p className={`text-sm font-medium ${role === opt.value ? 'text-coral' : 'text-texto'}`}>
+                      <p className={`text-sm font-medium ${role === opt.value ? 'text-primary' : 'text-texto'}`}>
                         {opt.label}
                       </p>
                       <p className="text-xs text-texto-soft">{opt.desc}</p>

@@ -1,30 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import { petsApi } from '@/lib/api';
 import { Pet } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { cn, especieLabel } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { ChevronLeft, PawPrint } from 'lucide-react';
 
 const ESPECIE_EMOJI: Record<string, string> = {
-  CACHORRO: '🐶',
-  GATO: '🐱',
-  CAVALO: '🐴',
-  PEIXE: '🐟',
-  PASSARO: '🐦',
-  ROEDOR: '🐹',
-  COELHO: '🐰',
-  REPTIL: '🦎',
-  FURAO: '🦦',
-  OUTRO: '🐾',
+  CACHORRO: '🐶', GATO: '🐱', CAVALO: '🐴', PEIXE: '🐟',
+  PASSARO: '🐦', ROEDOR: '🐹', COELHO: '🐰', REPTIL: '🦎',
+  FURAO: '🦦', OUTRO: '🐾',
 };
 
 const TABS = [
   { id: 'home', label: 'Home', path: '' },
-  { id: 'saude', label: 'Saúde', path: '/saude' },
+  { id: 'saude', label: 'Saude', path: '/saude' },
   { id: 'guarda', label: 'Guarda', path: '/guarda' },
-  { id: 'historico', label: 'Histórico', path: '/historico' },
+  { id: 'historico', label: 'Historico', path: '/historico' },
   { id: 'perfil', label: 'Perfil', path: '/perfil' },
 ];
 
@@ -39,11 +33,7 @@ const TABS_BY_ROLE: Record<string, string[]> = {
   OUTRO:            ['home'],
 };
 
-export default function PetLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PetLayout({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const params = useParams();
   const router = useRouter();
@@ -53,105 +43,140 @@ export default function PetLayout({
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Sliding indicator state
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace('/login');
-      return;
-    }
+    if (!authLoading && !user) { router.replace('/login'); return; }
     if (petId) {
-      petsApi
-        .get(petId)
+      petsApi.get(petId)
         .then(({ data }) => setPet(data))
         .catch(() => router.replace('/home'))
         .finally(() => setLoading(false));
     }
   }, [petId, user, authLoading, router]);
 
+  const allowedTabIds = pet?.meuRole
+    ? (TABS_BY_ROLE[pet.meuRole] ?? ['home', 'saude', 'guarda', 'historico', 'perfil'])
+    : ['home', 'saude', 'guarda', 'historico', 'perfil'];
+  const visibleTabs = TABS.filter((t) => allowedTabIds.includes(t.id));
+
+  const activeTab = visibleTabs.find((t) => {
+    const fullPath = `/pets/${petId}${t.path}`;
+    return t.path === '' ? pathname === fullPath : pathname.startsWith(fullPath);
+  }) || visibleTabs[0];
+
+  // Update sliding indicator position
+  const updateIndicator = useCallback(() => {
+    if (!activeTab) return;
+    const el = tabRefs.current[activeTab.id];
+    const container = tabsContainerRef.current;
+    if (el && container) {
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      setIndicatorStyle({
+        left: elRect.left - containerRect.left + container.scrollLeft,
+        width: elRect.width,
+      });
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    updateIndicator();
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [updateIndicator, loading]);
+
+  // Scroll active tab into view
+  useEffect(() => {
+    if (activeTab) {
+      const el = tabRefs.current[activeTab.id];
+      el?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, [activeTab]);
+
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-creme">
-        <div className="w-5 h-5 border-2 border-coral border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-surface mg-mesh-bg">
+        <div className="flex flex-col items-center gap-3">
+          <PawPrint className="w-8 h-8 text-primary animate-pulse" />
+          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
       </div>
     );
   }
 
   if (!pet) return null;
 
-  const allowedTabIds = pet.meuRole
-    ? (TABS_BY_ROLE[pet.meuRole] ?? ['home', 'saude', 'guarda', 'historico', 'perfil'])
-    : ['home', 'saude', 'guarda', 'historico', 'perfil'];
-
-  const visibleTabs = TABS.filter((t) => allowedTabIds.includes(t.id));
-
-  const activeTab =
-    visibleTabs.find((t) => {
-      const fullPath = `/pets/${petId}${t.path}`;
-      return t.path === '' ? pathname === fullPath : pathname.startsWith(fullPath);
-    }) || visibleTabs[0];
-
-  const navigateTo = (tab: (typeof TABS)[0]) => {
-    router.push(`/pets/${petId}${tab.path}`);
-  };
-
   const emoji = ESPECIE_EMOJI[pet.especie] || '🐾';
 
   return (
-    <div className="min-h-screen bg-creme">
+    <div className="min-h-screen bg-surface mg-mesh-bg">
       {/* Sticky header */}
-      <header className="sticky top-0 z-40 bg-creme">
-        <div className="max-w-screen-xl mx-auto px-4 pt-4 pb-2">
-          <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-gray-100/50">
+        <div className="max-w-screen-xl mx-auto px-4 pt-3 pb-0">
+          {/* Back + status */}
+          <div className="flex items-center justify-between mb-3">
             <button
               onClick={() => router.push('/home')}
-              className="flex items-center gap-1 text-coral font-body text-sm hover:opacity-70 transition-opacity"
+              className="flex items-center gap-1 text-primary font-body text-sm hover:opacity-70 transition-opacity"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <ChevronLeft className="w-4 h-4" />
               Meus pets
             </button>
             {pet.status === 'ATIVO' ? (
-              <span className="pt-badge bg-menta-light text-menta text-xs font-body">Ativo</span>
+              <span className="mg-badge mg-badge-success text-xs">Ativo</span>
             ) : (
-              <span className="text-xs font-body px-2 py-0.5 rounded-full bg-creme-dark text-texto-soft">
-                Arquivado
-              </span>
+              <span className="mg-badge text-xs bg-surface-muted text-texto-soft">Arquivado</span>
             )}
           </div>
-        </div>
 
-        {/* Pet name hero */}
-        <div className="max-w-screen-xl mx-auto px-4 pt-3 pb-4 flex items-center gap-3">
-          <span className="text-3xl">{emoji}</span>
-          <h1 className="font-headline font-bold text-2xl tracking-tight text-texto">
-            {pet.nome.toUpperCase()}
-          </h1>
-        </div>
+          {/* Pet name */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">{emoji}</span>
+            <h1 className="font-headline font-bold text-xl tracking-tight text-texto">
+              {pet.nome.toUpperCase()}
+            </h1>
+          </div>
 
-        {/* Horizontal tab bar */}
-        <div className="max-w-screen-xl mx-auto px-4 pb-2">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {visibleTabs.map((tab) => {
-              const isActive = activeTab.id === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => navigateTo(tab)}
-                  className={cn(
-                    'px-4 py-2 rounded-full text-sm font-body font-medium whitespace-nowrap transition-all duration-200',
-                    isActive
-                      ? 'pt-tab-active'
-                      : 'pt-tab'
-                  )}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+          {/* Sliding tab bar */}
+          <div className="relative" ref={tabsContainerRef}>
+            <div className="flex gap-0 overflow-x-auto scrollbar-hide">
+              {visibleTabs.map((tab) => {
+                const isActive = activeTab?.id === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    ref={(el) => { tabRefs.current[tab.id] = el; }}
+                    onClick={() => router.push(`/pets/${petId}${tab.path}`)}
+                    className={cn(
+                      'px-4 py-2.5 text-sm font-headline whitespace-nowrap transition-all duration-200',
+                      isActive
+                        ? 'text-primary font-bold'
+                        : 'text-texto-soft font-medium hover:text-primary'
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Sliding indicator bar */}
+            <div
+              className="absolute bottom-0 h-[3px] rounded-t-full bg-gradient-to-r from-primary to-primary-light transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+              style={{
+                transform: `translateX(${indicatorStyle.left}px)`,
+                width: `${indicatorStyle.width}px`,
+              }}
+            />
           </div>
         </div>
       </header>
 
-      {/* Content area */}
-      <main className="max-w-screen-xl mx-auto px-4 pt-6 pb-12">{children}</main>
+      {/* Content */}
+      <main className="max-w-screen-xl mx-auto px-4 pt-6 pb-12 animate-fade-in">{children}</main>
     </div>
   );
 }

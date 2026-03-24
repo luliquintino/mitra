@@ -1,20 +1,39 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navbar } from '@/components/landing/Navbar';
-import { HeroSection } from '@/components/landing/HeroSection';
-import { FeaturesSection } from '@/components/landing/FeaturesSection';
-import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
-import { TrustSection } from '@/components/landing/TrustSection';
-import { PricingTeaser } from '@/components/landing/PricingTeaser';
-import { Footer } from '@/components/landing/Footer';
 import { ScrollReveal } from '@/components/landing/ScrollReveal';
+import {
+  PawPrint,
+  Heart,
+  Shield,
+  Clock,
+  ArrowRight,
+  Check,
+  Star,
+  Users,
+  Zap,
+  Lock,
+  Smartphone,
+  ChevronDown,
+  Menu,
+  X,
+  Calendar,
+  FileText,
+  Activity,
+} from 'lucide-react';
+import Link from 'next/link';
+
+/* ════════════════════════════════════════════
+   MITRA Landing Page — Glassmorphism Redesign
+   ════════════════════════════════════════════ */
 
 export default function RootPage() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -22,54 +41,629 @@ export default function RootPage() {
     }
   }, [isAuthenticated, loading, router]);
 
-  return (
-    <main className="font-body">
-      <Navbar />
-      <HeroSection />
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-      {/* ProblemaSection — inline */}
-      <section className="bg-creme-dark py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <ScrollReveal>
-            <h2 className="font-headline font-extrabold text-2xl md:text-3xl text-texto leading-snug">
-              Cuidar de um pet é lindo.<br />
-              Organizar tudo... nem tanto.
-            </h2>
-          </ScrollReveal>
+  /* ── Navbar ──────────────────────────────── */
+  const Navbar = () => (
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-white/70 backdrop-blur-xl shadow-[0_4px_30px_rgba(124,58,237,0.06)] border-b border-white/30'
+          : 'bg-transparent'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center shadow-lg shadow-[#7C3AED]/20 group-hover:shadow-[#7C3AED]/40 transition-shadow">
+              <PawPrint className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-headline text-xl font-extrabold bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] bg-clip-text text-transparent">
+              MITRA
+            </span>
+          </Link>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="font-body text-sm font-medium text-[#6B7280] hover:text-[#7C3AED] transition-colors">
+              Recursos
+            </a>
+            <a href="#how-it-works" className="font-body text-sm font-medium text-[#6B7280] hover:text-[#7C3AED] transition-colors">
+              Como funciona
+            </a>
+            <a href="#pricing" className="font-body text-sm font-medium text-[#6B7280] hover:text-[#7C3AED] transition-colors">
+              Planos
+            </a>
+          </div>
+
+          {/* Desktop CTAs */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link href="/login" className="mg-btn-ghost text-sm">
+              Entrar
+            </Link>
+            <Link href="/register" className="mg-btn text-sm !py-2.5 !px-5">
+              Criar conta gratis
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-xl hover:bg-[#7C3AED]/5 transition-colors"
+            aria-label="Menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6 text-[#1E1B4B]" /> : <Menu className="w-6 h-6 text-[#1E1B4B]" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white/90 backdrop-blur-2xl border-t border-white/30 shadow-xl">
+          <div className="px-4 py-6 space-y-4">
+            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="block font-body text-base font-medium text-[#1E1B4B] hover:text-[#7C3AED]">
+              Recursos
+            </a>
+            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="block font-body text-base font-medium text-[#1E1B4B] hover:text-[#7C3AED]">
+              Como funciona
+            </a>
+            <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="block font-body text-base font-medium text-[#1E1B4B] hover:text-[#7C3AED]">
+              Planos
+            </a>
+            <div className="pt-4 border-t border-[#F1F3F9] flex flex-col gap-3">
+              <Link href="/login" className="mg-btn-secondary w-full text-center">
+                Entrar
+              </Link>
+              <Link href="/register" className="mg-btn w-full text-center">
+                Criar conta gratis
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+
+  /* ── Hero ─────────────────────────────────── */
+  const Hero = () => (
+    <section className="relative min-h-screen flex items-center pt-20 pb-16 overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-20 left-[-10%] w-[500px] h-[500px] rounded-full bg-[#7C3AED]/[0.07] blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-10 right-[-5%] w-[400px] h-[400px] rounded-full bg-[#14B8A6]/[0.06] blur-[80px] pointer-events-none" />
+      <div className="absolute top-40 right-[20%] w-[300px] h-[300px] rounded-full bg-[#F43F5E]/[0.05] blur-[80px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left — Copy */}
+          <div className="text-center lg:text-left">
+            <ScrollReveal>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#7C3AED]/[0.08] border border-[#7C3AED]/[0.12] mb-6">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#14B8A6] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#14B8A6]" />
+                </span>
+                <span className="font-body text-sm font-semibold text-[#7C3AED]">
+                  Novo: IA Veterinaria integrada
+                </span>
+              </div>
+            </ScrollReveal>
+
             <ScrollReveal delay={1}>
-              <div className="bg-branco rounded-xl p-6 shadow-card">
-                <span className="text-4xl">📋</span>
-                <p className="font-headline font-semibold text-texto mt-3">Vacinas em papéis perdidos</p>
-              </div>
+              <h1 className="font-headline text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1E1B4B] leading-[1.1] tracking-tight">
+                Tudo sobre seu pet.{' '}
+                <span className="bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#7C3AED] bg-clip-text text-transparent">
+                  Em um so lugar.
+                </span>
+              </h1>
             </ScrollReveal>
+
             <ScrollReveal delay={2}>
-              <div className="bg-branco rounded-xl p-6 shadow-card">
-                <span className="text-4xl">🤝</span>
-                <p className="font-headline font-semibold text-texto mt-3">Guarda compartilhada sem comunicação</p>
+              <p className="mt-6 text-lg sm:text-xl text-[#6B7280] leading-relaxed max-w-lg mx-auto lg:mx-0">
+                Saude, agenda, guarda compartilhada e historico completo.
+                A plataforma que pet parents modernos merecem.
+              </p>
+            </ScrollReveal>
+
+            <ScrollReveal delay={3}>
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link href="/register" className="mg-btn text-base !py-3.5 !px-8 group">
+                  Comecar agora
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <a href="#features" className="mg-btn-ghost text-base !py-3.5 !px-8 border border-[#7C3AED]/10">
+                  Ver recursos
+                  <ChevronDown className="w-4 h-4" />
+                </a>
               </div>
             </ScrollReveal>
-            <ScrollReveal delay={3}>
-              <div className="bg-branco rounded-xl p-6 shadow-card">
-                <span className="text-4xl">📱</span>
-                <p className="font-headline font-semibold text-texto mt-3">Informações espalhadas em 5 apps</p>
+
+            <ScrollReveal delay={4}>
+              <div className="mt-10 flex items-center gap-6 justify-center lg:justify-start text-sm text-[#6B7280]">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-[#14B8A6]" />
+                  <span>Gratis para sempre</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-[#14B8A6]" />
+                  <span>Sem cartao de credito</span>
+                </div>
               </div>
             </ScrollReveal>
           </div>
 
-          <ScrollReveal delay={4}>
-            <p className="mt-10 font-headline font-bold text-coral text-lg">
-              O MITRA resolve tudo isso →
+          {/* Right — Floating glass card app preview */}
+          <ScrollReveal delay={2}>
+            <div className="relative flex justify-center lg:justify-end">
+              {/* Main preview card */}
+              <div className="relative w-full max-w-[380px]">
+                <div className="mg-card !p-0 overflow-hidden shadow-2xl shadow-[#7C3AED]/10 border border-white/40">
+                  {/* App header */}
+                  <div className="bg-gradient-to-r from-[#7C3AED] to-[#5B21B6] p-5 pb-12">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl">
+                        🐕
+                      </div>
+                      <div>
+                        <p className="font-headline font-bold text-white text-lg">Thor</p>
+                        <p className="text-white/70 text-sm">Golden Retriever, 3 anos</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stat cards */}
+                  <div className="px-5 -mt-6 space-y-3 pb-5">
+                    <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-4 shadow-lg shadow-black/[0.03] border border-white/60 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-[#14B8A6]/10 flex items-center justify-center">
+                        <Heart className="w-5 h-5 text-[#14B8A6]" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-[#6B7280] font-medium">Proxima vacina</p>
+                        <p className="font-headline font-bold text-[#1E1B4B] text-sm">V10 — 15 Abr</p>
+                      </div>
+                      <div className="mg-badge-success text-xs">Em dia</div>
+                    </div>
+
+                    <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-4 shadow-lg shadow-black/[0.03] border border-white/60 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-[#6366F1]/10 flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-[#6366F1]" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-[#6B7280] font-medium">Proximo banho</p>
+                        <p className="font-headline font-bold text-[#1E1B4B] text-sm">Sabado, 10:00</p>
+                      </div>
+                      <div className="mg-badge-info text-xs">Agendado</div>
+                    </div>
+
+                    <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-4 shadow-lg shadow-black/[0.03] border border-white/60 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-[#7C3AED]/10 flex items-center justify-center">
+                        <Users className="w-5 h-5 text-[#7C3AED]" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-[#6B7280] font-medium">Guarda</p>
+                        <p className="font-headline font-bold text-[#1E1B4B] text-sm">Sua vez esta semana</p>
+                      </div>
+                      <div className="mg-badge-primary text-xs">Ativo</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating badge — top right */}
+                <div className="absolute -top-4 -right-4 sm:-right-6 bg-white/80 backdrop-blur-xl rounded-2xl p-3 shadow-xl shadow-[#7C3AED]/10 border border-white/40 animate-[float_3s_ease-in-out_infinite]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-[#F43F5E]/10 flex items-center justify-center">
+                      <Activity className="w-4 h-4 text-[#F43F5E]" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-[#9CA3AF] font-medium">IA Analise</p>
+                      <p className="text-xs font-bold text-[#1E1B4B]">Saudavel</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating badge — bottom left */}
+                <div className="absolute -bottom-3 -left-4 sm:-left-6 bg-white/80 backdrop-blur-xl rounded-2xl p-3 shadow-xl shadow-[#14B8A6]/10 border border-white/40 animate-[float_3s_ease-in-out_infinite_0.5s]">
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      <div className="w-7 h-7 rounded-full bg-[#7C3AED] flex items-center justify-center text-white text-xs font-bold border-2 border-white">L</div>
+                      <div className="w-7 h-7 rounded-full bg-[#14B8A6] flex items-center justify-center text-white text-xs font-bold border-2 border-white">R</div>
+                    </div>
+                    <p className="text-xs font-bold text-[#1E1B4B]">2 guardioes</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-[#9CA3AF]">
+        <span className="text-xs font-medium">Scroll</span>
+        <div className="w-6 h-10 rounded-full border-2 border-[#9CA3AF]/30 flex items-start justify-center p-1.5">
+          <div className="w-1.5 h-3 rounded-full bg-[#7C3AED]/40 animate-bounce" />
+        </div>
+      </div>
+    </section>
+  );
+
+  /* ── Features ────────────────────────────── */
+  const features = [
+    {
+      icon: Heart,
+      title: 'Saude completa',
+      desc: 'Vacinas, consultas, exames e medicacoes. Tudo organizado com alertas inteligentes e analise por IA.',
+      color: '#14B8A6',
+      bgClass: 'mg-card-saude',
+      emoji: '💚',
+    },
+    {
+      icon: Calendar,
+      title: 'Agenda inteligente',
+      desc: 'Banhos, consultas, vermifugos e mais. Nunca mais esqueca um compromisso do seu pet.',
+      color: '#6366F1',
+      bgClass: 'mg-card-agenda',
+      emoji: '📅',
+    },
+    {
+      icon: Users,
+      title: 'Guarda compartilhada',
+      desc: 'Gerencie turnos, despesas e comunicacao com o co-guardiao. Transparencia total.',
+      color: '#7C3AED',
+      bgClass: 'mg-card-guarda',
+      emoji: '🤝',
+    },
+    {
+      icon: FileText,
+      title: 'Historico completo',
+      desc: 'Linha do tempo com todos os eventos, documentos e fotos. O prontuario digital do seu pet.',
+      color: '#F59E0B',
+      bgClass: 'mg-card-historico',
+      emoji: '📋',
+    },
+  ];
+
+  const Features = () => (
+    <section id="features" className="py-20 sm:py-28 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <ScrollReveal>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#7C3AED]/[0.06] border border-[#7C3AED]/10 mb-4">
+              <Zap className="w-3.5 h-3.5 text-[#7C3AED]" />
+              <span className="text-xs font-semibold text-[#7C3AED] uppercase tracking-wider">Recursos</span>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal delay={1}>
+            <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1E1B4B] leading-tight">
+              Tudo que seu pet precisa.{' '}
+              <span className="bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] bg-clip-text text-transparent">
+                Nada que voce nao precise.
+              </span>
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal delay={2}>
+            <p className="mt-4 text-lg text-[#6B7280]">
+              Quatro modulos poderosos que simplificam a vida de quem ama seu pet.
             </p>
           </ScrollReveal>
         </div>
-      </section>
 
-      <FeaturesSection />
-      <HowItWorksSection />
-      <TrustSection />
-      <PricingTeaser />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((f, i) => (
+            <ScrollReveal key={f.title} delay={i + 1}>
+              <div className={`mg-card ${f.bgClass} h-full group cursor-default`}>
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110"
+                  style={{ background: `${f.color}12` }}
+                >
+                  <f.icon className="w-6 h-6" style={{ color: f.color }} />
+                </div>
+                <h3 className="font-headline text-lg font-bold text-[#1E1B4B] mb-2">
+                  {f.title}
+                </h3>
+                <p className="text-sm text-[#6B7280] leading-relaxed">
+                  {f.desc}
+                </p>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  /* ── How It Works ────────────────────────── */
+  const steps = [
+    {
+      num: '01',
+      title: 'Crie sua conta',
+      desc: 'Cadastro rapido e gratis. Sem cartao de credito, sem burocracia.',
+      icon: Smartphone,
+    },
+    {
+      num: '02',
+      title: 'Adicione seu pet',
+      desc: 'Cadastre as informacoes basicas, vacinas e rotina. A IA ajuda a organizar tudo.',
+      icon: PawPrint,
+    },
+    {
+      num: '03',
+      title: 'Gerencie com facilidade',
+      desc: 'Convide co-guardioes, agende compromissos e acompanhe a saude em tempo real.',
+      icon: Zap,
+    },
+  ];
+
+  const HowItWorks = () => (
+    <section id="how-it-works" className="py-20 sm:py-28 relative">
+      {/* Subtle background accent */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F1F3F9]/50 to-transparent pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <ScrollReveal>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#14B8A6]/[0.08] border border-[#14B8A6]/10 mb-4">
+              <Clock className="w-3.5 h-3.5 text-[#14B8A6]" />
+              <span className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider">Como funciona</span>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal delay={1}>
+            <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1E1B4B] leading-tight">
+              Comece em{' '}
+              <span className="bg-gradient-to-r from-[#14B8A6] to-[#0D9488] bg-clip-text text-transparent">
+                3 passos simples
+              </span>
+            </h2>
+          </ScrollReveal>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8 relative">
+          {/* Connecting line (desktop) */}
+          <div className="hidden md:block absolute top-24 left-[20%] right-[20%] h-px bg-gradient-to-r from-[#7C3AED]/20 via-[#14B8A6]/20 to-[#F59E0B]/20" />
+
+          {steps.map((s, i) => (
+            <ScrollReveal key={s.num} delay={i + 1}>
+              <div className="mg-card text-center relative h-full">
+                {/* Step number */}
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center mx-auto mb-5 shadow-lg shadow-[#7C3AED]/20">
+                  <span className="font-headline text-xl font-extrabold text-white">{s.num}</span>
+                </div>
+                <h3 className="font-headline text-xl font-bold text-[#1E1B4B] mb-3">
+                  {s.title}
+                </h3>
+                <p className="text-[#6B7280] leading-relaxed">
+                  {s.desc}
+                </p>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  /* ── Trust ───────────────────────────────── */
+  const trustItems = [
+    {
+      icon: Lock,
+      title: 'Dados protegidos',
+      desc: 'Criptografia de ponta a ponta. Seus dados e do seu pet estao seguros.',
+      color: '#7C3AED',
+    },
+    {
+      icon: Star,
+      title: 'Feito por pet parents',
+      desc: 'Criado por quem entende a rotina de cuidar de um pet de verdade.',
+      color: '#F59E0B',
+    },
+    {
+      icon: Shield,
+      title: 'Privacidade em primeiro',
+      desc: 'Nunca vendemos seus dados. Sua privacidade e nossa prioridade absoluta.',
+      color: '#14B8A6',
+    },
+  ];
+
+  const Trust = () => (
+    <section className="py-20 sm:py-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <ScrollReveal>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F59E0B]/[0.08] border border-[#F59E0B]/10 mb-4">
+              <Shield className="w-3.5 h-3.5 text-[#F59E0B]" />
+              <span className="text-xs font-semibold text-[#F59E0B] uppercase tracking-wider">Confianca</span>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal delay={1}>
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-[#1E1B4B] leading-tight">
+              Por que confiar no MITRA?
+            </h2>
+          </ScrollReveal>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {trustItems.map((item, i) => (
+            <ScrollReveal key={item.title} delay={i + 1}>
+              <div className="mg-card text-center h-full">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                  style={{ background: `${item.color}12` }}
+                >
+                  <item.icon className="w-7 h-7" style={{ color: item.color }} />
+                </div>
+                <h3 className="font-headline text-lg font-bold text-[#1E1B4B] mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-[#6B7280] leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  /* ── Pricing Teaser ──────────────────────── */
+  const Pricing = () => (
+    <section id="pricing" className="py-20 sm:py-28 relative overflow-hidden">
+      {/* Gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED] via-[#6D28D9] to-[#5B21B6]" />
+      {/* Glass pattern overlay */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-10 left-10 w-72 h-72 rounded-full bg-white/20 blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative text-center">
+        <ScrollReveal>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-6">
+            <Star className="w-3.5 h-3.5 text-[#F59E0B]" />
+            <span className="text-xs font-semibold text-white/90 uppercase tracking-wider">Planos</span>
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal delay={1}>
+          <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+            Comece gratis.{' '}
+            <span className="text-white/70">Evolua quando quiser.</span>
+          </h2>
+        </ScrollReveal>
+
+        <ScrollReveal delay={2}>
+          <p className="mt-6 text-lg text-white/70 max-w-xl mx-auto">
+            O plano gratuito ja inclui tudo que voce precisa para gerenciar seu pet.
+            Planos premium desbloqueiam IA avancada e mais recursos.
+          </p>
+        </ScrollReveal>
+
+        <ScrollReveal delay={3}>
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center gap-2 bg-white text-[#7C3AED] font-headline font-bold py-3.5 px-8 rounded-xl hover:bg-white/90 transition-all hover:shadow-xl hover:shadow-black/10 hover:-translate-y-0.5 text-base"
+            >
+              Criar conta gratis
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal delay={4}>
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 justify-center text-sm text-white/60">
+            <div className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-[#14B8A6]" />
+              <span>1 pet incluso</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-[#14B8A6]" />
+              <span>Saude e agenda</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-[#14B8A6]" />
+              <span>Guarda compartilhada</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-[#14B8A6]" />
+              <span>Sem cartao de credito</span>
+            </div>
+          </div>
+        </ScrollReveal>
+      </div>
+    </section>
+  );
+
+  /* ── Footer ──────────────────────────────── */
+  const Footer = () => (
+    <footer className="bg-[#1E1B4B] text-white/70 pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+          {/* Brand */}
+          <div className="sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] flex items-center justify-center">
+                <PawPrint className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-headline text-lg font-extrabold text-white">MITRA</span>
+            </div>
+            <p className="text-sm leading-relaxed">
+              A plataforma completa para pet parents que levam o cuidado a serio.
+            </p>
+          </div>
+
+          {/* Product */}
+          <div>
+            <h4 className="font-headline font-bold text-white text-sm mb-4 uppercase tracking-wider">Produto</h4>
+            <ul className="space-y-2.5">
+              <li><a href="#features" className="text-sm hover:text-[#A78BFA] transition-colors">Recursos</a></li>
+              <li><a href="#how-it-works" className="text-sm hover:text-[#A78BFA] transition-colors">Como funciona</a></li>
+              <li><a href="#pricing" className="text-sm hover:text-[#A78BFA] transition-colors">Planos</a></li>
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h4 className="font-headline font-bold text-white text-sm mb-4 uppercase tracking-wider">Suporte</h4>
+            <ul className="space-y-2.5">
+              <li><a href="#" className="text-sm hover:text-[#A78BFA] transition-colors">Central de ajuda</a></li>
+              <li><a href="#" className="text-sm hover:text-[#A78BFA] transition-colors">Contato</a></li>
+              <li><a href="#" className="text-sm hover:text-[#A78BFA] transition-colors">Feedback</a></li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="font-headline font-bold text-white text-sm mb-4 uppercase tracking-wider">Legal</h4>
+            <ul className="space-y-2.5">
+              <li><a href="#" className="text-sm hover:text-[#A78BFA] transition-colors">Privacidade</a></li>
+              <li><a href="#" className="text-sm hover:text-[#A78BFA] transition-colors">Termos de uso</a></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Divider + bottom */}
+        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-white/40">
+            &copy; {new Date().getFullYear()} MITRA. Todos os direitos reservados.
+          </p>
+          <div className="flex items-center gap-1 text-xs text-white/40">
+            <span>Feito com</span>
+            <Heart className="w-3 h-3 text-[#F43F5E] fill-[#F43F5E]" />
+            <span>para pet parents</span>
+            <span className="text-lg leading-none">🐾</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+
+  /* ── Float Animation Keyframes ── */
+  const floatKeyframes = `
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+  `;
+  const FloatStyles = () => (
+    <style dangerouslySetInnerHTML={{ __html: floatKeyframes }} />
+  );
+
+  /* ── Main Render ─────────────────────────── */
+  return (
+    <main className="font-body mg-mesh-bg">
+      <FloatStyles />
+      <Navbar />
+      <Hero />
+      <Features />
+      <HowItWorks />
+      <Trust />
+      <Pricing />
       <Footer />
     </main>
   );

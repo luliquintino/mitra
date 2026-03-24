@@ -1,31 +1,36 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Be_Vietnam_Pro } from 'next/font/google';
+import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { NotificacaoProvider } from '@/contexts/NotificacaoContext';
 import { ToastProvider } from '@/components/ToastContainer';
 
-const jakarta = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-jakarta',
-  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-inter',
 });
 
-const vietnam = Be_Vietnam_Pro({
-  subsets: ['latin'],
+const satoshi = localFont({
+  src: [
+    { path: '../../public/fonts/Satoshi-Regular.woff2', weight: '400', style: 'normal' },
+    { path: '../../public/fonts/Satoshi-Medium.woff2', weight: '500', style: 'normal' },
+    { path: '../../public/fonts/Satoshi-Bold.woff2', weight: '700', style: 'normal' },
+    { path: '../../public/fonts/Satoshi-Black.woff2', weight: '900', style: 'normal' },
+  ],
+  variable: '--font-satoshi',
   display: 'swap',
-  variable: '--font-vietnam',
-  weight: ['400', '500', '600', '700'],
+  fallback: ['system-ui', 'sans-serif'],
 });
 
 export const metadata: Metadata = {
-  title: 'MITRA — Gestão completa do pet',
-  description: 'Saúde, guarda, histórico e governança do seu pet num único lugar. Organização e tranquilidade para tutores, prestadores e familiares.',
-  keywords: ['pet', 'gestão', 'saúde animal', 'guarda compartilhada', 'veterinário', 'tutor'],
+  title: 'MITRA — Gestao completa do pet',
+  description: 'Saude, guarda, historico e governanca do seu pet num unico lugar. Organizacao e tranquilidade para tutores, prestadores e familiares.',
+  keywords: ['pet', 'gestao', 'saude animal', 'guarda compartilhada', 'veterinario', 'tutor'],
   openGraph: {
-    title: 'MITRA — Gestão completa do pet',
-    description: 'Saúde, guarda, histórico e governança do seu pet num único lugar.',
+    title: 'MITRA — Gestao completa do pet',
+    description: 'Saude, guarda, historico e governanca do seu pet num unico lugar.',
     type: 'website',
     locale: 'pt_BR',
   },
@@ -37,8 +42,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${jakarta.variable} ${vietnam.variable}`}>
-      <body className="min-h-screen bg-creme antialiased font-body text-texto">
+    <html lang="pt-BR" className={`${satoshi.variable} ${inter.variable}`}>
+      <body className="min-h-screen bg-surface antialiased font-body text-texto">
         <AuthProvider>
           <ToastProvider>
             <NotificacaoProvider>{children}</NotificacaoProvider>

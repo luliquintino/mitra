@@ -5,6 +5,19 @@ import { useParams } from 'next/navigation';
 import { governanceApi, custodyApi, eventsApi } from '@/lib/api';
 import type { PetUsuario, Solicitacao, GuardaTemporaria, Evento } from '@/types';
 import { cn } from '@/lib/utils';
+import {
+  Shield,
+  Users,
+  Clock,
+  Calendar,
+  FileText,
+  Plus,
+  Check,
+  X,
+  ChevronRight,
+  AlertCircle,
+  User,
+} from 'lucide-react';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -55,11 +68,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  AGENDADA: 'bg-amarelo-light text-amarelo',
-  CONFIRMADA: 'bg-menta-light text-menta',
-  EM_ANDAMENTO: 'bg-menta-light text-menta',
-  CONCLUIDA: 'bg-azul-light text-azul',
-  CANCELADA: 'bg-erro/10 text-erro',
+  AGENDADA: 'mg-badge-warning',
+  CONFIRMADA: 'mg-badge-success',
+  EM_ANDAMENTO: 'mg-badge-success',
+  CONCLUIDA: 'mg-badge-info',
+  CANCELADA: 'mg-badge-error',
 };
 
 const CUSTODY_EVENT_TYPES = [
@@ -196,18 +209,18 @@ export default function GuardaPage() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-6 w-48 pt-skeleton rounded-lg" />
-        <div className="h-4 w-64 pt-skeleton rounded-lg" />
-        <div className="pt-card space-y-4">
-          <div className="h-16 pt-skeleton rounded-xl" />
+        <div className="h-6 w-48 mg-skeleton rounded-lg" />
+        <div className="h-4 w-64 mg-skeleton rounded-lg" />
+        <div className="mg-card space-y-4">
+          <div className="h-16 mg-skeleton rounded-xl" />
         </div>
-        <div className="pt-card space-y-3">
-          <div className="h-14 pt-skeleton rounded-xl" />
-          <div className="h-14 pt-skeleton rounded-xl" />
+        <div className="mg-card space-y-3">
+          <div className="h-14 mg-skeleton rounded-xl" />
+          <div className="h-14 mg-skeleton rounded-xl" />
         </div>
-        <div className="pt-card space-y-3">
-          <div className="h-14 pt-skeleton rounded-xl" />
-          <div className="h-14 pt-skeleton rounded-xl" />
+        <div className="mg-card space-y-3">
+          <div className="h-14 mg-skeleton rounded-xl" />
+          <div className="h-14 mg-skeleton rounded-xl" />
         </div>
       </div>
     );
@@ -219,18 +232,23 @@ export default function GuardaPage() {
     <div className="space-y-6 animate-fade-in">
       {/* Section header */}
       <div>
-        <h2 className="font-headline text-xl font-bold text-texto">Guarda</h2>
+        <h2 className="font-headline font-bold text-xl text-texto">Guarda</h2>
         <p className="text-sm text-texto-soft font-body">Gerencie a guarda e custodia do pet</p>
       </div>
 
       {/* ── 1. GUARDA ATUAL ──────────────────────────────────────────────────── */}
-      <div className="pt-card space-y-4">
-        <h3 className="font-headline text-lg font-bold text-texto">Guarda Atual</h3>
+      <div className="mg-card space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Shield className="w-4 h-4 text-primary" />
+          </div>
+          <h3 className="font-headline text-lg font-bold text-texto">Guarda Atual</h3>
+        </div>
 
         {guardiao ? (
-          <div className="bg-creme-dark/30 rounded-xl p-3 flex items-center gap-3">
+          <div className="mg-card-solid rounded-xl p-3 flex items-center gap-3">
             {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-coral-light flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
               {guardiao.usuario.avatarUrl ? (
                 <img
                   src={guardiao.usuario.avatarUrl}
@@ -238,7 +256,7 @@ export default function GuardaPage() {
                   className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (
-                <span className="text-coral text-sm font-headline font-bold">
+                <span className="text-primary text-sm font-headline font-bold">
                   {initials(guardiao.usuario.nome)}
                 </span>
               )}
@@ -253,38 +271,49 @@ export default function GuardaPage() {
               </p>
             </div>
 
-            <span className="px-3 py-1 rounded-full text-xs font-headline font-bold bg-coral-light text-coral flex-shrink-0">
+            <span className="mg-badge mg-badge-primary flex-shrink-0">
               {ROLE_LABELS[guardiao.role] || guardiao.role}
             </span>
           </div>
         ) : (
-          <p className="text-sm text-texto-soft font-body py-3 text-center">
-            Nenhum tutor principal definido
-          </p>
+          <div className="mg-card-solid rounded-xl py-8 flex flex-col items-center gap-2">
+            <Shield className="w-8 h-8 text-texto-soft/40" />
+            <p className="text-sm text-texto-soft font-body text-center">
+              Nenhum tutor principal definido
+            </p>
+          </div>
         )}
       </div>
 
       {/* ── 2. SOLICITAÇÕES PENDENTES ───────────────────────────────────────── */}
-      <div className="pt-card space-y-4">
-        <h3 className="font-headline text-lg font-bold text-texto">
-          Solicitacoes Pendentes
-        </h3>
+      <div className="mg-card space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-amber/10 flex items-center justify-center">
+            <AlertCircle className="w-4 h-4 text-amber" />
+          </div>
+          <h3 className="font-headline text-lg font-bold text-texto">
+            Solicitacoes Pendentes
+          </h3>
+        </div>
 
         {pendentes.length === 0 ? (
-          <p className="text-sm text-texto-soft font-body py-3 text-center">
-            Nenhuma solicitacao pendente
-          </p>
+          <div className="mg-card-solid rounded-xl py-8 flex flex-col items-center gap-2">
+            <Check className="w-8 h-8 text-texto-soft/40" />
+            <p className="text-sm text-texto-soft font-body text-center">
+              Nenhuma solicitacao pendente
+            </p>
+          </div>
         ) : (
           <div className="space-y-3">
             {pendentes.map((sol) => (
               <div
                 key={sol.id}
-                className="bg-creme-dark/30 rounded-xl p-4 space-y-3"
+                className="mg-card-solid rounded-xl p-4 space-y-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-rosa-light flex items-center justify-center flex-shrink-0">
-                      <span className="text-rosa text-sm font-headline font-bold">
+                    <div className="w-10 h-10 rounded-full bg-rose/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-rose text-sm font-headline font-bold">
                         {initials(sol.solicitante.nome)}
                       </span>
                     </div>
@@ -303,7 +332,7 @@ export default function GuardaPage() {
                 </div>
 
                 {sol.justificativa && (
-                  <div className="bg-creme-dark/40 rounded-xl px-4 py-3">
+                  <div className="bg-surface-muted/40 rounded-xl px-4 py-3">
                     <p className="text-sm text-texto font-body">{sol.justificativa}</p>
                   </div>
                 )}
@@ -315,7 +344,7 @@ export default function GuardaPage() {
                 {respondendo === sol.id && (
                   <div>
                     <textarea
-                      className="pt-input resize-none"
+                      className="mg-input resize-none"
                       rows={2}
                       placeholder="Mensagem (opcional)..."
                       value={mensagemResposta}
@@ -329,19 +358,21 @@ export default function GuardaPage() {
                     <>
                       <button
                         onClick={() => handleResponder(sol.id, 'APROVAR')}
-                        className="pt-btn text-sm"
+                        className="mg-btn text-sm"
                       >
+                        <Check className="w-3.5 h-3.5" />
                         Confirmar Aprovacao
                       </button>
                       <button
                         onClick={() => handleResponder(sol.id, 'RECUSAR')}
-                        className="pt-btn-secondary text-sm"
+                        className="mg-btn-secondary text-sm"
                       >
+                        <X className="w-3.5 h-3.5" />
                         Confirmar Recusa
                       </button>
                       <button
                         onClick={() => handleResponder(sol.id, 'SUGERIR')}
-                        className="pt-btn-ghost text-sm"
+                        className="mg-btn-ghost text-sm"
                       >
                         Enviar Sugestao
                       </button>
@@ -350,7 +381,7 @@ export default function GuardaPage() {
                           setRespondendo(null);
                           setMensagemResposta('');
                         }}
-                        className="pt-btn-ghost text-sm"
+                        className="mg-btn-ghost text-sm"
                       >
                         Cancelar
                       </button>
@@ -359,19 +390,21 @@ export default function GuardaPage() {
                     <>
                       <button
                         onClick={() => handleResponder(sol.id, 'APROVAR')}
-                        className="pt-btn text-sm"
+                        className="mg-btn text-sm"
                       >
+                        <Check className="w-3.5 h-3.5" />
                         Aprovar
                       </button>
                       <button
                         onClick={() => handleResponder(sol.id, 'RECUSAR')}
-                        className="pt-btn-secondary text-sm"
+                        className="mg-btn-secondary text-sm"
                       >
+                        <X className="w-3.5 h-3.5" />
                         Recusar
                       </button>
                       <button
                         onClick={() => setRespondendo(sol.id)}
-                        className="pt-btn-ghost text-sm"
+                        className="mg-btn-ghost text-sm"
                       >
                         Sugerir
                       </button>
@@ -385,27 +418,42 @@ export default function GuardaPage() {
       </div>
 
       {/* ── 3. GUARDAS TEMPORÁRIAS ──────────────────────────────────────────── */}
-      <div className="pt-card space-y-4">
+      <div className="mg-card space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-headline text-lg font-bold text-texto">
-            Guardas Temporarias
-          </h3>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-teal/10 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-teal" />
+            </div>
+            <h3 className="font-headline text-lg font-bold text-texto">
+              Guardas Temporarias
+            </h3>
+          </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="pt-btn-ghost text-sm"
+            className="mg-btn-ghost text-sm"
           >
-            {showForm ? 'Cancelar' : '+ Nova'}
+            {showForm ? (
+              <>
+                <X className="w-3.5 h-3.5" />
+                Cancelar
+              </>
+            ) : (
+              <>
+                <Plus className="w-3.5 h-3.5" />
+                Nova
+              </>
+            )}
           </button>
         </div>
 
         {/* Inline form */}
         {showForm && (
-          <div className="space-y-3 bg-azul-light/30 rounded-xl p-5">
+          <div className="space-y-3 mg-card-solid rounded-xl p-5">
             <h4 className="font-headline font-bold text-texto text-sm">Nova guarda temporaria</h4>
             <div>
-              <label className="pt-label">Responsavel</label>
+              <label className="mg-label">Responsavel</label>
               <select
-                className="pt-input"
+                className="mg-select"
                 value={formData.responsavelId}
                 onChange={(e) =>
                   setFormData({ ...formData, responsavelId: e.target.value })
@@ -424,10 +472,10 @@ export default function GuardaPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="pt-label">Data Inicio</label>
+                <label className="mg-label">Data Inicio</label>
                 <input
                   type="date"
-                  className="pt-input"
+                  className="mg-input"
                   value={formData.dataInicio}
                   onChange={(e) =>
                     setFormData({ ...formData, dataInicio: e.target.value })
@@ -435,10 +483,10 @@ export default function GuardaPage() {
                 />
               </div>
               <div>
-                <label className="pt-label">Data Fim</label>
+                <label className="mg-label">Data Fim</label>
                 <input
                   type="date"
-                  className="pt-input"
+                  className="mg-input"
                   value={formData.dataFim}
                   onChange={(e) =>
                     setFormData({ ...formData, dataFim: e.target.value })
@@ -448,9 +496,9 @@ export default function GuardaPage() {
             </div>
 
             <div>
-              <label className="pt-label">Observacoes</label>
+              <label className="mg-label">Observacoes</label>
               <textarea
-                className="pt-input resize-none"
+                className="mg-input resize-none"
                 rows={2}
                 placeholder="Observacoes opcionais..."
                 value={formData.observacoes}
@@ -464,7 +512,7 @@ export default function GuardaPage() {
               onClick={handleCriarTemporaria}
               disabled={formLoading || !formData.dataInicio || !formData.dataFim}
               className={cn(
-                'pt-btn w-full text-sm',
+                'mg-btn w-full text-sm',
                 (formLoading || !formData.dataInicio || !formData.dataFim) &&
                   'opacity-40 cursor-not-allowed',
               )}
@@ -476,9 +524,12 @@ export default function GuardaPage() {
 
         {/* List */}
         {temporarias.length === 0 && !showForm ? (
-          <p className="text-sm text-texto-soft font-body py-3 text-center">
-            Nenhuma guarda temporaria registrada
-          </p>
+          <div className="mg-card-solid rounded-xl py-8 flex flex-col items-center gap-2">
+            <Calendar className="w-8 h-8 text-texto-soft/40" />
+            <p className="text-sm text-texto-soft font-body text-center">
+              Nenhuma guarda temporaria registrada
+            </p>
+          </div>
         ) : (
           <div className="space-y-2">
             {temporarias.map((gt) => {
@@ -490,12 +541,12 @@ export default function GuardaPage() {
               return (
                 <div
                   key={gt.id}
-                  className="bg-creme-dark/30 rounded-xl p-3 space-y-2"
+                  className="mg-card-solid rounded-xl p-3 space-y-2"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-full bg-azul-light flex items-center justify-center flex-shrink-0">
-                        <span className="text-azul text-sm font-headline font-bold">
+                      <div className="w-10 h-10 rounded-full bg-teal/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-teal text-sm font-headline font-bold">
                           {initials(nome)}
                         </span>
                       </div>
@@ -508,8 +559,8 @@ export default function GuardaPage() {
                     </div>
                     <span
                       className={cn(
-                        'px-3 py-1 rounded-full text-xs font-headline font-bold flex-shrink-0',
-                        STATUS_COLORS[statusKey] || 'bg-creme-dark text-texto-soft',
+                        'mg-badge flex-shrink-0',
+                        STATUS_COLORS[statusKey] || 'mg-badge',
                       )}
                     >
                       {STATUS_LABELS[statusKey] || statusKey}
@@ -525,15 +576,17 @@ export default function GuardaPage() {
                       {statusKey === 'AGENDADA' && (
                         <button
                           onClick={() => handleConfirmarTemporaria(gt.id)}
-                          className="pt-btn text-sm"
+                          className="mg-btn text-sm"
                         >
+                          <Check className="w-3.5 h-3.5" />
                           Confirmar
                         </button>
                       )}
                       <button
                         onClick={() => handleCancelarTemporaria(gt.id)}
-                        className="pt-btn-secondary text-sm"
+                        className="mg-btn-secondary text-sm"
                       >
+                        <X className="w-3.5 h-3.5" />
                         Cancelar
                       </button>
                     </div>
@@ -546,27 +599,35 @@ export default function GuardaPage() {
       </div>
 
       {/* ── 4. HISTÓRICO DE TROCAS ──────────────────────────────────────────── */}
-      <div className="pt-card space-y-4">
-        <h3 className="font-headline text-lg font-bold text-texto">
-          Historico de Trocas
-        </h3>
+      <div className="mg-card space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-rose/10 flex items-center justify-center">
+            <FileText className="w-4 h-4 text-rose" />
+          </div>
+          <h3 className="font-headline text-lg font-bold text-texto">
+            Historico de Trocas
+          </h3>
+        </div>
 
         {historico.length === 0 ? (
-          <p className="text-sm text-texto-soft font-body py-3 text-center">
-            Nenhum evento de guarda registrado
-          </p>
+          <div className="mg-card-solid rounded-xl py-8 flex flex-col items-center gap-2">
+            <FileText className="w-8 h-8 text-texto-soft/40" />
+            <p className="text-sm text-texto-soft font-body text-center">
+              Nenhum evento de guarda registrado
+            </p>
+          </div>
         ) : (
           <div className="relative pl-6">
             {/* Timeline line */}
-            <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-creme-dark" />
+            <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-surface-muted" />
 
             <div className="space-y-3">
               {historico.map((evt) => (
                 <div key={evt.id} className="relative">
                   {/* Dot */}
-                  <div className="absolute -left-[18px] top-1.5 w-3 h-3 rounded-full bg-coral border-2 border-white" />
+                  <div className="absolute -left-[18px] top-1.5 w-3 h-3 rounded-full bg-primary border-2 border-white" />
 
-                  <div className="bg-creme-dark/30 rounded-xl p-3 space-y-1">
+                  <div className="mg-card-solid rounded-xl p-3 space-y-1">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-headline font-bold text-texto">
                         {evt.titulo}
@@ -580,7 +641,7 @@ export default function GuardaPage() {
                         {evt.descricao}
                       </p>
                     )}
-                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-headline font-bold bg-coral-light text-coral">
+                    <span className="mg-badge mg-badge-primary">
                       {evt.tipo.replace(/_/g, ' ')}
                     </span>
                   </div>

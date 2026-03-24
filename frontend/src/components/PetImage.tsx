@@ -16,7 +16,7 @@ export function PetImage({
   nome,
   especie,
   className = 'w-14 h-14',
-  fallbackClassName = 'bg-creme-dark',
+  fallbackClassName = 'bg-surface-muted',
 }: PetImageProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
@@ -49,7 +49,7 @@ export function PetImage({
         className={cn(
           'rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden',
           className,
-          imageLoading ? 'pt-skeleton' : '',
+          imageLoading ? 'mg-skeleton' : '',
         )}
       >
         <img

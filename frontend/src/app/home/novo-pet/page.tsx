@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 import { petsApi } from '@/lib/api';
 import { Pet } from '@/types';
+import { ChevronLeft, Check, Copy } from 'lucide-react';
 
 const ESPECIES = [
   { value: 'CACHORRO', label: 'Cachorro', emoji: '🐕' },
@@ -146,9 +147,7 @@ export default function NovoPetPage() {
       <ProtectedLayout>
         <div className="max-w-md mx-auto animate-fade-in text-center space-y-6 py-8">
           <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center text-4xl mx-auto">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20,6 9,17 4,12" />
-            </svg>
+            <Check size={40} className="text-green-600" strokeWidth={2.5} />
           </div>
           <div>
             <h1 className="text-xl font-bold text-texto">{createdPet.nome} cadastrado!</h1>
@@ -166,18 +165,13 @@ export default function NovoPetPage() {
                 </span>
                 <button
                   onClick={handleCopy}
-                  className="p-2 rounded-lg hover:bg-creme-dark transition-colors text-texto-soft hover:text-texto"
+                  className="p-2 rounded-lg hover:bg-surface-muted transition-colors text-texto-soft hover:text-texto"
                   title="Copiar código"
                 >
                   {copied ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20,6 9,17 4,12" />
-                    </svg>
+                    <Check size={18} className="text-green-600" />
                   ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                    </svg>
+                    <Copy size={18} />
                   )}
                 </button>
               </div>
@@ -215,17 +209,17 @@ export default function NovoPetPage() {
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => router.back()}
-            className="w-8 h-8 rounded-lg bg-creme-dark hover:bg-white flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg bg-surface-muted hover:bg-white flex items-center justify-center transition-colors"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15,18 9,12 15,6" /></svg>
+            <ChevronLeft size={18} />
           </button>
           <h1 className="text-xl font-semibold text-texto">Adicionar pet</h1>
         </div>
 
         {/* Badge tutor principal */}
-        <div className="flex items-center gap-2 bg-coral-light rounded-xl px-4 py-3 mb-4">
+        <div className="flex items-center gap-2 bg-primary/10 rounded-xl px-4 py-3 mb-4">
           <span className="text-sm">👤</span>
-          <p className="text-xs text-coral font-medium">
+          <p className="text-xs text-primary font-medium">
             Você será registrado como tutor principal deste pet
           </p>
         </div>
@@ -234,7 +228,7 @@ export default function NovoPetPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Foto do pet */}
             <div className="flex flex-col items-center gap-2 pb-2">
-              <div className="w-24 h-24 rounded-full bg-creme-dark overflow-hidden flex items-center justify-center ring-4 ring-coral-light">
+              <div className="w-24 h-24 rounded-full bg-surface-muted overflow-hidden flex items-center justify-center ring-4 ring-primary/20">
                 {form.fotoUrl ? (
                   <img
                     src={form.fotoUrl}
@@ -245,7 +239,7 @@ export default function NovoPetPage() {
                   <span className="text-4xl">📷</span>
                 )}
               </div>
-              <label className="cursor-pointer text-xs font-medium text-coral hover:text-coral/80 transition-colors">
+              <label className="cursor-pointer text-xs font-medium text-primary hover:text-primary/80 transition-colors">
                 {form.fotoUrl ? 'Trocar foto' : 'Adicionar foto'}
                 <input
                   type="file"
@@ -407,8 +401,8 @@ export default function NovoPetPage() {
                   onClick={() => setTipoGuarda('CONJUNTA')}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     tipoGuarda === 'CONJUNTA'
-                      ? 'bg-coral-light text-coral'
-                      : 'bg-creme-dark text-texto-soft hover:bg-white'
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-surface-muted text-texto-soft hover:bg-white'
                   }`}
                 >
                   Sim, compartilhada
@@ -418,15 +412,15 @@ export default function NovoPetPage() {
                   onClick={() => setTipoGuarda('')}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     tipoGuarda === ''
-                      ? 'bg-creme-dark text-texto'
-                      : 'bg-white text-texto-soft hover:bg-creme-dark'
+                      ? 'bg-surface-muted text-texto'
+                      : 'bg-white text-texto-soft hover:bg-surface-muted'
                   }`}
                 >
                   Não, sou o único
                 </button>
               </div>
               {tipoGuarda === 'CONJUNTA' && (
-                <div className="bg-coral-light/50 rounded-lg p-3 text-xs text-coral">
+                <div className="bg-primary/10 rounded-lg p-3 text-xs text-primary">
                   Após criar o pet, você receberá um código para compartilhar com o outro tutor.
                   Ele poderá usar esse código para se vincular como tutor principal.
                 </div>

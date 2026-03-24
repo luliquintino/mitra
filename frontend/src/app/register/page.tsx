@@ -2,21 +2,43 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
-import { Passo2Tipo } from './passo-2-tipo';
-import { Passo3Profissional } from './passo-3-profissional';
+import {
+  User,
+  Mail,
+  Phone,
+  Lock,
+  PawPrint,
+  Briefcase,
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  Stethoscope,
+  Dog,
+  Scissors,
+  UserCheck,
+} from 'lucide-react';
 
 type Passo = 1 | 2 | 3;
 
-const STEP_LABELS = ['Dados', 'Perfil', 'Profissional'];
+const STEP_LABELS = ['Dados Basicos', 'Tipo de Usuario', 'Dados Profissionais'];
+
+const tiposServico = [
+  { valor: 'VETERINARIO', label: 'Veterinario' },
+  { valor: 'PET_SITTER', label: 'Pet Sitter' },
+  { valor: 'DAY_CARE', label: 'Day Care' },
+  { valor: 'ADESTRADOR', label: 'Adestrador' },
+  { valor: 'BANHO_TOSA', label: 'Banho e Tosa' },
+  { valor: 'CUIDADOR_EVENTUAL', label: 'Cuidador Eventual' },
+  { valor: 'OUTRO', label: 'Outro' },
+];
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const [passo, setPasso] = useState<Passo>(1);
   const [tipoUsuario, setTipoUsuario] = useState('');
 
-  // Passo 1: Dados básicos
+  // Passo 1: Dados basicos
   const [form, setForm] = useState({
     nome: '',
     email: '',
@@ -24,9 +46,25 @@ export default function RegisterPage() {
     telefone: '',
   });
 
+  // Passo 2: selected type
+  const [selectedTipo, setSelectedTipo] = useState('');
+
+  // Passo 3: Dados profissionais
+  const [formPro, setFormPro] = useState({
+    tipoPrestador: '',
+    nomeEmpresa: '',
+    cnpj: '',
+    telefoneProfissional: '',
+    endereco: '',
+    registroProfissional: '',
+    descricao: '',
+    website: '',
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // --- Step 1 handler ---
   const handlePasso1 = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -39,25 +77,40 @@ export default function RegisterPage() {
     setPasso(2);
   };
 
-  const handlePasso2 = (tipo: string) => {
-    setTipoUsuario(tipo);
-    if (tipo === 'TUTOR') {
-      // Se é apenas tutor, vai direto para completar registro
-      handleRegister({ ...form, tipoUsuario: tipo });
+  // --- Step 2 handler ---
+  const handlePasso2 = () => {
+    if (!selectedTipo) return;
+    setTipoUsuario(selectedTipo);
+    if (selectedTipo === 'TUTOR') {
+      handleRegister({ ...form, tipoUsuario: selectedTipo });
     } else {
-      // Se é prestador ou ambos, vai para passo 3
       setPasso(3);
     }
   };
 
-  const handlePasso3 = async (dadosProfissionais: any) => {
+  // --- Step 3 handler ---
+  const handlePasso3 = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (
+      !formPro.tipoPrestador ||
+      !formPro.telefoneProfissional ||
+      !formPro.endereco ||
+      !formPro.descricao
+    ) {
+      setError('Preencha todos os campos obrigatorios');
+      return;
+    }
+
     await handleRegister({
       ...form,
-      tipoUsuario: 'AMBOS',
-      dadosProfissionais,
+      tipoUsuario: tipoUsuario || 'AMBOS',
+      dadosProfissionais: formPro,
     });
   };
 
+  // --- Register handler ---
   const handleRegister = async (data: any) => {
     setError('');
     setLoading(true);
@@ -71,40 +124,79 @@ export default function RegisterPage() {
     }
   };
 
+  // --- Type option cards for step 2 ---
+  const tipoOpcoes = [
+    {
+      id: 'TUTOR',
+      label: 'Sou Tutor',
+      descricao: 'Tenho pet(s) e quero gerencia-los',
+      icon: Dog,
+    },
+    {
+      id: 'PRESTADOR',
+      label: 'Sou Prestador',
+      descricao: 'Veterinario, pet sitter, adestrador, etc',
+      icon: Stethoscope,
+    },
+    {
+      id: 'AMBOS',
+      label: 'Ambos',
+      descricao: 'Tenho pets e tambem presto servicos',
+      icon: UserCheck,
+    },
+  ];
+
+  // Step heading data
+  const stepHeadings: Record<Passo, { title: string; subtitle: string }> = {
+    1: { title: 'Criar conta', subtitle: 'Comece com suas informacoes basicas' },
+    2: { title: 'Tipo de usuario', subtitle: 'Escolha como voce deseja utilizar a MITRA' },
+    3: { title: 'Dados profissionais', subtitle: 'Conte-nos sobre seus servicos' },
+  };
+
   return (
-    <div className="min-h-screen bg-creme bg-blobs relative overflow-hidden">
-      {/* Centered content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
-        {/* Logo */}
-        <div className="mb-6 animate-fade-in">
-          <Image src="/logo.png" alt="MITRA" width={480} height={112} className="h-12 w-auto" priority />
+    <div className="mg-mesh-bg min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 relative overflow-hidden">
+      <div className="w-full max-w-lg space-y-6 relative z-10">
+        {/* MITRA Logo */}
+        <div
+          className="flex flex-col items-center gap-2 animate-fade-in"
+          style={{ animationDelay: '0ms', animationFillMode: 'both' }}
+        >
+          <div className="flex items-center gap-2.5">
+            <PawPrint className="w-8 h-8 text-[#7C3AED]" strokeWidth={2.5} />
+            <h1 className="font-headline font-extrabold text-4xl bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] bg-clip-text text-transparent tracking-tight">
+              MITRA
+            </h1>
+          </div>
         </div>
 
-        {/* Form card */}
-        <div className="w-full max-w-[460px] bg-white rounded-3xl shadow-card p-6 sm:p-8 space-y-6 animate-fade-slide-up">
-          {/* Visual stepper */}
-          <div className="flex items-center justify-center gap-0 mb-2">
+        {/* Glass card */}
+        <div
+          className="bg-white/[0.72] backdrop-blur-[16px] border border-white/30 shadow-glass rounded-2xl p-6 sm:p-8 space-y-6 animate-fade-in"
+          style={{ animationDelay: '150ms', animationFillMode: 'both' }}
+        >
+          {/* Step Indicator */}
+          <div className="flex items-center justify-center gap-0">
             {STEP_LABELS.map((label, idx) => {
-              const stepNum = idx + 1;
+              const stepNum = (idx + 1) as Passo;
               const isActive = stepNum === passo;
               const isCompleted = stepNum < passo;
               return (
                 <div key={label} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                         isCompleted
-                          ? 'bg-menta text-white'
+                          ? 'bg-[#7C3AED] text-white shadow-md shadow-[#7C3AED]/30'
                           : isActive
-                          ? 'bg-coral text-white'
-                          : 'bg-creme-dark text-texto-muted'
+                          ? 'bg-[#7C3AED] text-white shadow-md shadow-[#7C3AED]/30'
+                          : 'border-2 border-gray-300 text-gray-400 bg-white/50'
                       }`}
                     >
-                      {isCompleted ? '✓' : stepNum}
+                      {isCompleted ? <Check className="w-4 h-4" /> : stepNum}
                     </div>
                     <span
-                      className={`text-xs mt-1.5 font-medium ${
-                        isActive ? 'text-coral' : isCompleted ? 'text-menta' : 'text-texto-muted'
+                      className={`text-[11px] mt-1.5 font-semibold font-headline transition-colors whitespace-nowrap ${
+                        isActive || isCompleted ? 'text-[#7C3AED]' : 'text-gray-400'
                       }`}
                     >
                       {label}
@@ -112,8 +204,8 @@ export default function RegisterPage() {
                   </div>
                   {idx < STEP_LABELS.length - 1 && (
                     <div
-                      className={`w-12 sm:w-16 h-px mx-2 mb-5 transition-colors ${
-                        stepNum < passo ? 'bg-menta' : 'bg-creme-dark'
+                      className={`w-10 sm:w-14 h-0.5 mx-1.5 sm:mx-2.5 mb-5 rounded-full transition-colors duration-300 ${
+                        stepNum < passo ? 'bg-[#7C3AED]' : 'bg-gray-200'
                       }`}
                     />
                   )}
@@ -124,127 +216,388 @@ export default function RegisterPage() {
 
           {/* Step heading */}
           <div className="space-y-1">
-            <h2 className="font-headline font-bold text-2xl text-texto">
-              {passo === 1 ? 'Criar conta' : passo === 2 ? 'Tipo de usuário' : 'Dados profissionais'}
+            <h2 className="font-headline font-bold text-2xl text-gray-800">
+              {stepHeadings[passo].title}
             </h2>
-            <p className="text-texto-soft text-sm">
-              {passo === 1
-                ? 'Comece com suas informações básicas'
-                : passo === 2
-                ? 'Escolha como você deseja utilizar a MITRA'
-                : 'Conte-nos sobre seus serviços'}
+            <p className="text-gray-500 font-body text-sm">
+              {stepHeadings[passo].subtitle}
             </p>
           </div>
 
-          {/* Passo 1: Dados básicos */}
+          {/* Error display */}
+          {error && (
+            <div className="bg-[#F43F5E]/10 backdrop-blur-sm border border-[#F43F5E]/20 text-[#F43F5E] rounded-xl px-4 py-3 text-sm font-medium flex items-center gap-2 animate-fade-in">
+              <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-[#F43F5E]" />
+              {error}
+            </div>
+          )}
+
+          {/* ===== PASSO 1: Dados Basicos ===== */}
           {passo === 1 && (
-            <div className="animate-slide-up">
+            <div className="animate-fade-in" key="step-1">
               <form onSubmit={handlePasso1} className="space-y-4">
-                <div>
-                  <label className="pt-label">Nome completo</label>
-                  <input
-                    type="text"
-                    className="pt-input"
-                    placeholder="Ana Souza"
-                    value={form.nome}
-                    onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="pt-label">E-mail</label>
-                  <input
-                    type="email"
-                    className="pt-input"
-                    placeholder="seu@email.com"
-                    value={form.email}
-                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="pt-label">Telefone (opcional)</label>
-                  <input
-                    type="tel"
-                    className="pt-input"
-                    placeholder="11 99999-0001"
-                    value={form.telefone}
-                    onChange={(e) => setForm((f) => ({ ...f, telefone: e.target.value }))}
-                  />
-                </div>
-
-                <div>
-                  <label className="pt-label">Senha</label>
-                  <input
-                    type="password"
-                    className="pt-input"
-                    placeholder="Mínimo 8 caracteres"
-                    value={form.senha}
-                    onChange={(e) => setForm((f) => ({ ...f, senha: e.target.value }))}
-                    required
-                    minLength={8}
-                  />
-                </div>
-
-                {error && (
-                  <div className="bg-erro/10 text-erro rounded-2xl px-4 py-3 text-sm">
-                    {error}
+                {/* Nome */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Nome completo</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                      <User className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="text"
+                      className="mg-input pl-10"
+                      placeholder="Ana Souza"
+                      value={form.nome}
+                      onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))}
+                      required
+                    />
                   </div>
-                )}
+                </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="pt-btn w-full flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Continuando...
-                    </>
-                  ) : (
-                    'Continuar'
-                  )}
-                </button>
+                {/* Email */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">E-mail</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                      <Mail className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="email"
+                      className="mg-input pl-10"
+                      placeholder="seu@email.com"
+                      value={form.email}
+                      onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Telefone */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Telefone (opcional)</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                      <Phone className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="tel"
+                      className="mg-input pl-10"
+                      placeholder="11 99999-0001"
+                      value={form.telefone}
+                      onChange={(e) => setForm((f) => ({ ...f, telefone: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                {/* Senha */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Senha</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                      <Lock className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="password"
+                      className="mg-input pl-10"
+                      placeholder="Minimo 8 caracteres"
+                      value={form.senha}
+                      onChange={(e) => setForm((f) => ({ ...f, senha: e.target.value }))}
+                      required
+                      minLength={8}
+                    />
+                  </div>
+                </div>
+
+                {/* Navigation */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="mg-btn w-full flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Proximo
+                        <ChevronRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
               </form>
             </div>
           )}
 
-          {/* Passo 2: Tipo de usuário */}
+          {/* ===== PASSO 2: Tipo de Usuario ===== */}
           {passo === 2 && (
-            <div className="animate-slide-up">
-              <Passo2Tipo
-                onContinue={handlePasso2}
-                onBack={() => setPasso(1)}
-              />
+            <div className="animate-fade-in" key="step-2">
+              <div className="space-y-3 mb-6">
+                {tipoOpcoes.map((opcao) => {
+                  const isSelected = selectedTipo === opcao.id;
+                  const IconComp = opcao.icon;
+                  return (
+                    <button
+                      key={opcao.id}
+                      onClick={() => setSelectedTipo(opcao.id)}
+                      className={`w-full rounded-xl p-4 transition-all duration-200 text-left cursor-pointer active:scale-[0.98] ${
+                        isSelected
+                          ? 'bg-white/80 backdrop-blur-sm border-2 border-[#7C3AED] ring-2 ring-[#7C3AED]/20 shadow-md'
+                          : 'bg-white/40 backdrop-blur-sm border-2 border-white/30 hover:bg-white/60 hover:border-white/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div
+                          className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                            isSelected
+                              ? 'bg-[#7C3AED]/10 text-[#7C3AED]'
+                              : 'bg-gray-100/80 text-gray-400'
+                          }`}
+                        >
+                          <IconComp className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`font-headline font-semibold ${isSelected ? 'text-[#7C3AED]' : 'text-gray-700'}`}>
+                            {opcao.label}
+                          </p>
+                          <p className="text-sm text-gray-500 font-body">{opcao.descricao}</p>
+                        </div>
+                        {isSelected && (
+                          <div className="w-6 h-6 rounded-full bg-[#7C3AED] text-white flex items-center justify-center shrink-0">
+                            <Check className="w-3.5 h-3.5" />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Navigation */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setPasso(1)}
+                  className="mg-btn-ghost flex-1 flex items-center justify-center gap-1.5"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Voltar
+                </button>
+                <button
+                  onClick={handlePasso2}
+                  disabled={!selectedTipo || loading}
+                  className="mg-btn flex-1 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : selectedTipo === 'TUTOR' ? (
+                    <>
+                      Criar conta
+                      <Check className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      Proximo
+                      <ChevronRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Passo 3: Dados profissionais */}
+          {/* ===== PASSO 3: Dados Profissionais ===== */}
           {passo === 3 && (
-            <div className="animate-slide-up">
-              <Passo3Profissional
-                tipoUsuario={tipoUsuario}
-                onContinue={handlePasso3}
-                onBack={() => setPasso(2)}
-              />
+            <div className="animate-fade-in" key="step-3">
+              <form onSubmit={handlePasso3} className="space-y-4">
+                {/* Tipo de servico */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Tipo de servico *</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                      <Briefcase className="w-4 h-4" />
+                    </span>
+                    <select
+                      className="mg-select pl-10"
+                      value={formPro.tipoPrestador}
+                      onChange={(e) =>
+                        setFormPro((f) => ({ ...f, tipoPrestador: e.target.value }))
+                      }
+                    >
+                      <option value="">Selecione</option>
+                      {tiposServico.map((tipo) => (
+                        <option key={tipo.valor} value={tipo.valor}>
+                          {tipo.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Empresa grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="mg-label">Nome da empresa</label>
+                    <input
+                      type="text"
+                      className="mg-input"
+                      placeholder="Opcional"
+                      value={formPro.nomeEmpresa}
+                      onChange={(e) =>
+                        setFormPro((f) => ({ ...f, nomeEmpresa: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="mg-label">CNPJ</label>
+                    <input
+                      type="text"
+                      className="mg-input"
+                      placeholder="Opcional"
+                      value={formPro.cnpj}
+                      onChange={(e) => setFormPro((f) => ({ ...f, cnpj: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                {/* Telefone profissional */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Telefone profissional *</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                      <Phone className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="tel"
+                      className="mg-input pl-10"
+                      placeholder="11 99999-9999"
+                      value={formPro.telefoneProfissional}
+                      onChange={(e) =>
+                        setFormPro((f) => ({
+                          ...f,
+                          telefoneProfissional: e.target.value,
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Endereco */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Endereco *</label>
+                  <input
+                    type="text"
+                    className="mg-input"
+                    placeholder="Rua, numero, cidade, estado"
+                    value={formPro.endereco}
+                    onChange={(e) =>
+                      setFormPro((f) => ({ ...f, endereco: e.target.value }))
+                    }
+                    required
+                  />
+                </div>
+
+                {/* Registro profissional */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Registro profissional</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                      <Stethoscope className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="text"
+                      className="mg-input pl-10"
+                      placeholder="Ex: CRMV 123456"
+                      value={formPro.registroProfissional}
+                      onChange={(e) =>
+                        setFormPro((f) => ({
+                          ...f,
+                          registroProfissional: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* Descricao */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Descricao do servico *</label>
+                  <textarea
+                    className="mg-input resize-none"
+                    rows={3}
+                    placeholder="Descreva seu servico, especialidades, etc"
+                    value={formPro.descricao}
+                    onChange={(e) =>
+                      setFormPro((f) => ({ ...f, descricao: e.target.value }))
+                    }
+                    required
+                  />
+                </div>
+
+                {/* Website */}
+                <div className="space-y-1.5">
+                  <label className="mg-label">Site</label>
+                  <input
+                    type="url"
+                    className="mg-input"
+                    placeholder="https://..."
+                    value={formPro.website}
+                    onChange={(e) =>
+                      setFormPro((f) => ({ ...f, website: e.target.value }))
+                    }
+                  />
+                </div>
+
+                {/* Navigation */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setPasso(2)}
+                    className="mg-btn-ghost flex-1 flex items-center justify-center gap-1.5"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Voltar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="mg-btn flex-1 flex items-center justify-center gap-1.5"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Criar conta
+                        <Check className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
           )}
 
-          {/* Link para login */}
+          {/* Login link - only on step 1 */}
           {passo === 1 && (
-            <p className="text-center text-sm text-texto-soft">
-              Já tem conta?{' '}
+            <p className="text-center text-gray-500 font-body text-sm pt-1">
+              Ja tem conta?{' '}
               <Link
                 href="/login"
-                className="text-coral font-bold hover:text-coral/80 transition-colors"
+                className="text-[#7C3AED] font-bold hover:underline transition-colors"
               >
                 Entrar
               </Link>
             </p>
           )}
+        </div>
+
+        {/* Trust signal */}
+        <div
+          className="flex items-center justify-center gap-2 text-sm text-gray-400 font-body animate-fade-in"
+          style={{ animationDelay: '300ms', animationFillMode: 'both' }}
+        >
+          <PawPrint className="w-3.5 h-3.5" />
+          <span>Cuidando de quem cuida dos pets</span>
         </div>
       </div>
     </div>

@@ -5,17 +5,27 @@ import { useParams } from 'next/navigation';
 import { eventsApi } from '@/lib/api';
 import { Evento } from '@/types';
 import { cn, formatDate, eventoIcon } from '@/lib/utils';
+import {
+  Clock,
+  Calendar,
+  Heart,
+  Shield,
+  FileText,
+  Camera,
+  Plus,
+  Tag,
+} from 'lucide-react';
 
 // ─── Filter Categories ──────────────────────────────────────────────────────────
 
 type FilterKey = 'TODOS' | 'SAUDE' | 'GUARDA' | 'CONSULTA' | 'ATIVIDADE';
 
-const FILTER_PILLS: { key: FilterKey; label: string; color: string }[] = [
-  { key: 'TODOS', label: 'Todos', color: 'bg-coral text-white' },
-  { key: 'SAUDE', label: 'Saude', color: 'bg-rosa text-white' },
-  { key: 'GUARDA', label: 'Guarda', color: 'bg-azul text-white' },
-  { key: 'CONSULTA', label: 'Consulta', color: 'bg-menta text-white' },
-  { key: 'ATIVIDADE', label: 'Atividade', color: 'bg-amarelo text-white' },
+const FILTER_PILLS: { key: FilterKey; label: string; activeClass: string; icon: typeof Heart }[] = [
+  { key: 'TODOS', label: 'Todos', activeClass: 'bg-primary text-white', icon: Tag },
+  { key: 'SAUDE', label: 'Saude', activeClass: 'bg-rose text-white', icon: Heart },
+  { key: 'GUARDA', label: 'Guarda', activeClass: 'bg-primary text-white', icon: Shield },
+  { key: 'CONSULTA', label: 'Consulta', activeClass: 'bg-teal text-white', icon: FileText },
+  { key: 'ATIVIDADE', label: 'Atividade', activeClass: 'bg-amber text-white', icon: Calendar },
 ];
 
 const FILTER_TIPOS: Record<FilterKey, string[]> = {
@@ -82,19 +92,19 @@ function groupByMonth(eventos: Evento[]): [string, Evento[]][] {
 }
 
 function eventoBorderColor(tipo: string): string {
-  if (FILTER_TIPOS.SAUDE.includes(tipo)) return 'border-rosa';
-  if (FILTER_TIPOS.GUARDA.includes(tipo)) return 'border-azul';
-  if (FILTER_TIPOS.CONSULTA.includes(tipo)) return 'border-menta';
-  if (FILTER_TIPOS.ATIVIDADE.includes(tipo)) return 'border-amarelo';
-  return 'border-coral';
+  if (FILTER_TIPOS.SAUDE.includes(tipo)) return 'border-rose';
+  if (FILTER_TIPOS.GUARDA.includes(tipo)) return 'border-primary';
+  if (FILTER_TIPOS.CONSULTA.includes(tipo)) return 'border-teal';
+  if (FILTER_TIPOS.ATIVIDADE.includes(tipo)) return 'border-amber';
+  return 'border-primary';
 }
 
 function eventoDotColor(tipo: string): string {
-  if (FILTER_TIPOS.SAUDE.includes(tipo)) return 'bg-rosa';
-  if (FILTER_TIPOS.GUARDA.includes(tipo)) return 'bg-azul';
-  if (FILTER_TIPOS.CONSULTA.includes(tipo)) return 'bg-menta';
-  if (FILTER_TIPOS.ATIVIDADE.includes(tipo)) return 'bg-amarelo';
-  return 'bg-coral';
+  if (FILTER_TIPOS.SAUDE.includes(tipo)) return 'bg-rose';
+  if (FILTER_TIPOS.GUARDA.includes(tipo)) return 'bg-primary';
+  if (FILTER_TIPOS.CONSULTA.includes(tipo)) return 'bg-teal';
+  if (FILTER_TIPOS.ATIVIDADE.includes(tipo)) return 'bg-amber';
+  return 'bg-primary';
 }
 
 // ─── Sub-tab type ────────────────────────────────────────────────────────────────
@@ -183,11 +193,11 @@ export default function HistoricoPage() {
       <div className="space-y-4 animate-fade-in">
         <div className="flex gap-2">
           {[1, 2].map((i) => (
-            <div key={i} className="h-9 w-24 pt-skeleton rounded-xl flex-shrink-0" />
+            <div key={i} className="h-9 w-24 mg-skeleton rounded-xl flex-shrink-0" />
           ))}
         </div>
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-24 pt-skeleton rounded-2xl" />
+          <div key={i} className="h-24 mg-skeleton rounded-2xl" />
         ))}
       </div>
     );
@@ -199,29 +209,33 @@ export default function HistoricoPage() {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="font-headline text-xl font-bold text-texto">Historico</h1>
+        <h1 className="font-headline font-bold text-xl text-texto">Historico</h1>
         <p className="text-sm text-texto-soft mt-0.5">Acompanhe todos os eventos e momentos do seu pet</p>
       </div>
 
       {/* Sub-tab pills */}
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: 'timeline' as SubTab, label: 'Timeline' },
-          { id: 'diario' as SubTab, label: 'Diario' },
-        ].map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id)}
-            className={cn(
-              'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
-              activeTab === t.id
-                ? 'bg-coral text-white shadow-sm'
-                : 'bg-white text-texto-soft hover:bg-creme-dark',
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
+          { id: 'timeline' as SubTab, label: 'Timeline', icon: Clock },
+          { id: 'diario' as SubTab, label: 'Diario', icon: Camera },
+        ].map((t) => {
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className={cn(
+                'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 flex items-center gap-1.5',
+                activeTab === t.id
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'mg-card-solid text-texto-soft hover:bg-surface-muted',
+              )}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* ─── TIMELINE TAB ─────────────────────────────────────────────────────── */}
@@ -229,20 +243,24 @@ export default function HistoricoPage() {
         <div className="space-y-4">
           {/* Filter Pills */}
           <div className="flex flex-wrap gap-2">
-            {FILTER_PILLS.map((pill) => (
-              <button
-                key={pill.key}
-                onClick={() => toggleFilter(pill.key)}
-                className={cn(
-                  'px-3 py-1.5 rounded-full text-xs font-headline font-bold transition-all',
-                  activeFilters.has(pill.key)
-                    ? pill.color
-                    : 'bg-creme-dark/50 text-texto-soft hover:bg-creme-dark',
-                )}
-              >
-                {pill.label}
-              </button>
-            ))}
+            {FILTER_PILLS.map((pill) => {
+              const Icon = pill.icon;
+              return (
+                <button
+                  key={pill.key}
+                  onClick={() => toggleFilter(pill.key)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-full text-xs font-headline font-bold transition-all flex items-center gap-1',
+                    activeFilters.has(pill.key)
+                      ? pill.activeClass
+                      : 'bg-surface-muted/50 text-texto-soft hover:bg-surface-muted',
+                  )}
+                >
+                  <Icon className="w-3 h-3" />
+                  {pill.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Event Count */}
@@ -254,8 +272,8 @@ export default function HistoricoPage() {
 
           {/* Empty State */}
           {filteredEventos.length === 0 ? (
-            <div className="pt-card text-center py-10 space-y-3">
-              <div className="text-3xl">📋</div>
+            <div className="mg-card text-center py-10 space-y-3">
+              <Clock className="w-10 h-10 text-texto-soft/30 mx-auto" />
               <div>
                 <p className="font-semibold text-texto text-sm">
                   Linha do tempo vazia
@@ -275,13 +293,13 @@ export default function HistoricoPage() {
                     <span className="font-headline font-bold text-texto-soft text-xs uppercase tracking-wider whitespace-nowrap capitalize">
                       {mesAno}
                     </span>
-                    <div className="h-px flex-1 bg-creme-dark/30" />
+                    <div className="h-px flex-1 bg-surface-muted/30" />
                   </div>
 
                   {/* Timeline */}
                   <div className="relative pl-12">
                     {/* Vertical line */}
-                    <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-creme-dark/40 rounded-full" />
+                    <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-surface-muted/40 rounded-full" />
 
                     <div className="space-y-4">
                       {monthEvents.map((evento, i) => (
@@ -301,13 +319,13 @@ export default function HistoricoPage() {
                           {/* Event card */}
                           <div
                             className={cn(
-                              'bg-white rounded-2xl p-4 border-l-4 transition-all hover:shadow-md',
+                              'mg-card-solid rounded-2xl p-4 border-l-4 transition-all hover:shadow-md',
                               eventoBorderColor(evento.tipo),
                             )}
                           >
                             <div className="flex items-start gap-3">
                               {/* Emoji icon */}
-                              <div className="w-10 h-10 rounded-xl bg-creme-dark/30 flex items-center justify-center text-lg flex-shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-surface-muted/30 flex items-center justify-center text-lg flex-shrink-0">
                                 {eventoIcon(evento.tipo)}
                               </div>
 
@@ -324,7 +342,7 @@ export default function HistoricoPage() {
                                 {/* Meta row */}
                                 <div className="flex items-center gap-2 mt-2 flex-wrap">
                                   {evento.autorId && (
-                                    <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-creme-dark/40 text-texto-soft px-2 py-0.5 rounded-full">
+                                    <span className="mg-badge">
                                       Registrado
                                     </span>
                                   )}
@@ -368,8 +386,9 @@ export default function HistoricoPage() {
             </div>
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('mitra:register-event'))}
-              className="px-4 py-2 rounded-xl bg-coral text-white text-sm font-medium shadow-sm hover:opacity-90 transition-all"
+              className="mg-btn text-sm"
             >
+              <Camera className="w-3.5 h-3.5" />
               Adicionar Foto
             </button>
           </div>
@@ -377,15 +396,24 @@ export default function HistoricoPage() {
           {/* Stats */}
           {eventos.length > 0 && (
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-rosa-light/50 rounded-2xl p-4 text-center">
+              <div className="mg-card-solid rounded-2xl p-4 text-center">
+                <div className="w-8 h-8 rounded-lg bg-rose/10 flex items-center justify-center mx-auto mb-2">
+                  <Heart className="w-4 h-4 text-rose" />
+                </div>
                 <p className="text-2xl font-headline font-bold text-texto">{eventos.length}</p>
                 <p className="text-[11px] text-texto-soft mt-1 leading-tight">Total</p>
               </div>
-              <div className="bg-azul-light/50 rounded-2xl p-4 text-center">
+              <div className="mg-card-solid rounded-2xl p-4 text-center">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                </div>
                 <p className="text-2xl font-headline font-bold text-texto">{thisMonthCount}</p>
                 <p className="text-[11px] text-texto-soft mt-1 leading-tight">Este mes</p>
               </div>
-              <div className="bg-amarelo-light/50 rounded-2xl p-4 text-center">
+              <div className="mg-card-solid rounded-2xl p-4 text-center">
+                <div className="w-8 h-8 rounded-lg bg-amber/10 flex items-center justify-center mx-auto mb-2">
+                  <Tag className="w-4 h-4 text-amber" />
+                </div>
                 <p className="text-2xl font-headline font-bold text-texto">{uniqueTypes}</p>
                 <p className="text-[11px] text-texto-soft mt-1 leading-tight">Tipos</p>
               </div>
@@ -411,9 +439,9 @@ export default function HistoricoPage() {
                       isWide && !isFirst && 'md:col-span-2',
                     )}
                   >
-                    <div className="bg-white rounded-2xl p-4 shadow-sm animate-fade-in">
+                    <div className="mg-card-solid rounded-2xl p-4 animate-fade-in">
                       {/* Event card content */}
-                      <div className="relative overflow-hidden rounded-xl aspect-square mb-3 bg-creme-dark/30 flex items-center justify-center">
+                      <div className="relative overflow-hidden rounded-xl aspect-square mb-3 bg-surface-muted/30 flex items-center justify-center">
                         <span className="text-4xl opacity-20">{sticker}</span>
                       </div>
                       <p className="font-headline font-bold text-sm text-texto">
@@ -433,8 +461,8 @@ export default function HistoricoPage() {
             </div>
           ) : (
             /* Empty State */
-            <div className="pt-card text-center py-10 space-y-3">
-              <div className="text-3xl">📷</div>
+            <div className="mg-card text-center py-10 space-y-3">
+              <Camera className="w-10 h-10 text-texto-soft/30 mx-auto" />
               <div>
                 <p className="font-semibold text-texto text-sm">
                   Nenhuma aventura ainda

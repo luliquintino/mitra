@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotificacoes } from '@/contexts/NotificacaoContext';
 import { useToast } from '@/components/ToastContainer';
+import { Bell, LogOut, PawPrint } from 'lucide-react';
 
 export default function ProtectedLayout({
   children,
@@ -22,12 +23,12 @@ export default function ProtectedLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-creme">
+      <div className="min-h-screen flex items-center justify-center bg-surface mg-mesh-bg">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-2xl bg-coral flex items-center justify-center">
-            <span className="text-white font-bold">M</span>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-glow-primary">
+            <PawPrint className="w-5 h-5 text-white" />
           </div>
-          <div className="w-5 h-5 border-2 border-coral border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -36,7 +37,7 @@ export default function ProtectedLayout({
   if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen bg-creme">
+    <div className="min-h-screen bg-surface mg-mesh-bg">
       <TopBar />
       <main className="max-w-4xl mx-auto px-4 py-6">{children}</main>
     </div>
@@ -52,12 +53,11 @@ function TopBar() {
   const lastCountRef = useRef(0);
   const isHome = pathname === '/home';
 
-  // Monitor for new notifications and show toast
   useEffect(() => {
     if (contNaoLidas > lastCountRef.current && lastCountRef.current > 0) {
       const newCount = contNaoLidas - lastCountRef.current;
       info(
-        `${newCount} nova notificação${newCount > 1 ? 's' : ''}`,
+        `${newCount} nova notificacao${newCount > 1 ? 's' : ''}`,
         'Clique para ver detalhes',
         5000,
       );
@@ -66,27 +66,28 @@ function TopBar() {
   }, [contNaoLidas, info]);
 
   return (
-    <header className="sticky top-0 z-40 bg-creme">
+    <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/30">
       <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
         <button
           onClick={() => router.push('/home')}
           className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
         >
-          <div className="w-7 h-7 rounded-lg bg-coral text-white flex items-center justify-center font-headline text-sm">M</div>
-          <span className="font-semibold text-coral text-sm tracking-wider hidden sm:block">MITRA</span>
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center shadow-sm">
+            <PawPrint className="w-4 h-4" />
+          </div>
+          <span className="font-headline font-bold text-transparent bg-gradient-to-r from-primary to-primary-light bg-clip-text text-sm tracking-wider hidden sm:block">MITRA</span>
         </button>
 
-        <div className="flex items-center gap-2">
-          {/* Notification Bell — hidden on home (has inline notifications) */}
+        <div className="flex items-center gap-1.5">
           {!isHome && (
             <button
               onClick={() => router.push('/home')}
-              className="relative text-texto-soft hover:text-texto transition-colors p-1.5 rounded-lg hover:bg-creme-dark"
-              title="Notificações"
+              className="relative text-texto-soft hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5"
+              title="Notificacoes"
             >
-              <span className="text-[18px]">🔔</span>
+              <Bell className="w-[18px] h-[18px]" />
               {contNaoLidas > 0 && (
-                <span className="absolute -top-1 -right-1 bg-coral text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse-badge">
+                <span className="absolute -top-0.5 -right-0.5 bg-rose text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 min-w-[18px] min-h-[18px] flex items-center justify-center animate-pulse-badge">
                   {contNaoLidas > 9 ? '9+' : contNaoLidas}
                 </span>
               )}
@@ -98,31 +99,19 @@ function TopBar() {
             className="flex items-center hover:opacity-80 transition-opacity"
             title="Minha conta"
           >
-            <div className="h-8 px-3 rounded-full bg-coral-light flex items-center justify-center ring-2 ring-transparent hover:ring-coral-light transition-all">
-              <span className="text-coral text-xs font-semibold">
+            <div className="h-8 px-3 rounded-full bg-primary/8 flex items-center justify-center ring-2 ring-transparent hover:ring-primary/20 transition-all">
+              <span className="text-primary text-xs font-semibold font-headline">
                 {user?.nome?.split(' ')[0]}
               </span>
             </div>
           </button>
+
           <button
             onClick={logout}
-            className="text-texto-soft hover:text-texto transition-colors p-1.5 rounded-lg hover:bg-creme-dark"
+            className="text-texto-soft hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5"
             title="Sair"
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16,17 21,12 16,7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>

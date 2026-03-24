@@ -61,7 +61,7 @@ export default function ConvitesPage() {
   if (convites.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-center py-16 gap-4">
-        <div className="w-16 h-16 rounded-full bg-creme-dark flex items-center justify-center text-3xl">
+        <div className="w-16 h-16 rounded-full bg-surface-muted flex items-center justify-center text-3xl">
           ✉️
         </div>
         <div>
@@ -97,7 +97,7 @@ export default function ConvitesPage() {
                 {convite.pet.raca ? ` · ${convite.pet.raca}` : ''}
               </p>
               {convite.relacao && (
-                <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-creme-dark text-texto-soft mt-1">
+                <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-surface-muted text-texto-soft mt-1">
                   {convite.relacao}
                 </span>
               )}
@@ -111,7 +111,7 @@ export default function ConvitesPage() {
               {convite.permissoesVisualizacao.map((p) => (
                 <span
                   key={p}
-                  className="text-xs px-2 py-0.5 rounded-full bg-coral-light text-coral font-medium"
+                  className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium"
                 >
                   {PERMISSION_LABELS[p] ?? p}
                 </span>

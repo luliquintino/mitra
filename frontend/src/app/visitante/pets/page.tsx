@@ -6,6 +6,7 @@ import { visitantesApi } from '@/lib/api';
 import { VisitantePet } from '@/types';
 import { especieLabel } from '@/lib/utils';
 import { PetImage } from '@/components/PetImage';
+import { ChevronRight } from 'lucide-react';
 
 export default function VisitantePetsPage() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function VisitantePetsPage() {
   if (pets.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-center py-16 gap-4">
-        <div className="w-16 h-16 rounded-full bg-creme-dark flex items-center justify-center text-3xl">
+        <div className="w-16 h-16 rounded-full bg-surface-muted flex items-center justify-center text-3xl">
           👀
         </div>
         <div>
@@ -59,11 +60,11 @@ export default function VisitantePetsPage() {
               fotoUrl={pet.fotoUrl}
               nome={pet.nome}
               especie={pet.especie}
-              className="w-14 h-14 bg-creme-dark"
-              fallbackClassName="bg-creme-dark"
+              className="w-14 h-14 bg-surface-muted"
+              fallbackClassName="bg-surface-muted"
             />
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-texto group-hover:text-coral transition-colors">
+              <h3 className="font-semibold text-texto group-hover:text-primary transition-colors">
                 {pet.nome}
               </h3>
               <p className="text-sm text-texto-soft">
@@ -71,12 +72,12 @@ export default function VisitantePetsPage() {
                 {pet.raca ? ` · ${pet.raca}` : ''}
               </p>
               {pet.relacao && (
-                <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-creme-dark text-texto-soft mt-1">
+                <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-surface-muted text-texto-soft mt-1">
                   {pet.relacao}
                 </span>
               )}
             </div>
-            <span className="text-texto-muted group-hover:text-coral transition-colors flex-shrink-0 mt-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+            <span className="text-texto-muted group-hover:text-primary transition-colors flex-shrink-0 mt-1"><ChevronRight size={16} /></span>
           </div>
 
           {/* Permission badges */}
@@ -84,7 +85,7 @@ export default function VisitantePetsPage() {
             {pet.permissoesVisualizacao.slice(0, 3).map((p) => (
               <span
                 key={p}
-                className="text-xs px-1.5 py-0.5 rounded bg-coral-light text-coral"
+                className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary"
               >
                 {PERMISSION_LABELS[p] ?? p}
               </span>

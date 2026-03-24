@@ -11,6 +11,32 @@ import { cn, especieLabel, petAge } from '@/lib/utils';
 import { timeConfig } from '@/lib/config';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 import { PetImage } from '@/components/PetImage';
+import {
+  Bell,
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  Link2,
+  PawPrint,
+  Heart,
+  Shield,
+  Clock,
+  Pill,
+  Syringe,
+  AlertCircle,
+  Users,
+  Eye,
+  Check,
+  X,
+  Stethoscope,
+  Mail,
+  Key,
+  Home,
+  Megaphone,
+  Handshake,
+  UserCheck,
+  Ban,
+} from 'lucide-react';
 
 // ─── Role config ──────────────────────────────────────────────────────────────
 
@@ -18,19 +44,18 @@ const TUTOR_ROLES = new Set(['TUTOR_PRINCIPAL', 'TUTOR_EMERGENCIA']);
 
 interface RoleStyle {
   label: string;
-  bg: string;
-  text: string;
+  badge: string;
 }
 
 const ROLE_STYLE: Record<string, RoleStyle> = {
-  TUTOR_PRINCIPAL:  { label: 'Principal',   bg: 'bg-coral-light',    text: 'text-coral'       },
-  TUTOR_EMERGENCIA: { label: 'Emergência',  bg: 'bg-rosa-light',     text: 'text-rosa'        },
-  VETERINARIO:      { label: 'Veterinário', bg: 'bg-azul-light',     text: 'text-azul'        },
-  ADESTRADOR:       { label: 'Adestrador',  bg: 'bg-amarelo-light',  text: 'text-amarelo'     },
-  PASSEADOR:        { label: 'Passeador',   bg: 'bg-menta-light',    text: 'text-menta'       },
-  FAMILIAR:         { label: 'Família',     bg: 'bg-creme-dark',     text: 'text-texto-soft'  },
-  AMIGO:            { label: 'Amigo',       bg: 'bg-creme-dark',     text: 'text-texto-soft'  },
-  OUTRO:            { label: 'Outro',       bg: 'bg-creme-dark',     text: 'text-texto-soft'  },
+  TUTOR_PRINCIPAL:  { label: 'Principal',   badge: 'mg-badge-primary'  },
+  TUTOR_EMERGENCIA: { label: 'Emergencia',  badge: 'mg-badge-error'    },
+  VETERINARIO:      { label: 'Veterinario', badge: 'mg-badge-info'     },
+  ADESTRADOR:       { label: 'Adestrador',  badge: 'mg-badge-warning'  },
+  PASSEADOR:        { label: 'Passeador',   badge: 'mg-badge-success'  },
+  FAMILIAR:         { label: 'Familia',     badge: 'mg-badge'          },
+  AMIGO:            { label: 'Amigo',       badge: 'mg-badge'          },
+  OUTRO:            { label: 'Outro',       badge: 'mg-badge'          },
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -79,31 +104,31 @@ export default function HomePage() {
           <div className="flex items-end justify-between">
             <div>
               <p className="text-sm text-texto-soft font-medium mb-0.5">
-                Olá, {user?.nome?.split(' ')[0]} 👋
+                Ola, {user?.nome?.split(' ')[0]} 👋
               </p>
-              <h1 className="text-2xl font-semibold font-headline text-texto tracking-tight">
+              <h1 className="text-2xl font-bold font-headline text-texto tracking-tight">
                 {userType === 'TUTOR' && 'Meus pets'}
                 {userType === 'PRESTADOR' && 'Pets que atendo'}
                 {userType === 'AMBOS' && 'Dashboard'}
               </h1>
               {userType === 'AMBOS' && (
-                <p className="text-xs text-texto-soft mt-1">Tutor e prestador de serviços</p>
+                <p className="text-xs text-texto-soft mt-1">Tutor e prestador de servicos</p>
               )}
             </div>
             {isTutor && (
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => router.push('/home/vincular-pet')}
-                  className="pt-btn-secondary flex items-center gap-1.5 text-sm"
+                  className="mg-btn-secondary flex items-center gap-1.5 text-sm"
                 >
-                  <span>🔗</span>
+                  <Link2 className="w-4 h-4" />
                   Vincular
                 </button>
                 <button
                   onClick={() => router.push('/home/novo-pet')}
-                  className="pt-btn flex items-center gap-2 text-sm"
+                  className="mg-btn flex items-center gap-2 text-sm"
                 >
-                  <span>🐾</span>
+                  <Plus className="w-4 h-4" />
                   Adicionar pet
                 </button>
               </div>
@@ -127,18 +152,18 @@ export default function HomePage() {
         {loading && (
           <div className="grid gap-4 sm:grid-cols-2">
             {[1, 2].map((i) => (
-              <div key={i} className="pt-card">
+              <div key={i} className="mg-card">
                 <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 pt-skeleton rounded-2xl flex-shrink-0" />
+                  <div className="w-14 h-14 mg-skeleton rounded-2xl flex-shrink-0" />
                   <div className="flex-1 space-y-2 pt-1">
-                    <div className="h-4 pt-skeleton w-2/3" />
-                    <div className="h-3 pt-skeleton w-1/3" />
-                    <div className="h-3 pt-skeleton w-1/2" />
+                    <div className="h-4 mg-skeleton rounded-lg w-2/3" />
+                    <div className="h-3 mg-skeleton rounded-lg w-1/3" />
+                    <div className="h-3 mg-skeleton rounded-lg w-1/2" />
                   </div>
                 </div>
-                <div className="mt-4 pt-4 flex justify-between">
-                  <div className="h-3 pt-skeleton w-20" />
-                  <div className="h-3 pt-skeleton w-12" />
+                <div className="mt-4 pt-4 border-t border-white/20 flex justify-between">
+                  <div className="h-3 mg-skeleton rounded-lg w-20" />
+                  <div className="h-3 mg-skeleton rounded-lg w-12" />
                 </div>
               </div>
             ))}
@@ -147,26 +172,29 @@ export default function HomePage() {
 
         {/* Error */}
         {error && (
-          <div className="pt-card bg-erro-light">
-            <p className="text-sm text-erro">{error}</p>
+          <div className="mg-card border-rose-200/50 bg-rose-50/60 backdrop-blur-[16px]">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-[#F43F5E] flex-shrink-0" />
+              <p className="text-sm text-[#F43F5E] font-medium">{error}</p>
+            </div>
           </div>
         )}
 
         {/* Empty */}
         {isEmpty && (
           <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
-            <div className="w-24 h-24 rounded-full bg-coral-light flex items-center justify-center text-5xl shadow-inner">
-              🐾
+            <div className="mg-card w-24 h-24 rounded-full flex items-center justify-center">
+              <PawPrint className="w-10 h-10 text-[#7C3AED]" />
             </div>
             <div className="space-y-1">
-              <p className="font-semibold text-texto text-base">Nenhum pet cadastrado</p>
-              <p className="text-sm text-texto-soft">Adicione seu primeiro pet para começar</p>
+              <p className="font-bold font-headline text-texto text-base">Nenhum pet cadastrado</p>
+              <p className="text-sm text-texto-soft">Adicione seu primeiro pet para comecar</p>
             </div>
             <button
               onClick={() => router.push('/home/novo-pet')}
-              className="pt-btn flex items-center gap-2 px-8 py-3 text-sm"
+              className="mg-btn flex items-center gap-2 px-8 py-3 text-sm"
             >
-              <span>🐾</span>
+              <Plus className="w-4 h-4" />
               Adicionar pet
             </button>
           </div>
@@ -176,19 +204,21 @@ export default function HomePage() {
         {!loading && convitesPendentes.length > 0 && (
           <button
             onClick={() => router.push('/visitante/convites')}
-            className="w-full pt-card bg-rosa-light hover:bg-rosa-light/80 transition-colors text-left active:scale-[0.98]"
+            className="w-full mg-card border-[#14B8A6]/20 hover:shadow-glass-hover hover:-translate-y-0.5 text-left active:scale-[0.98] transition-all"
           >
             <div className="flex items-center gap-3">
-              <span className="text-xl">✉️</span>
+              <div className="w-10 h-10 rounded-xl bg-[#14B8A6]/10 flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-[#14B8A6]" />
+              </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-rosa">
+                <p className="text-sm font-bold font-headline text-[#14B8A6]">
                   {convitesPendentes.length} {convitesPendentes.length === 1 ? 'convite pendente' : 'convites pendentes'}
                 </p>
-                <p className="text-xs text-rosa/80 mt-0.5">
+                <p className="text-xs text-texto-soft mt-0.5">
                   Toque para ver e aceitar convites de acompanhamento
                 </p>
               </div>
-              <span className="text-rosa/60 text-base">›</span>
+              <ChevronRight className="w-4 h-4 text-[#14B8A6]/60 flex-shrink-0" />
             </div>
           </button>
         )}
@@ -197,11 +227,11 @@ export default function HomePage() {
         {!loading && (pets.length > 0 || prestadorPets.length > 0 || visitantePets.length > 0) && (
           <div className="space-y-8">
 
-            {/* Seção tutor - Meus Pets */}
+            {/* Secao tutor - Meus Pets */}
             {isTutor && myPets.length > 0 && (
               <section className="space-y-3">
                 {hasBothTutorAndPrestador && (
-                  <SectionLabel icon="🏠" label="Como tutor" />
+                  <SectionLabel icon={<Home className="w-4 h-4 text-[#7C3AED]" />} label="Como tutor" />
                 )}
                 <div className="grid gap-4 sm:grid-cols-2">
                   {myPets.map((pet, i) => (
@@ -213,12 +243,12 @@ export default function HomePage() {
               </section>
             )}
 
-            {/* Seção acesso compartilhado */}
+            {/* Secao acesso compartilhado */}
             {isTutor && accessPets.length > 0 && (
               <section className="space-y-3">
-                <SectionLabel icon="🔑" label="Acesso compartilhado" />
+                <SectionLabel icon={<Key className="w-4 h-4 text-[#F59E0B]" />} label="Acesso compartilhado" />
                 <p className="text-xs text-texto-soft -mt-1">
-                  Você tem acesso a {accessPets.length === 1 ? 'este pet' : 'estes pets'} com permissões limitadas conforme seu papel.
+                  Voce tem acesso a {accessPets.length === 1 ? 'este pet' : 'estes pets'} com permissoes limitadas conforme seu papel.
                 </p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {accessPets.map((pet) => (
@@ -228,11 +258,11 @@ export default function HomePage() {
               </section>
             )}
 
-            {/* Seção prestador - Pets que atendo */}
+            {/* Secao prestador - Pets que atendo */}
             {isPrestador && (
               <section className="space-y-3">
                 {hasBothTutorAndPrestador && (
-                  <SectionLabel icon="🩺" label="Como prestador" />
+                  <SectionLabel icon={<Stethoscope className="w-4 h-4 text-[#14B8A6]" />} label="Como prestador" />
                 )}
                 {prestadorPets.length > 0 ? (
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -241,14 +271,14 @@ export default function HomePage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="pt-card border-2 border-dashed border-creme-dark">
+                  <div className="mg-card border-2 border-dashed border-white/30">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-creme-dark flex items-center justify-center text-lg">
-                        🩺
+                      <div className="w-10 h-10 rounded-xl bg-[#14B8A6]/10 flex items-center justify-center">
+                        <Stethoscope className="w-5 h-5 text-[#14B8A6]" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-texto">Nenhum pet convidado ainda</p>
-                        <p className="text-xs text-texto-soft mt-0.5">Tutores podem convidá-lo para atender seus pets</p>
+                        <p className="text-xs text-texto-soft mt-0.5">Tutores podem convida-lo para atender seus pets</p>
                       </div>
                     </div>
                   </div>
@@ -256,27 +286,27 @@ export default function HomePage() {
               </section>
             )}
 
-            {/* Seção visitante - Acompanhando */}
+            {/* Secao visitante - Acompanhando */}
             {visitantePets.length > 0 && (
               <section className="space-y-3">
-                <SectionLabel icon="👀" label="Acompanhando" />
+                <SectionLabel icon={<Eye className="w-4 h-4 text-[#7C3AED]" />} label="Acompanhando" />
                 <div className="grid gap-4 sm:grid-cols-2">
                   {visitantePets.map((vp) => (
                     <button
                       key={vp.id}
                       onClick={() => router.push(`/visitante/pets/${vp.id}`)}
-                      className="pt-card hover:shadow-card-hover active:scale-[0.98] text-left w-full group transition-all"
+                      className="mg-card hover:shadow-glass-hover hover:-translate-y-0.5 active:scale-[0.98] text-left w-full group transition-all"
                     >
                       <div className="flex items-start gap-3">
                         <PetImage
                           fotoUrl={vp.fotoUrl}
                           nome={vp.nome}
                           especie={vp.especie}
-                          className="w-16 h-16 bg-creme-dark"
-                          fallbackClassName="bg-creme-dark"
+                          className="w-16 h-16 ring-2 ring-[#7C3AED]/20 rounded-2xl"
+                          fallbackClassName="bg-[#7C3AED]/5"
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-texto group-hover:text-coral transition-colors truncate">
+                          <h3 className="font-bold font-headline text-texto group-hover:text-[#7C3AED] transition-colors truncate">
                             {vp.nome}
                           </h3>
                           <p className="text-sm text-texto-soft">
@@ -284,12 +314,12 @@ export default function HomePage() {
                             {vp.raca ? ` · ${vp.raca}` : ''}
                           </p>
                           {vp.relacao && (
-                            <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-creme-dark text-texto-soft mt-1">
+                            <span className="mg-badge mt-1">
                               {vp.relacao}
                             </span>
                           )}
                         </div>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-texto-muted group-hover:text-coral transition-colors flex-shrink-0 mt-1"><path d="m9 18 6-6-6-6"/></svg>
+                        <ChevronRight className="w-4 h-4 text-texto-muted group-hover:text-[#7C3AED] transition-colors flex-shrink-0 mt-1" />
                       </div>
                     </button>
                   ))}
@@ -306,11 +336,11 @@ export default function HomePage() {
 
 // ─── Section label ────────────────────────────────────────────────────────────
 
-function SectionLabel({ icon, label }: { icon: string; label: string }) {
+function SectionLabel({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <div className="flex items-center gap-2 animate-slide-up">
-      <span className="text-sm">{icon}</span>
-      <span className="text-xs font-semibold text-texto-soft uppercase tracking-wider">{label}</span>
+      {icon}
+      <span className="text-xs font-bold font-headline text-texto-soft uppercase tracking-wider">{label}</span>
     </div>
   );
 }
@@ -321,7 +351,7 @@ function PetCard({ pet, onClick }: { pet: Pet; onClick: () => void }) {
   const isTutor = TUTOR_ROLES.has(pet.meuRole ?? '');
   const role = pet.meuRole ? ROLE_STYLE[pet.meuRole] : null;
 
-  // Only count actual tutors (principal + emergência) for the avatar stack
+  // Only count actual tutors (principal + emergencia) for the avatar stack
   const tutoresVinculados = (pet.petUsuarios ?? []).filter((pu) =>
     TUTOR_ROLES.has(pu.role),
   );
@@ -330,46 +360,35 @@ function PetCard({ pet, onClick }: { pet: Pet; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="pt-card hover:shadow-card-hover active:scale-[0.98] text-left w-full group transition-all"
+      className="mg-card hover:shadow-glass-hover hover:-translate-y-0.5 active:scale-[0.98] text-left w-full group transition-all"
     >
       <div className="flex items-start gap-4">
         {/* Avatar with Pet Image */}
-        <PetImage
-          fotoUrl={pet.fotoUrl}
-          nome={pet.nome}
-          especie={pet.especie}
-          className={cn(
-            'w-20 h-20',
-            isTutor
-              ? 'bg-coral-light'
-              : role
-                ? `${role.bg}`
-                : 'bg-creme-dark',
+        <div className="relative">
+          <PetImage
+            fotoUrl={pet.fotoUrl}
+            nome={pet.nome}
+            especie={pet.especie}
+            className="w-20 h-20 ring-2 ring-[#7C3AED]/20 rounded-2xl"
+            fallbackClassName="bg-[#7C3AED]/5"
+          />
+          {hasAlert && (
+            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#F59E0B] border-2 border-white shadow-sm" title="Alertas pendentes" />
           )}
-          fallbackClassName={cn(
-            isTutor
-              ? 'bg-coral-light'
-              : role
-                ? `${role.bg}`
-                : 'bg-creme-dark',
-          )}
-        />
+        </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
           {/* Name row */}
           <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-semibold text-texto text-base leading-tight truncate group-hover:text-coral transition-colors">
+            <h2 className="font-bold font-headline text-texto text-base leading-tight truncate group-hover:text-[#7C3AED] transition-colors">
               {pet.nome}
             </h2>
-            {hasAlert && (
-              <span className="w-2 h-2 rounded-full bg-amarelo flex-shrink-0" title="Alertas pendentes" />
-            )}
           </div>
 
-          {/* Role badge — positioned right below the name */}
+          {/* Role badge */}
           {role && (
-            <span className={cn('inline-block text-xs font-medium px-2 py-0.5 rounded-full mb-1.5', role.bg, role.text)}>
+            <span className={cn('mg-badge mb-1.5', role.badge)}>
               {role.label}
             </span>
           )}
@@ -383,11 +402,11 @@ function PetCard({ pet, onClick }: { pet: Pet; onClick: () => void }) {
           )}
         </div>
 
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-texto-muted group-hover:text-coral transition-colors flex-shrink-0 mt-0.5"><path d="m9 18 6-6-6-6"/></svg>
+        <ChevronRight className="w-4 h-4 text-texto-muted group-hover:text-[#7C3AED] transition-colors flex-shrink-0 mt-0.5" />
       </div>
 
       {/* Footer */}
-      <div className="mt-4 pt-4 flex items-center justify-between">
+      <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
 
         {/* Left: avatar stack for tutors; nothing for access */}
         {isTutor ? (
@@ -396,44 +415,48 @@ function PetCard({ pet, onClick }: { pet: Pet; onClick: () => void }) {
               {tutoresVinculados.slice(0, 3).map((pu) => (
                 <div
                   key={pu.id}
-                  className="w-6 h-6 rounded-full bg-coral-light flex items-center justify-center"
+                  className="w-6 h-6 rounded-full bg-[#7C3AED]/10 border-2 border-white flex items-center justify-center"
                   title={pu.usuario.nome}
                 >
-                  <span className="text-coral text-[10px] font-semibold">
+                  <span className="text-[#7C3AED] text-[10px] font-semibold">
                     {pu.usuario.nome.charAt(0)}
                   </span>
                 </div>
               ))}
               {tutoresVinculados.length > 3 && (
-                <div className="w-6 h-6 rounded-full bg-creme-dark flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-white/60 border-2 border-white flex items-center justify-center">
                   <span className="text-texto-soft text-[9px] font-semibold">+{tutoresVinculados.length - 3}</span>
                 </div>
               )}
             </div>
-            <span className="text-xs text-texto-soft">
+            <span className="text-xs text-texto-soft flex items-center gap-1">
+              <Users className="w-3 h-3" />
               {tutoresVinculados.length}{' '}
               {tutoresVinculados.length === 1 ? 'tutor' : 'tutores'}
             </span>
           </div>
         ) : (
-          <span className="text-xs text-texto-soft">Acesso limitado</span>
+          <span className="text-xs text-texto-soft flex items-center gap-1">
+            <Shield className="w-3 h-3" />
+            Acesso limitado
+          </span>
         )}
 
         {/* Right: alerts + archived */}
         <div className="flex items-center gap-2">
           {(pet.medicamentosAtivos ?? 0) > 0 && (
-            <span className="flex items-center gap-1 text-xs text-amarelo font-medium">
-              <span>💊</span>
+            <span className="mg-badge-warning flex items-center gap-1">
+              <Pill className="w-3 h-3" />
               {pet.medicamentosAtivos}
             </span>
           )}
           {pet.proximaVacina && (pet.medicamentosAtivos ?? 0) === 0 && (
-            <span className="flex items-center gap-1 text-xs text-blue-500 font-medium">
-              <span>💉</span>
+            <span className="mg-badge-info flex items-center gap-1">
+              <Syringe className="w-3 h-3" />
             </span>
           )}
           {pet.status === 'ARQUIVADO' && (
-            <span className="pt-badge bg-creme-dark text-texto-soft">Arquivado</span>
+            <span className="mg-badge">Arquivado</span>
           )}
         </div>
 
@@ -448,10 +471,10 @@ const NOTIF_PREVIEW_COUNT = 3;
 
 function getNotificacaoIcon(tipo: string) {
   switch (tipo) {
-    case 'CONVITE_PRESTADOR':        return '🤝';
-    case 'PRESTADOR_ACEITO_CONVITE': return '✅';
-    case 'ACESSO_REMOVIDO_PRESTADOR':return '🚫';
-    default:                         return '📢';
+    case 'CONVITE_PRESTADOR':        return <Handshake className="w-5 h-5 text-[#7C3AED]" />;
+    case 'PRESTADOR_ACEITO_CONVITE': return <UserCheck className="w-5 h-5 text-[#14B8A6]" />;
+    case 'ACESSO_REMOVIDO_PRESTADOR':return <Ban className="w-5 h-5 text-[#F43F5E]" />;
+    default:                         return <Megaphone className="w-5 h-5 text-[#F59E0B]" />;
   }
 }
 
@@ -464,9 +487,9 @@ function formatarData(data: string) {
   const diffDias = Math.floor(diffMs / timeConfig.MS_PER_DAY);
 
   if (diffMins < 1) return 'Agora mesmo';
-  if (diffMins < 60) return `${diffMins}m atrás`;
-  if (diffHoras < 24) return `${diffHoras}h atrás`;
-  if (diffDias < 7) return `${diffDias}d atrás`;
+  if (diffMins < 60) return `${diffMins}m atras`;
+  if (diffHoras < 24) return `${diffHoras}h atras`;
+  if (diffDias < 7) return `${diffDias}d atras`;
   return date.toLocaleDateString('pt-BR');
 }
 
@@ -493,21 +516,21 @@ function NotificacoesSection({
 
   return (
     <section className="animate-fade-in">
-      {/* Collapsed bar — always visible */}
+      {/* Collapsed bar -- always visible */}
       <button
         onClick={onToggleExpanded}
         className={cn(
           'w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all',
           expanded
-            ? 'bg-white rounded-b-none'
-            : 'bg-white shadow-sm hover:shadow-card-hover',
+            ? 'mg-card rounded-b-none'
+            : 'mg-card hover:shadow-glass-hover',
         )}
       >
         <div className="flex items-center gap-2.5">
-          <span className="text-xl">🔔</span>
-          <span className="text-sm font-medium text-texto">Notificações</span>
+          <Bell className="w-5 h-5 text-[#7C3AED]" />
+          <span className="text-sm font-bold font-headline text-texto">Notificacoes</span>
           {contNaoLidas > 0 && (
-            <span className="text-xs font-bold text-white bg-coral rounded-full w-5 h-5 flex items-center justify-center animate-scale-in">
+            <span className="text-xs font-bold text-white bg-[#F43F5E] rounded-full w-5 h-5 flex items-center justify-center animate-scale-in">
               {contNaoLidas}
             </span>
           )}
@@ -515,14 +538,12 @@ function NotificacoesSection({
             <span className="text-xs text-texto-soft">{notificacoes.length}</span>
           )}
         </div>
-        <span
+        <ChevronDown
           className={cn(
-            'text-texto-soft transition-transform duration-200',
+            'w-5 h-5 text-texto-soft transition-transform duration-200',
             expanded && 'rotate-180',
           )}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-        </span>
+        />
       </button>
 
       {/* Expanded content */}
@@ -532,14 +553,15 @@ function NotificacoesSection({
           expanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0',
         )}
       >
-        <div className="bg-white rounded-b-xl px-4 pb-4 pt-2 space-y-3">
+        <div className="bg-white/72 backdrop-blur-[16px] border border-t-0 border-white/30 rounded-b-xl px-4 pb-4 pt-2 space-y-3">
           {/* Actions row */}
           {contNaoLidas > 0 && (
             <div className="flex justify-end">
               <button
                 onClick={onReadAll}
-                className="text-xs font-medium text-coral hover:text-coral/80 transition-colors"
+                className="text-xs font-medium text-[#7C3AED] hover:text-[#7C3AED]/80 transition-colors flex items-center gap-1"
               >
+                <Check className="w-3 h-3" />
                 Marcar todas como lidas
               </button>
             </div>
@@ -551,14 +573,12 @@ function NotificacoesSection({
               <div
                 key={notif.id}
                 className={cn(
-                  'rounded-xl p-3 transition-all',
-                  !notif.lida
-                    ? 'bg-coral-light/50'
-                    : 'bg-creme/50',
+                  'mg-card-solid rounded-xl p-3 transition-all',
+                  !notif.lida && 'ring-1 ring-[#7C3AED]/20 bg-[#7C3AED]/[0.03]',
                 )}
               >
                 <div className="flex gap-3">
-                  <div className="text-lg flex-shrink-0 pt-0.5">
+                  <div className="flex-shrink-0 pt-0.5">
                     {getNotificacaoIcon(notif.tipo)}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -574,19 +594,21 @@ function NotificacoesSection({
                         )}
                       </div>
                       {!notif.lida && (
-                        <div className="w-2 h-2 rounded-full bg-coral flex-shrink-0 mt-1.5" />
+                        <div className="w-2 h-2 rounded-full bg-[#7C3AED] flex-shrink-0 mt-1.5" />
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-texto-soft">
+                      <span className="text-xs text-texto-soft flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
                         {formatarData(notif.criadoEm)}
                       </span>
                       <div className="flex gap-3">
                         {notif.deepLink && (
                           <Link
                             href={notif.deepLink}
-                            className="text-xs font-medium text-coral hover:text-coral/80 transition-colors"
+                            className="text-xs font-medium text-[#7C3AED] hover:text-[#7C3AED]/80 transition-colors flex items-center gap-1"
                           >
+                            <Eye className="w-3 h-3" />
                             Ver
                           </Link>
                         )}
@@ -595,7 +617,7 @@ function NotificacoesSection({
                             onClick={() => onRead(notif.id)}
                             className="text-xs font-medium text-texto-soft hover:text-texto transition-colors flex items-center gap-1"
                           >
-                            <span className="text-xs">✓</span>
+                            <Check className="w-3 h-3" />
                             Lida
                           </button>
                         )}
@@ -610,8 +632,9 @@ function NotificacoesSection({
           {hasMore && (
             <button
               onClick={() => setShowAll((v) => !v)}
-              className="w-full text-center text-xs font-medium text-coral hover:text-coral/80 transition-colors py-1"
+              className="w-full text-center text-xs font-medium text-[#7C3AED] hover:text-[#7C3AED]/80 transition-colors py-1 flex items-center justify-center gap-1"
             >
+              <ChevronDown className={cn('w-3 h-3 transition-transform', showAll && 'rotate-180')} />
               {showAll ? 'Ver menos' : `Ver todas (${notificacoes.length})`}
             </button>
           )}
