@@ -87,7 +87,7 @@ export default function RootPage() {
               Entrar
             </Link>
             <Link href="/register" className="mg-btn text-sm !py-2.5 !px-5">
-              Criar conta gratis
+              Criar conta grátis
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -121,7 +121,7 @@ export default function RootPage() {
                 Entrar
               </Link>
               <Link href="/register" className="mg-btn w-full text-center">
-                Criar conta gratis
+                Criar conta grátis
               </Link>
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function RootPage() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#14B8A6]" />
                 </span>
                 <span className="font-body text-sm font-semibold text-[#7C3AED]">
-                  Novo: Carteira de Vacinacao gamificada
+                  Novo: Carteira de Vacinação gamificada
                 </span>
               </div>
             </ScrollReveal>
@@ -165,7 +165,7 @@ export default function RootPage() {
 
             <ScrollReveal delay={2}>
               <p className="mt-6 text-lg sm:text-xl text-[#6B7280] leading-relaxed max-w-lg mx-auto lg:mx-0">
-                Saude, agenda, guarda compartilhada e historico completo.
+                Saúde, agenda, guarda compartilhada e histórico completo.
                 A plataforma que pet parents modernos merecem.
               </p>
             </ScrollReveal>
@@ -187,11 +187,11 @@ export default function RootPage() {
               <div className="mt-10 flex items-center gap-6 justify-center lg:justify-start text-sm text-[#6B7280]">
                 <div className="flex items-center gap-1.5">
                   <Check className="w-4 h-4 text-[#14B8A6]" />
-                  <span>Gratis para sempre</span>
+                  <span>Grátis para sempre</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Check className="w-4 h-4 text-[#14B8A6]" />
-                  <span>Sem cartao de credito</span>
+                  <span>Sem cartão de crédito</span>
                 </div>
               </div>
             </ScrollReveal>
@@ -223,7 +223,7 @@ export default function RootPage() {
                         <Heart className="w-5 h-5 text-[#14B8A6]" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-xs text-[#6B7280] font-medium">Proxima vacina</p>
+                        <p className="text-xs text-[#6B7280] font-medium">Próxima vacina</p>
                         <p className="font-headline font-bold text-[#1E1B4B] text-sm">V10 — 15 Abr</p>
                       </div>
                       <div className="mg-badge-success text-xs">Em dia</div>
@@ -234,7 +234,7 @@ export default function RootPage() {
                         <Calendar className="w-5 h-5 text-[#6366F1]" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-xs text-[#6B7280] font-medium">Proximo banho</p>
+                        <p className="text-xs text-[#6B7280] font-medium">Próximo banho</p>
                         <p className="font-headline font-bold text-[#1E1B4B] text-sm">Sabado, 10:00</p>
                       </div>
                       <div className="mg-badge-info text-xs">Agendado</div>
@@ -261,7 +261,7 @@ export default function RootPage() {
                     </div>
                     <div>
                       <p className="text-[10px] text-[#9CA3AF] font-medium">Status</p>
-                      <p className="text-xs font-bold text-[#1E1B4B]">Saudavel ✨</p>
+                      <p className="text-xs font-bold text-[#1E1B4B]">Saudável ✨</p>
                     </div>
                   </div>
                 </div>
@@ -273,7 +273,7 @@ export default function RootPage() {
                       <div className="w-7 h-7 rounded-full bg-[#7C3AED] flex items-center justify-center text-white text-xs font-bold border-2 border-white">L</div>
                       <div className="w-7 h-7 rounded-full bg-[#14B8A6] flex items-center justify-center text-white text-xs font-bold border-2 border-white">R</div>
                     </div>
-                    <p className="text-xs font-bold text-[#1E1B4B]">2 guardioes</p>
+                    <p className="text-xs font-bold text-[#1E1B4B]">2 guardiões</p>
                   </div>
                 </div>
               </div>
@@ -296,8 +296,8 @@ export default function RootPage() {
   const features = [
     {
       icon: Heart,
-      title: 'Saude completa',
-      desc: 'Vacinas, consultas, exames e medicacoes. Tudo organizado com alertas inteligentes e analise por IA.',
+      title: 'Saúde completa',
+      desc: 'Vacinas, consultas, exames e medicações. Tudo organizado com alertas inteligentes e análise por IA.',
       color: '#14B8A6',
       bgClass: 'mg-card-saude',
       emoji: '💚',
@@ -305,7 +305,7 @@ export default function RootPage() {
     {
       icon: Calendar,
       title: 'Agenda inteligente',
-      desc: 'Banhos, consultas, vermifugos e mais. Nunca mais esqueca um compromisso do seu pet.',
+      desc: 'Banhos, consultas, vermífugos e mais. Nunca mais esqueça um compromisso do seu pet.',
       color: '#6366F1',
       bgClass: 'mg-card-agenda',
       emoji: '📅',
@@ -313,15 +313,15 @@ export default function RootPage() {
     {
       icon: Users,
       title: 'Guarda compartilhada',
-      desc: 'Gerencie turnos, despesas e comunicacao com o co-guardiao. Transparencia total.',
+      desc: 'Gerencie turnos, despesas e comunicação com o co-guardião. Transparência total.',
       color: '#7C3AED',
       bgClass: 'mg-card-guarda',
       emoji: '🤝',
     },
     {
       icon: FileText,
-      title: 'Historico completo',
-      desc: 'Linha do tempo com todos os eventos, documentos e fotos. O prontuario digital do seu pet.',
+      title: 'Histórico completo',
+      desc: 'Linha do tempo com todos os eventos, documentos e fotos. O prontuário digital do seu pet.',
       color: '#F59E0B',
       bgClass: 'mg-card-historico',
       emoji: '📋',
@@ -342,13 +342,13 @@ export default function RootPage() {
             <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1E1B4B] leading-tight">
               Tudo que seu pet precisa.{' '}
               <span className="bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] bg-clip-text text-transparent">
-                Nada que voce nao precise.
+                Nada que você não precise.
               </span>
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={2}>
             <p className="mt-4 text-lg text-[#6B7280]">
-              Quatro modulos poderosos que simplificam a vida de quem ama seu pet.
+              Quatro módulos poderosos que simplificam a vida de quem ama seu pet.
             </p>
           </ScrollReveal>
         </div>
@@ -382,19 +382,19 @@ export default function RootPage() {
     {
       num: '01',
       title: 'Crie sua conta',
-      desc: 'Cadastro rapido e gratis. Sem cartao de credito, sem burocracia.',
+      desc: 'Cadastro rápido e grátis. Sem cartão de crédito, sem burocracia.',
       icon: Smartphone,
     },
     {
       num: '02',
       title: 'Adicione seu pet',
-      desc: 'Cadastre as informacoes basicas, vacinas e rotina. A IA ajuda a organizar tudo.',
+      desc: 'Cadastre as informações básicas, vacinas e rotina. A IA ajuda a organizar tudo.',
       icon: PawPrint,
     },
     {
       num: '03',
       title: 'Gerencie com facilidade',
-      desc: 'Convide co-guardioes, agende compromissos e acompanhe a saude em tempo real.',
+      desc: 'Convide co-guardiões, agende compromissos e acompanhe a saúde em tempo real.',
       icon: Zap,
     },
   ];
@@ -452,7 +452,7 @@ export default function RootPage() {
     {
       icon: Lock,
       title: 'Dados protegidos',
-      desc: 'Criptografia de ponta a ponta. Seus dados e do seu pet estao seguros.',
+      desc: 'Criptografia de ponta a ponta. Seus dados e do seu pet estão seguros.',
       color: '#7C3AED',
     },
     {
@@ -476,7 +476,7 @@ export default function RootPage() {
           <ScrollReveal>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F59E0B]/[0.08] border border-[#F59E0B]/10 mb-4">
               <Shield className="w-3.5 h-3.5 text-[#F59E0B]" />
-              <span className="text-xs font-semibold text-[#F59E0B] uppercase tracking-wider">Confianca</span>
+              <span className="text-xs font-semibold text-[#F59E0B] uppercase tracking-wider">Confiança</span>
             </div>
           </ScrollReveal>
           <ScrollReveal delay={1}>
@@ -531,15 +531,15 @@ export default function RootPage() {
 
         <ScrollReveal delay={1}>
           <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
-            Comece gratis.{' '}
+            Comece grátis.{' '}
             <span className="text-white/70">Evolua quando quiser.</span>
           </h2>
         </ScrollReveal>
 
         <ScrollReveal delay={2}>
           <p className="mt-6 text-lg text-white/70 max-w-xl mx-auto">
-            O plano gratuito ja inclui tudo que voce precisa para gerenciar seu pet.
-            Planos premium desbloqueiam IA avancada e mais recursos.
+            O plano gratuito já inclui tudo que você precisa para gerenciar seu pet.
+            Planos premium desbloqueiam IA avançada e mais recursos.
           </p>
         </ScrollReveal>
 
@@ -549,7 +549,7 @@ export default function RootPage() {
               href="/register"
               className="inline-flex items-center justify-center gap-2 bg-white text-[#7C3AED] font-headline font-bold py-3.5 px-8 rounded-xl hover:bg-white/90 transition-all hover:shadow-xl hover:shadow-black/10 hover:-translate-y-0.5 text-base"
             >
-              Criar conta gratis
+              Criar conta grátis
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -563,7 +563,7 @@ export default function RootPage() {
             </div>
             <div className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-[#14B8A6]" />
-              <span>Saude e agenda</span>
+              <span>Saúde e agenda</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-[#14B8A6]" />
@@ -571,7 +571,7 @@ export default function RootPage() {
             </div>
             <div className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-[#14B8A6]" />
-              <span>Sem cartao de credito</span>
+              <span>Sem cartão de crédito</span>
             </div>
           </div>
         </ScrollReveal>
@@ -593,7 +593,7 @@ export default function RootPage() {
               <span className="font-headline text-lg font-extrabold text-white">MITRA</span>
             </div>
             <p className="text-sm leading-relaxed">
-              A plataforma completa para pet parents que levam o cuidado a serio.
+              A plataforma completa para pet parents que levam o cuidado a sério.
             </p>
           </div>
 

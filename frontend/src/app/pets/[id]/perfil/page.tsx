@@ -169,7 +169,7 @@ export default function PerfilPage() {
     setGuardaSaving(true);
     try {
       await custodyApi.criar(petId, guardaForm);
-      setConfirmation('Solicitacao enviada com sucesso!');
+      setConfirmation('Solicitação enviada com sucesso!');
       setShowGuardaForm(false);
       setGuardaForm({ tipo: 'TEMPORARIA', motivo: '', dataInicio: '', dataFim: '' });
       // Refresh solicitacoes
@@ -177,7 +177,7 @@ export default function PerfilPage() {
       setSolicitacoes((data as any[]) || []);
       setTimeout(() => setConfirmation(''), 5000);
     } catch (err: any) {
-      setConfirmation(err?.response?.data?.message || 'Erro ao enviar solicitacao.');
+      setConfirmation(err?.response?.data?.message || 'Erro ao enviar solicitação.');
       setTimeout(() => setConfirmation(''), 5000);
     } finally {
       setGuardaSaving(false);
@@ -295,7 +295,7 @@ export default function PerfilPage() {
       {/* Section header */}
       <div>
         <h2 className="font-headline font-bold text-xl text-texto">Perfil do Pet</h2>
-        <p className="text-sm text-texto-soft font-body">Dados cadastrais, rede de cuidado e configuracoes</p>
+        <p className="text-sm text-texto-soft font-body">Dados cadastrais, rede de cuidado e configurações</p>
       </div>
 
       {/* Section 1: Pet Info Card */}
@@ -374,7 +374,7 @@ export default function PerfilPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm">
-          {pet.genero && <Field label="Genero" value={generoLabel(pet.genero)} />}
+          {pet.genero && <Field label="Gênero" value={generoLabel(pet.genero)} />}
           {pet.cor && <Field label="Cor" value={pet.cor} />}
           {pet.peso && <Field label="Peso" value={`${pet.peso} kg`} />}
           {pet.microchip && <Field label="Microchip" value={pet.microchip} />}
@@ -382,7 +382,7 @@ export default function PerfilPage() {
 
         {pet.observacoes && (
           <div className="mg-card-solid rounded-xl px-4 py-3">
-            <p className="mg-label mb-1">Observacoes</p>
+            <p className="mg-label mb-1">Observações</p>
             <p className="text-sm text-texto font-body">{pet.observacoes}</p>
           </div>
         )}
@@ -396,7 +396,7 @@ export default function PerfilPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary" />
-              <p className="mg-label">Localizacao (AirTag)</p>
+              <p className="mg-label">Localização (AirTag)</p>
             </div>
             {!editingAirTag && (
               <button
@@ -448,7 +448,7 @@ export default function PerfilPage() {
                 className="mg-btn-secondary flex items-center justify-center gap-2 w-full text-sm"
               >
                 <MapPin className="w-3.5 h-3.5" />
-                Ver localizacao no Find My
+                Ver localização no Find My
               </a>
             </div>
           ) : (
@@ -523,7 +523,7 @@ export default function PerfilPage() {
                   value={tutorForm.role}
                   onChange={(e) => setTutorForm((f) => ({ ...f, role: e.target.value }))}
                 >
-                  <option value="TUTOR_EMERGENCIA">Tutor de emergencia</option>
+                  <option value="TUTOR_EMERGENCIA">Tutor de emergência</option>
                 </select>
               </div>
               {tutorError && <p className="text-xs text-erro font-body">{tutorError}</p>}
@@ -631,7 +631,7 @@ export default function PerfilPage() {
             <form onSubmit={handleAddVisitante} className="space-y-3 mg-card-solid rounded-xl p-5">
               <h4 className="font-headline font-bold text-texto text-sm">Convidar visitante</h4>
               <p className="text-xs text-texto-soft font-body">
-                Visitantes tem acesso somente-leitura com permissoes configuraveis.
+                Visitantes têm acesso somente-leitura com permissões configuráveis.
               </p>
               <div>
                 <label className="mg-label">E-mail *</label>
@@ -646,17 +646,17 @@ export default function PerfilPage() {
                 />
               </div>
               <div>
-                <label className="mg-label">Relacao</label>
+                <label className="mg-label">Relação</label>
                 <input
                   type="text"
                   className="mg-input"
-                  placeholder="Ex: Avo, Vizinho, Dogsitter..."
+                  placeholder="Ex: Avó, Vizinho, Dogsitter..."
                   value={visitanteForm.relacao}
                   onChange={(e) => setVisitanteForm((f) => ({ ...f, relacao: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="mg-label">Permissoes</label>
+                <label className="mg-label">Permissões</label>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {PERMISSAO_OPTIONS.map((p) => (
                     <button
@@ -676,7 +676,7 @@ export default function PerfilPage() {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-texto-soft font-body mt-1">Saude e sempre incluida.</p>
+                <p className="text-xs text-texto-soft font-body mt-1">Saúde é sempre incluída.</p>
               </div>
               {visitanteError && <p className="text-xs text-erro font-body">{visitanteError}</p>}
               <div className="flex gap-3">
@@ -717,7 +717,7 @@ export default function PerfilPage() {
           <div className="w-8 h-8 rounded-lg bg-amber/10 flex items-center justify-center">
             <AlertCircle className="w-4 h-4 text-amber" />
           </div>
-          <h3 className="font-headline text-lg font-bold text-texto">Acoes</h3>
+          <h3 className="font-headline text-lg font-bold text-texto">Ações</h3>
         </div>
 
         <button
@@ -729,7 +729,7 @@ export default function PerfilPage() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-headline font-bold text-texto">Enviar feedback</p>
-            <p className="text-xs text-texto-soft font-body">Compartilhe sua experiencia</p>
+            <p className="text-xs text-texto-soft font-body">Compartilhe sua experiência</p>
           </div>
           <ChevronRight className="w-4 h-4 text-texto-soft flex-shrink-0" />
         </button>
@@ -745,7 +745,7 @@ export default function PerfilPage() {
                   setFeedbackForm((f) => ({ ...f, tipo: e.target.value }))
                 }
               >
-                <option value="SUGESTAO">Sugestao</option>
+                <option value="SUGESTAO">Sugestão</option>
                 <option value="BUG">Bug</option>
                 <option value="ELOGIO">Elogio</option>
                 <option value="OUTRO">Outro</option>
@@ -788,7 +788,7 @@ export default function PerfilPage() {
             Beta
           </span>
           <p className="text-xs text-texto-soft font-body">
-            Voce esta no acesso antecipado do MITRA
+            Você está no acesso antecipado do MITRA
           </p>
         </div>
 
@@ -802,13 +802,13 @@ export default function PerfilPage() {
       </div>
 
       {/* Guarda BottomSheet */}
-      <BottomSheet open={showGuardaForm} onClose={() => setShowGuardaForm(false)} title="Solicitar alteracao de guarda">
+      <BottomSheet open={showGuardaForm} onClose={() => setShowGuardaForm(false)} title="Solicitar alteração de guarda">
         <form onSubmit={handleGuardaSubmit} className="space-y-4">
           <div>
             <label className="mg-label">Tipo</label>
             <select className="mg-select" value={guardaForm.tipo} onChange={e => setGuardaForm(f => ({...f, tipo: e.target.value}))}>
-              <option value="TEMPORARIA">Guarda temporaria</option>
-              <option value="DEFINITIVA">Alteracao definitiva</option>
+              <option value="TEMPORARIA">Guarda temporária</option>
+              <option value="DEFINITIVA">Alteração definitiva</option>
             </select>
           </div>
           <div>
@@ -818,7 +818,7 @@ export default function PerfilPage() {
           {guardaForm.tipo === 'TEMPORARIA' && (
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mg-label">Data inicio</label>
+                <label className="mg-label">Data início</label>
                 <input type="date" className="mg-input" value={guardaForm.dataInicio} onChange={e => setGuardaForm(f => ({...f, dataInicio: e.target.value}))} required />
               </div>
               <div>
@@ -828,7 +828,7 @@ export default function PerfilPage() {
             </div>
           )}
           <button type="submit" disabled={guardaSaving} className="mg-btn w-full">
-            {guardaSaving ? 'Enviando...' : 'Enviar solicitacao'}
+            {guardaSaving ? 'Enviando...' : 'Enviar solicitação'}
           </button>
         </form>
       </BottomSheet>
@@ -846,8 +846,8 @@ function Field({ label, value }: { label: string; value: string }) {
 }
 
 const PERMISSAO_OPTIONS: { value: string; label: string }[] = [
-  { value: 'DADOS_BASICOS', label: 'Dados basicos' },
-  { value: 'STATUS_SAUDE', label: 'Saude' },
+  { value: 'DADOS_BASICOS', label: 'Dados básicos' },
+  { value: 'STATUS_SAUDE', label: 'Saúde' },
   { value: 'HISTORICO_VACINACAO', label: 'Vacinas' },
   { value: 'MEDICAMENTOS', label: 'Medicamentos' },
   { value: 'AGENDA_CONSULTAS', label: 'Consultas' },
@@ -890,7 +890,7 @@ function TutorRow({
           {pu.usuario.nome}
           {isMe && (
             <span className="text-texto-soft font-normal text-xs ml-1 font-body">
-              (voce)
+              (você)
             </span>
           )}
         </p>
@@ -958,7 +958,7 @@ function CodigoPetDisplay({ codigo, nome }: { codigo: string; nome: string }) {
     <div className="mg-card-solid rounded-xl px-4 py-3">
       <div className="flex items-center justify-between">
         <div>
-          <p className="mg-label mb-0.5">Codigo do pet</p>
+          <p className="mg-label mb-0.5">Código do pet</p>
           <p className="text-sm font-mono font-bold text-texto tracking-wider">
             {codigo}
           </p>
@@ -966,7 +966,7 @@ function CodigoPetDisplay({ codigo, nome }: { codigo: string; nome: string }) {
         <button
           onClick={handleCopy}
           className="mg-btn-ghost text-sm"
-          title="Copiar codigo"
+          title="Copiar código"
         >
           {copied ? (
             <>

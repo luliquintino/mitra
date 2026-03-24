@@ -12,29 +12,29 @@ type MedInfo = { nome: string; dosagem: string; frequencia: string; motivos: str
 
 const MEDICAMENTOS_POR_ESPECIE: Record<string, MedInfo[]> = {
   CACHORRO: [
-    { nome: 'Bravecto (Fluralaner)',        dosagem: '1 comprimido (por peso)',      frequencia: 'A cada 3 meses',    motivos: ['Prevencao de pulgas e carrapatos'] },
-    { nome: 'Simparica (Sarolaner)',         dosagem: '1 comprimido (por peso)',      frequencia: 'Mensal',            motivos: ['Prevencao de pulgas e carrapatos'] },
-    { nome: 'NexGard (Afoxolaner)',          dosagem: '1 comprimido (por peso)',      frequencia: 'Mensal',            motivos: ['Prevencao de pulgas e carrapatos'] },
-    { nome: 'Milbemax (Milbemicina+Praz.)', dosagem: '1 comprimido (por peso)',      frequencia: 'A cada 3 meses',    motivos: ['Vermifugacao', 'Prevencao de vermes intestinais'] },
-    { nome: 'Drontal Plus',                  dosagem: '1 comprimido por 10 kg',       frequencia: 'A cada 3 meses',    motivos: ['Vermifugacao'] },
-    { nome: 'Heartgard (Ivermectina)',        dosagem: '1 comprimido (por peso)',      frequencia: 'Mensal',            motivos: ['Prevencao de dirofilariose', 'Controle de parasitas internos'] },
+    { nome: 'Bravecto (Fluralaner)',        dosagem: '1 comprimido (por peso)',      frequencia: 'A cada 3 meses',    motivos: ['Prevenção de pulgas e carrapatos'] },
+    { nome: 'Simparica (Sarolaner)',         dosagem: '1 comprimido (por peso)',      frequencia: 'Mensal',            motivos: ['Prevenção de pulgas e carrapatos'] },
+    { nome: 'NexGard (Afoxolaner)',          dosagem: '1 comprimido (por peso)',      frequencia: 'Mensal',            motivos: ['Prevenção de pulgas e carrapatos'] },
+    { nome: 'Milbemax (Milbemicina+Praz.)', dosagem: '1 comprimido (por peso)',      frequencia: 'A cada 3 meses',    motivos: ['Vermifugação', 'Prevenção de vermes intestinais'] },
+    { nome: 'Drontal Plus',                  dosagem: '1 comprimido por 10 kg',       frequencia: 'A cada 3 meses',    motivos: ['Vermifugação'] },
+    { nome: 'Heartgard (Ivermectina)',        dosagem: '1 comprimido (por peso)',      frequencia: 'Mensal',            motivos: ['Prevenção de dirofilariose', 'Controle de parasitas internos'] },
     { nome: 'Amoxicilina',                   dosagem: '10-20 mg/kg',                  frequencia: 'A cada 12 horas',   motivos: ['Infeccao bacteriana', 'Antibioticoterapia'] },
     { nome: 'Metronidazol',                  dosagem: '10-15 mg/kg',                  frequencia: 'A cada 12 horas',   motivos: ['Infeccao gastrointestinal', 'Giardiase'] },
     { nome: 'Prednisolona',                  dosagem: '1-2 mg/kg',                    frequencia: 'Uma vez ao dia',    motivos: ['Anti-inflamatorio', 'Tratamento de alergias'] },
-    { nome: 'Omega 3',                       dosagem: '1 capsula',                    frequencia: 'Uma vez ao dia',    motivos: ['Suplementacao', 'Saude da pele e pelagem'] },
+    { nome: 'Omega 3',                       dosagem: '1 capsula',                    frequencia: 'Uma vez ao dia',    motivos: ['Suplementação', 'Saúde da pele e pelagem'] },
   ],
   GATO: [
-    { nome: 'Revolution (Selamectina)',      dosagem: '1 pipeta (por peso)',          frequencia: 'Mensal',            motivos: ['Prevencao de pulgas', 'Controle de parasitas'] },
-    { nome: 'Bravecto Plus',                 dosagem: '1 pipeta (por peso)',          frequencia: 'A cada 2 meses',    motivos: ['Prevencao de pulgas e carrapatos'] },
-    { nome: 'Profender (Emodepsida+Praz.)', dosagem: '1 pipeta (por peso)',          frequencia: 'A cada 3 meses',    motivos: ['Vermifugacao'] },
-    { nome: 'Milbemax Gato',                 dosagem: '1 comprimido (por peso)',      frequencia: 'A cada 3 meses',    motivos: ['Vermifugacao'] },
+    { nome: 'Revolution (Selamectina)',      dosagem: '1 pipeta (por peso)',          frequencia: 'Mensal',            motivos: ['Prevenção de pulgas', 'Controle de parasitas'] },
+    { nome: 'Bravecto Plus',                 dosagem: '1 pipeta (por peso)',          frequencia: 'A cada 2 meses',    motivos: ['Prevenção de pulgas e carrapatos'] },
+    { nome: 'Profender (Emodepsida+Praz.)', dosagem: '1 pipeta (por peso)',          frequencia: 'A cada 3 meses',    motivos: ['Vermifugação'] },
+    { nome: 'Milbemax Gato',                 dosagem: '1 comprimido (por peso)',      frequencia: 'A cada 3 meses',    motivos: ['Vermifugação'] },
     { nome: 'Amoxicilina',                   dosagem: '10-20 mg/kg',                  frequencia: 'A cada 12 horas',   motivos: ['Infeccao bacteriana', 'Antibioticoterapia'] },
     { nome: 'Prednisolona',                  dosagem: '1-2 mg/kg',                    frequencia: 'Uma vez ao dia',    motivos: ['Anti-inflamatorio', 'Tratamento de alergias'] },
-    { nome: 'Omega 3',                       dosagem: '1 capsula',                    frequencia: 'Uma vez ao dia',    motivos: ['Suplementacao', 'Saude da pele e pelagem'] },
+    { nome: 'Omega 3',                       dosagem: '1 capsula',                    frequencia: 'Uma vez ao dia',    motivos: ['Suplementação', 'Saúde da pele e pelagem'] },
   ],
   CAVALO: [
     { nome: 'Ivermectina (pasta)',           dosagem: '200 mcg/kg',                   frequencia: 'A cada 6-8 semanas', motivos: ['Controle de parasitas internos'] },
-    { nome: 'Fenbendazol',                   dosagem: '5-10 mg/kg',                   frequencia: 'A cada 6-8 semanas', motivos: ['Vermifugacao'] },
+    { nome: 'Fenbendazol',                   dosagem: '5-10 mg/kg',                   frequencia: 'A cada 6-8 semanas', motivos: ['Vermifugação'] },
     { nome: 'Fenilbutazona',                 dosagem: '2,2-4,4 mg/kg',               frequencia: 'A cada 12-24 horas', motivos: ['Anti-inflamatorio', 'Dor musculoesqueletica'] },
     { nome: 'Flunixin Meglumine',            dosagem: '1,1 mg/kg',                    frequencia: 'A cada 12 horas',   motivos: ['Anti-inflamatorio', 'Colica', 'Dor'] },
   ],
@@ -498,7 +498,7 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
                 )}
               </>
             ) : (
-              <input className="pt-input" placeholder="Prevencao, tratamento..." value={form.motivo} onChange={(e) => setForm(f => ({ ...f, motivo: e.target.value }))} />
+              <input className="pt-input" placeholder="Prevenção, tratamento..." value={form.motivo} onChange={(e) => setForm(f => ({ ...f, motivo: e.target.value }))} />
             )}
           </div>
 
@@ -542,7 +542,7 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
           )}
           {inativos.length > 0 && (
             <>
-              <p className="text-xs text-texto-soft font-medium uppercase tracking-wider mt-2">Historico</p>
+              <p className="text-xs text-texto-soft font-medium uppercase tracking-wider mt-2">Histórico</p>
               {inativos.map((m) => (
                 <div key={m.id} className="bg-white rounded-xl p-4 opacity-60">
                   <div className="flex items-center gap-3">

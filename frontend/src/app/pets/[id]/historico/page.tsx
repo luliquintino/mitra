@@ -22,7 +22,7 @@ type FilterKey = 'TODOS' | 'SAUDE' | 'GUARDA' | 'CONSULTA' | 'ATIVIDADE';
 
 const FILTER_PILLS: { key: FilterKey; label: string; activeClass: string; icon: typeof Heart }[] = [
   { key: 'TODOS', label: 'Todos', activeClass: 'bg-primary text-white', icon: Tag },
-  { key: 'SAUDE', label: 'Saude', activeClass: 'bg-rose text-white', icon: Heart },
+  { key: 'SAUDE', label: 'Saúde', activeClass: 'bg-rose text-white', icon: Heart },
   { key: 'GUARDA', label: 'Guarda', activeClass: 'bg-primary text-white', icon: Shield },
   { key: 'CONSULTA', label: 'Consulta', activeClass: 'bg-teal text-white', icon: FileText },
   { key: 'ATIVIDADE', label: 'Atividade', activeClass: 'bg-amber text-white', icon: Calendar },
@@ -209,7 +209,7 @@ export default function HistoricoPage() {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="font-headline font-bold text-xl text-texto">Historico</h1>
+        <h1 className="font-headline font-bold text-xl text-texto">Histórico</h1>
         <p className="text-sm text-texto-soft mt-0.5">Acompanhe todos os eventos e momentos do seu pet</p>
       </div>
 
@@ -217,7 +217,7 @@ export default function HistoricoPage() {
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
         {[
           { id: 'timeline' as SubTab, label: 'Timeline', icon: Clock },
-          { id: 'diario' as SubTab, label: 'Diario', icon: Camera },
+          { id: 'diario' as SubTab, label: 'Diário', icon: Camera },
         ].map((t) => {
           const Icon = t.icon;
           return (
@@ -279,7 +279,7 @@ export default function HistoricoPage() {
                   Linha do tempo vazia
                 </p>
                 <p className="text-xs text-texto-soft mt-1 max-w-xs mx-auto">
-                  A linha do tempo da vida do seu pet aparecera aqui conforme os
+                  A linha do tempo da vida do seu pet aparecerá aqui conforme os
                   eventos forem registrados.
                 </p>
               </div>
@@ -367,7 +367,7 @@ export default function HistoricoPage() {
               {/* Bottom note */}
               <div className="text-center pt-2 pb-4">
                 <p className="text-xs text-texto-soft/50">
-                  Eventos sao imutaveis e nao podem ser editados ou deletados
+                  Eventos são imutáveis e não podem ser editados ou deletados
                 </p>
               </div>
             </div>
@@ -381,7 +381,7 @@ export default function HistoricoPage() {
           {/* Section heading */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-headline text-lg font-bold text-texto">Diario de Aventuras</h2>
+              <h2 className="font-headline text-lg font-bold text-texto">Diário de Aventuras</h2>
               <p className="text-sm text-texto-soft mt-0.5">Colecione momentos felizes com seu melhor amigo</p>
             </div>
             <button
@@ -408,7 +408,7 @@ export default function HistoricoPage() {
                   <Calendar className="w-4 h-4 text-primary" />
                 </div>
                 <p className="text-2xl font-headline font-bold text-texto">{thisMonthCount}</p>
-                <p className="text-[11px] text-texto-soft mt-1 leading-tight">Este mes</p>
+                <p className="text-[11px] text-texto-soft mt-1 leading-tight">Este mês</p>
               </div>
               <div className="mg-card-solid rounded-2xl p-4 text-center">
                 <div className="w-8 h-8 rounded-lg bg-amber/10 flex items-center justify-center mx-auto mb-2">

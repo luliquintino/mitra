@@ -32,57 +32,57 @@ type MedInfo = { nome: string; dosagem: string; frequencia: string; motivos: str
 
 const MEDICAMENTOS_POR_ESPECIE: Record<string, MedInfo[]> = {
   CACHORRO: [
-    { nome: 'Bravecto (Fluralaner)', dosagem: '1 comprimido (por peso)', frequencia: 'A cada 3 meses', motivos: ['Prevencao de pulgas e carrapatos'] },
-    { nome: 'Simparica (Sarolaner)', dosagem: '1 comprimido (por peso)', frequencia: 'Mensal', motivos: ['Prevencao de pulgas e carrapatos'] },
-    { nome: 'NexGard (Afoxolaner)', dosagem: '1 comprimido (por peso)', frequencia: 'Mensal', motivos: ['Prevencao de pulgas e carrapatos'] },
-    { nome: 'Milbemax (Milbemicina+Praz.)', dosagem: '1 comprimido (por peso)', frequencia: 'A cada 3 meses', motivos: ['Vermifugacao', 'Prevencao de vermes intestinais'] },
-    { nome: 'Drontal Plus', dosagem: '1 comprimido por 10 kg', frequencia: 'A cada 3 meses', motivos: ['Vermifugacao'] },
-    { nome: 'Heartgard (Ivermectina)', dosagem: '1 comprimido (por peso)', frequencia: 'Mensal', motivos: ['Prevencao de dirofilariose', 'Controle de parasitas internos'] },
-    { nome: 'Amoxicilina', dosagem: '10-20 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infeccao bacteriana', 'Antibioticoterapia'] },
-    { nome: 'Metronidazol', dosagem: '10-15 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infeccao gastrointestinal', 'Giardiase'] },
-    { nome: 'Prednisolona', dosagem: '1-2 mg/kg', frequencia: 'Uma vez ao dia', motivos: ['Anti-inflamatorio', 'Tratamento de alergias'] },
-    { nome: 'Omega 3', dosagem: '1 capsula', frequencia: 'Uma vez ao dia', motivos: ['Suplementacao', 'Saude da pele e pelagem'] },
+    { nome: 'Bravecto (Fluralaner)', dosagem: '1 comprimido (por peso)', frequencia: 'A cada 3 meses', motivos: ['Prevenção de pulgas e carrapatos'] },
+    { nome: 'Simparica (Sarolaner)', dosagem: '1 comprimido (por peso)', frequencia: 'Mensal', motivos: ['Prevenção de pulgas e carrapatos'] },
+    { nome: 'NexGard (Afoxolaner)', dosagem: '1 comprimido (por peso)', frequencia: 'Mensal', motivos: ['Prevenção de pulgas e carrapatos'] },
+    { nome: 'Milbemax (Milbemicina+Praz.)', dosagem: '1 comprimido (por peso)', frequencia: 'A cada 3 meses', motivos: ['Vermifugação', 'Prevenção de vermes intestinais'] },
+    { nome: 'Drontal Plus', dosagem: '1 comprimido por 10 kg', frequencia: 'A cada 3 meses', motivos: ['Vermifugação'] },
+    { nome: 'Heartgard (Ivermectina)', dosagem: '1 comprimido (por peso)', frequencia: 'Mensal', motivos: ['Prevenção de dirofilariose', 'Controle de parasitas internos'] },
+    { nome: 'Amoxicilina', dosagem: '10-20 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infecção bacteriana', 'Antibioticoterapia'] },
+    { nome: 'Metronidazol', dosagem: '10-15 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infecção gastrointestinal', 'Giardíase'] },
+    { nome: 'Prednisolona', dosagem: '1-2 mg/kg', frequencia: 'Uma vez ao dia', motivos: ['Anti-inflamatório', 'Tratamento de alergias'] },
+    { nome: 'Omega 3', dosagem: '1 capsula', frequencia: 'Uma vez ao dia', motivos: ['Suplementação', 'Saúde da pele e pelagem'] },
   ],
   GATO: [
     { nome: 'Revolution (Selamectina)', dosagem: '1 pipeta (por peso)', frequencia: 'Mensal', motivos: ['Prevencao de pulgas', 'Controle de parasitas'] },
-    { nome: 'Bravecto Plus', dosagem: '1 pipeta (por peso)', frequencia: 'A cada 2 meses', motivos: ['Prevencao de pulgas e carrapatos'] },
-    { nome: 'Profender (Emodepsida+Praz.)', dosagem: '1 pipeta (por peso)', frequencia: 'A cada 3 meses', motivos: ['Vermifugacao'] },
-    { nome: 'Milbemax Gato', dosagem: '1 comprimido (por peso)', frequencia: 'A cada 3 meses', motivos: ['Vermifugacao'] },
-    { nome: 'Amoxicilina', dosagem: '10-20 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infeccao bacteriana', 'Antibioticoterapia'] },
-    { nome: 'Prednisolona', dosagem: '1-2 mg/kg', frequencia: 'Uma vez ao dia', motivos: ['Anti-inflamatorio', 'Tratamento de alergias'] },
-    { nome: 'Omega 3', dosagem: '1 capsula', frequencia: 'Uma vez ao dia', motivos: ['Suplementacao', 'Saude da pele e pelagem'] },
+    { nome: 'Bravecto Plus', dosagem: '1 pipeta (por peso)', frequencia: 'A cada 2 meses', motivos: ['Prevenção de pulgas e carrapatos'] },
+    { nome: 'Profender (Emodepsida+Praz.)', dosagem: '1 pipeta (por peso)', frequencia: 'A cada 3 meses', motivos: ['Vermifugação'] },
+    { nome: 'Milbemax Gato', dosagem: '1 comprimido (por peso)', frequencia: 'A cada 3 meses', motivos: ['Vermifugação'] },
+    { nome: 'Amoxicilina', dosagem: '10-20 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infecção bacteriana', 'Antibioticoterapia'] },
+    { nome: 'Prednisolona', dosagem: '1-2 mg/kg', frequencia: 'Uma vez ao dia', motivos: ['Anti-inflamatório', 'Tratamento de alergias'] },
+    { nome: 'Omega 3', dosagem: '1 capsula', frequencia: 'Uma vez ao dia', motivos: ['Suplementação', 'Saúde da pele e pelagem'] },
   ],
   CAVALO: [
     { nome: 'Ivermectina (pasta)', dosagem: '200 mcg/kg', frequencia: 'A cada 6-8 semanas', motivos: ['Controle de parasitas internos'] },
-    { nome: 'Fenbendazol', dosagem: '5-10 mg/kg', frequencia: 'A cada 6-8 semanas', motivos: ['Vermifugacao'] },
-    { nome: 'Fenilbutazona', dosagem: '2,2-4,4 mg/kg', frequencia: 'A cada 12-24 horas', motivos: ['Anti-inflamatorio', 'Dor musculoesqueletica'] },
-    { nome: 'Flunixin Meglumine', dosagem: '1,1 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Anti-inflamatorio', 'Colica', 'Dor'] },
+    { nome: 'Fenbendazol', dosagem: '5-10 mg/kg', frequencia: 'A cada 6-8 semanas', motivos: ['Vermifugação'] },
+    { nome: 'Fenilbutazona', dosagem: '2,2-4,4 mg/kg', frequencia: 'A cada 12-24 horas', motivos: ['Anti-inflamatório', 'Dor musculoesquelética'] },
+    { nome: 'Flunixin Meglumine', dosagem: '1,1 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Anti-inflamatório', 'Cólica', 'Dor'] },
   ],
   PEIXE: [
-    { nome: 'Sal de cozinha (NaCl)', dosagem: '1-3 g/L de agua', frequencia: 'Banho de 5-30 min', motivos: ['Tratamento de infeccoes externas', 'Estresse'] },
-    { nome: 'Methylene Blue', dosagem: '1-3 mg/L', frequencia: 'Por 3-5 dias', motivos: ['Tratamento de fungos e bacterias'] },
+    { nome: 'Sal de cozinha (NaCl)', dosagem: '1-3 g/L de agua', frequencia: 'Banho de 5-30 min', motivos: ['Tratamento de infecções externas', 'Estresse'] },
+    { nome: 'Methylene Blue', dosagem: '1-3 mg/L', frequencia: 'Por 3-5 dias', motivos: ['Tratamento de fungos e bactérias'] },
   ],
   PASSARO: [
-    { nome: 'Ivermectina (solucao)', dosagem: '0,2 mg/kg', frequencia: 'A cada 30 dias', motivos: ['Controle de parasitas externos'] },
-    { nome: 'Espiramicina + Metronidazol', dosagem: 'Conforme bula', frequencia: 'Por 5-7 dias', motivos: ['Tricomoniase', 'Infeccao bacteriana'] },
+    { nome: 'Ivermectina (solução)', dosagem: '0,2 mg/kg', frequencia: 'A cada 30 dias', motivos: ['Controle de parasitas externos'] },
+    { nome: 'Espiramicina + Metronidazol', dosagem: 'Conforme bula', frequencia: 'Por 5-7 dias', motivos: ['Tricomoníase', 'Infecção bacteriana'] },
   ],
   ROEDOR: [
-    { nome: 'Ivermectina', dosagem: '0,2-0,4 mg/kg', frequencia: 'A cada 14 dias', motivos: ['Controle de acaros e parasitas'] },
-    { nome: 'Enrofloxacino', dosagem: '5-10 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infeccao bacteriana', 'Antibioticoterapia'] },
+    { nome: 'Ivermectina', dosagem: '0,2-0,4 mg/kg', frequencia: 'A cada 14 dias', motivos: ['Controle de ácaros e parasitas'] },
+    { nome: 'Enrofloxacino', dosagem: '5-10 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infecção bacteriana', 'Antibioticoterapia'] },
   ],
   COELHO: [
     { nome: 'Ivermectina', dosagem: '0,2-0,4 mg/kg', frequencia: 'A cada 14 dias', motivos: ['Controle de parasitas'] },
-    { nome: 'Meloxicam', dosagem: '0,3-0,6 mg/kg', frequencia: 'Uma vez ao dia', motivos: ['Anti-inflamatorio', 'Dor'] },
-    { nome: 'Enrofloxacino', dosagem: '5-10 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infeccao bacteriana', 'Antibioticoterapia'] },
+    { nome: 'Meloxicam', dosagem: '0,3-0,6 mg/kg', frequencia: 'Uma vez ao dia', motivos: ['Anti-inflamatório', 'Dor'] },
+    { nome: 'Enrofloxacino', dosagem: '5-10 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infecção bacteriana', 'Antibioticoterapia'] },
   ],
   REPTIL: [
-    { nome: 'Ivermectina (topica)', dosagem: 'Conforme peso', frequencia: 'A cada 14 dias', motivos: ['Controle de parasitas externos'] },
-    { nome: 'Metronidazol', dosagem: '20-50 mg/kg', frequencia: 'A cada 48 horas', motivos: ['Parasitas intestinais', 'Infeccao por protozoarios'] },
+    { nome: 'Ivermectina (tópica)', dosagem: 'Conforme peso', frequencia: 'A cada 14 dias', motivos: ['Controle de parasitas externos'] },
+    { nome: 'Metronidazol', dosagem: '20-50 mg/kg', frequencia: 'A cada 48 horas', motivos: ['Parasitas intestinais', 'Infecção por protozoários'] },
   ],
   FURAO: [
     { nome: 'Ivermectina', dosagem: '0,2-0,4 mg/kg', frequencia: 'A cada 14 dias', motivos: ['Controle de parasitas'] },
-    { nome: 'Prednisolona', dosagem: '1-2 mg/kg', frequencia: 'Uma vez ao dia', motivos: ['Anti-inflamatorio', 'Insulinoma'] },
-    { nome: 'Amoxicilina', dosagem: '10-20 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infeccao bacteriana', 'Antibioticoterapia'] },
+    { nome: 'Prednisolona', dosagem: '1-2 mg/kg', frequencia: 'Uma vez ao dia', motivos: ['Anti-inflamatório', 'Insulinoma'] },
+    { nome: 'Amoxicilina', dosagem: '10-20 mg/kg', frequencia: 'A cada 12 horas', motivos: ['Infecção bacteriana', 'Antibioticoterapia'] },
   ],
   OUTRO: [],
 };
@@ -90,11 +90,11 @@ const MEDICAMENTOS_POR_ESPECIE: Record<string, MedInfo[]> = {
 const VACINAS_POR_ESPECIE: Record<string, string[]> = {
   CACHORRO: ['V8 (Polivalente)', 'V10 (Polivalente)', 'Antirrabica', 'Gripe Canina (Bordetella)', 'Leishmaniose', 'Giardia', 'Leptospirose'],
   GATO: ['Triplice Felina (FPV/FHV/FCV)', 'Quadrupla Felina', 'Antirrabica', 'Leucemia Felina (FeLV)', 'FIV/FeLV Combo'],
-  CAVALO: ['Influenza Equina', 'Tetano', 'Encefalomielite', 'Raiva Equina', 'Herpesvirus Equino', 'Botulismo'],
+  CAVALO: ['Influenza Equina', 'Tétano', 'Encefalomielite', 'Raiva Equina', 'Herpesvírus Equino', 'Botulismo'],
   PEIXE: [],
-  PASSARO: ['Doenca de Newcastle', 'Variola Aviaria', 'Marek'],
+  PASSARO: ['Doença de Newcastle', 'Varíola Aviária', 'Marek'],
   ROEDOR: [],
-  COELHO: ['Mixomatose', 'Doenca Hemorragica Viral (RHD)', 'RHD2'],
+  COELHO: ['Mixomatose', 'Doença Hemorrágica Viral (RHD)', 'RHD2'],
   REPTIL: [],
   FURAO: ['Antirrabica', 'Distemper (CDV)'],
   OUTRO: [],
@@ -162,7 +162,7 @@ const SUBTABS: { id: SubTab; label: string; emoji?: string }[] = [
   { id: 'vacinas', label: 'Vacinas' },
   { id: 'medicamentos', label: 'Medicamentos' },
   { id: 'sintomas', label: 'Sintomas' },
-  { id: 'plano', label: 'Plano de Saude' },
+  { id: 'plano', label: 'Plano de Saúde' },
   { id: 'consultas', label: 'Consultas' },
 ];
 
@@ -251,17 +251,17 @@ function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mg-label">Data de aplicacao *</label>
+              <label className="mg-label">Data de aplicação *</label>
               <input type="date" className="mg-input" value={form.dataAplicacao} onChange={(e) => setForm(f => ({ ...f, dataAplicacao: e.target.value }))} required />
             </div>
             <div>
-              <label className="mg-label">Proxima dose</label>
+              <label className="mg-label">Próxima dose</label>
               <input type="date" className="mg-input" value={form.proximaDose} onChange={(e) => setForm(f => ({ ...f, proximaDose: e.target.value }))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mg-label">Veterinario</label>
+              <label className="mg-label">Veterinário</label>
               <input className="mg-input" placeholder="Dr. Silva" value={form.veterinario} onChange={(e) => setForm(f => ({ ...f, veterinario: e.target.value }))} />
             </div>
             <div>
@@ -275,7 +275,7 @@ function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
               <input className="mg-input" placeholder="ABC123" value={form.lote} onChange={(e) => setForm(f => ({ ...f, lote: e.target.value }))} />
             </div>
             <div>
-              <label className="mg-label">Clinica</label>
+              <label className="mg-label">Clínica</label>
               <input className="mg-input" placeholder="VetCare" value={form.clinica} onChange={(e) => setForm(f => ({ ...f, clinica: e.target.value }))} />
             </div>
           </div>
@@ -288,7 +288,7 @@ function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
       )}
 
       {initialVacinas.length === 0 ? (
-        <EmptyState icon="&#128137;" title="Nenhuma vacina registrada" description="Registre as vacinas do seu pet para manter o historico de imunizacao." />
+        <EmptyState icon="&#128137;" title="Nenhuma vacina registrada" description="Registre as vacinas do seu pet para manter o histórico de imunização." />
       ) : (
         <div className="space-y-3">
           {initialVacinas.map((v) => {
@@ -317,7 +317,7 @@ function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
                   </div>
                   {v.proximaDose && (
                     <div className="text-right flex-shrink-0">
-                      <p className="text-xs text-texto-soft font-body">Proxima dose</p>
+                      <p className="text-xs text-texto-soft font-body">Próxima dose</p>
                       <p className={cn(
                         'text-xs font-semibold mt-0.5',
                         alert === 'overdue' ? 'text-rose-500' : alert === 'soon' ? 'text-amber-500' : 'text-primary',
@@ -407,7 +407,7 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
       onUpdate();
       setTimeout(() => setConfirmation(''), 4000);
     } catch {
-      setConfirmation('Erro ao registrar administracao. Tente novamente.');
+      setConfirmation('Erro ao registrar administração. Tente novamente.');
       setTimeout(() => setConfirmation(''), 4000);
     }
   };
@@ -448,7 +448,7 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
             medFilter === 'HISTORICO' ? 'bg-primary text-white' : 'mg-card-solid text-texto-soft',
           )}
         >
-          Concluidos ({inativos.length})
+          Concluídos ({inativos.length})
         </button>
       </div>
 
@@ -478,12 +478,12 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
               <input className="mg-input" placeholder="1 comprimido" value={form.dosagem} onChange={(e) => setForm(f => ({ ...f, dosagem: e.target.value }))} required />
             </div>
             <div>
-              <label className="mg-label">Frequencia *{selectedMedInfo && <span className="ml-1 text-primary font-normal">(bula)</span>}</label>
+              <label className="mg-label">Frequência *{selectedMedInfo && <span className="ml-1 text-primary font-normal">(bula)</span>}</label>
               <input className="mg-input" placeholder="A cada 3 meses" value={form.frequencia} onChange={(e) => setForm(f => ({ ...f, frequencia: e.target.value }))} required />
             </div>
           </div>
           <div>
-            <label className="mg-label">Data de inicio *</label>
+            <label className="mg-label">Data de início *</label>
             <input type="date" className="mg-input" value={form.dataInicio} onChange={(e) => setForm(f => ({ ...f, dataInicio: e.target.value }))} required />
           </div>
           <div className="space-y-2">
@@ -500,7 +500,7 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
                 )}
               </>
             ) : (
-              <input className="mg-input" placeholder="Prevencao, tratamento..." value={form.motivo} onChange={(e) => setForm(f => ({ ...f, motivo: e.target.value }))} />
+              <input className="mg-input" placeholder="Prevenção, tratamento..." value={form.motivo} onChange={(e) => setForm(f => ({ ...f, motivo: e.target.value }))} />
             )}
           </div>
           {saveError && <p className="text-xs text-rose-500">{saveError}</p>}
@@ -514,8 +514,8 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
       {displayList.length === 0 ? (
         <EmptyState
           icon="&#128138;"
-          title={medFilter === 'ATIVO' ? 'Nenhum medicamento ativo' : 'Nenhum medicamento concluido'}
-          description={medFilter === 'ATIVO' ? 'Registre os medicamentos em uso para acompanhar o tratamento.' : 'Medicamentos concluidos ou cancelados aparecem aqui.'}
+          title={medFilter === 'ATIVO' ? 'Nenhum medicamento ativo' : 'Nenhum medicamento concluído'}
+          description={medFilter === 'ATIVO' ? 'Registre os medicamentos em uso para acompanhar o tratamento.' : 'Medicamentos concluídos ou cancelados aparecem aqui.'}
         />
       ) : (
         <div className="space-y-3">
@@ -531,13 +531,13 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
                     <p className="text-xs text-texto-soft font-body mt-0.5">{m.dosagem} &middot; {m.frequencia}</p>
                     {m.motivo && <p className="text-xs text-texto-soft font-body mt-0.5">{m.motivo}</p>}
                     {medFilter !== 'ATIVO' && (
-                      <p className="text-xs text-texto-soft font-body mt-0.5">{m.status === 'CONCLUIDO' ? 'Concluido' : 'Cancelado'} &middot; {formatDate(m.dataInicio)}</p>
+                      <p className="text-xs text-texto-soft font-body mt-0.5">{m.status === 'CONCLUIDO' ? 'Concluído' : 'Cancelado'} &middot; {formatDate(m.dataInicio)}</p>
                     )}
                     <span className={cn(
                       'inline-block mt-1 mg-badge text-[10px]',
                       m.status === 'ATIVO' ? 'mg-badge-success' : m.status === 'CONCLUIDO' ? 'mg-badge-info' : 'mg-badge-error',
                     )}>
-                      {m.status === 'ATIVO' ? 'Ativo' : m.status === 'CONCLUIDO' ? 'Concluido' : 'Cancelado'}
+                      {m.status === 'ATIVO' ? 'Ativo' : m.status === 'CONCLUIDO' ? 'Concluído' : 'Cancelado'}
                     </span>
                   </div>
                 </div>
@@ -588,7 +588,7 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
         return;
       }
       if (!file.type.startsWith('image/')) {
-        setSaveError(`Arquivo ${file.name} nao e uma imagem.`);
+        setSaveError(`Arquivo ${file.name} não é uma imagem.`);
         return;
       }
       const reader = new FileReader();
@@ -654,12 +654,12 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
         <form onSubmit={handleSave} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Novo sintoma</h3>
           <div>
-            <label className="mg-label">Descricao *</label>
+            <label className="mg-label">Descrição *</label>
             <textarea className="mg-input resize-none" rows={2} placeholder="Descreva o sintoma..." value={form.descricao} onChange={(e) => setForm(f => ({ ...f, descricao: e.target.value }))} required />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mg-label">Data de inicio *</label>
+              <label className="mg-label">Data de início *</label>
               <input type="date" className="mg-input" value={form.dataInicio} onChange={(e) => setForm(f => ({ ...f, dataInicio: e.target.value }))} required />
             </div>
             <div>
@@ -675,14 +675,14 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
             </select>
           </div>
           <div>
-            <label className="mg-label">Observacoes</label>
-            <textarea className="mg-input resize-none" rows={2} placeholder="Observacoes adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
+            <label className="mg-label">Observações</label>
+            <textarea className="mg-input resize-none" rows={2} placeholder="Observações adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
           </div>
 
           {/* Photo upload */}
           <div>
             <label className="mg-label">Fotos do sintoma</label>
-            <p className="text-[11px] text-texto-soft font-body mb-2">Anexe ate 5 fotos para ajudar a veterinaria a analisar. Max 5MB cada.</p>
+            <p className="text-[11px] text-texto-soft font-body mb-2">Anexe até 5 fotos para ajudar a veterinária a analisar. Max 5MB cada.</p>
 
             {/* Preview grid */}
             {fotos.length > 0 && (
@@ -731,7 +731,7 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
       )}
 
       {initialSintomas.length === 0 ? (
-        <EmptyState icon="&#129658;" title="Nenhum sintoma registrado" description="Registre sintomas para manter o historico de saude do seu pet." />
+        <EmptyState icon="&#129658;" title="Nenhum sintoma registrado" description="Registre sintomas para manter o histórico de saúde do seu pet." />
       ) : (
         <div className="space-y-3">
           {abertos.length > 0 && (
@@ -773,7 +773,7 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
                               <img
                                 key={idx}
                                 src={src}
-                                alt={`Evidencia ${idx + 1}`}
+                                alt={`Evidência ${idx + 1}`}
                                 className="w-16 h-16 rounded-lg object-cover border border-white/50 cursor-pointer hover:border-primary hover:shadow-md transition-all"
                                 onClick={() => setLightbox(src)}
                               />
@@ -818,7 +818,7 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
                               <img
                                 key={idx}
                                 src={src}
-                                alt={`Evidencia ${idx + 1}`}
+                                alt={`Evidência ${idx + 1}`}
                                 className="w-14 h-14 rounded-lg object-cover border border-white/30 cursor-pointer hover:border-primary transition-all"
                                 onClick={() => setLightbox(src)}
                               />
@@ -842,7 +842,7 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
           onClick={() => setLightbox(null)}
         >
           <div className="relative max-w-lg max-h-[80vh]" onClick={e => e.stopPropagation()}>
-            <img src={lightbox} alt="Evidencia ampliada" className="max-w-full max-h-[80vh] rounded-2xl object-contain shadow-2xl" />
+            <img src={lightbox} alt="Evidência ampliada" className="max-w-full max-h-[80vh] rounded-2xl object-contain shadow-2xl" />
             <button
               onClick={() => setLightbox(null)}
               className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm text-texto shadow-lg flex items-center justify-center hover:bg-white transition-colors"
@@ -906,12 +906,12 @@ function PlanoSaudeTab({ petId, plano, onUpdate }: {
         coberturas: form.coberturas ? form.coberturas.split(',').map(s => s.trim()).filter(Boolean) : [],
         observacoes: form.observacoes || undefined,
       });
-      setConfirmation((data as any).mensagem || 'Plano de saude atualizado!');
+      setConfirmation((data as any).mensagem || 'Plano de saúde atualizado!');
       setEditing(false);
       onUpdate();
       setTimeout(() => setConfirmation(''), 4000);
     } catch (err: any) {
-      setSaveError(err?.response?.data?.message || 'Erro ao salvar plano de saude.');
+      setSaveError(err?.response?.data?.message || 'Erro ao salvar plano de saúde.');
     } finally {
       setSaving(false);
     }
@@ -940,13 +940,13 @@ function PlanoSaudeTab({ petId, plano, onUpdate }: {
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {plano.numeroCartao && (
                   <div>
-                    <p className="text-xs text-texto-soft font-body">Numero do cartao</p>
+                    <p className="text-xs text-texto-soft font-body">Número do cartão</p>
                     <p className="font-medium text-texto">{plano.numeroCartao}</p>
                   </div>
                 )}
                 {plano.dataVigencia && (
                   <div>
-                    <p className="text-xs text-texto-soft font-body">Vigencia</p>
+                    <p className="text-xs text-texto-soft font-body">Vigência</p>
                     <p className="font-medium text-texto">{formatDate(plano.dataVigencia)}</p>
                   </div>
                 )}
@@ -969,31 +969,31 @@ function PlanoSaudeTab({ petId, plano, onUpdate }: {
               )}
               {plano.observacoes && (
                 <div>
-                  <p className="text-xs text-texto-soft font-body">Observacoes</p>
+                  <p className="text-xs text-texto-soft font-body">Observações</p>
                   <p className="text-sm text-texto font-body">{plano.observacoes}</p>
                 </div>
               )}
             </div>
           ) : (
-            <EmptyState icon="&#127973;" title="Nenhum plano de saude cadastrado" description="Cadastre o plano de saude do seu pet." />
+            <EmptyState icon="&#127973;" title="Nenhum plano de saúde cadastrado" description="Cadastre o plano de saúde do seu pet." />
           )}
           {!plano && (
             <button onClick={startEdit} className="mg-btn w-full text-sm flex items-center justify-center gap-1.5">
               <Plus className="w-4 h-4" />
-              Cadastrar plano de saude
+              Cadastrar plano de saúde
             </button>
           )}
         </>
       ) : (
         <form onSubmit={handleSave} className="mg-card space-y-3">
-          <h3 className="font-headline font-semibold text-texto text-sm">{plano ? 'Editar plano de saude' : 'Novo plano de saude'}</h3>
+          <h3 className="font-headline font-semibold text-texto text-sm">{plano ? 'Editar plano de saúde' : 'Novo plano de saúde'}</h3>
           <div>
             <label className="mg-label">Operadora *</label>
             <input className="mg-input" placeholder="Porto Seguro, SulAmerica..." value={form.operadora} onChange={(e) => setForm(f => ({ ...f, operadora: e.target.value }))} required />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mg-label">Numero do cartao</label>
+              <label className="mg-label">Número do cartão</label>
               <input className="mg-input" placeholder="1234-5678" value={form.numeroCartao} onChange={(e) => setForm(f => ({ ...f, numeroCartao: e.target.value }))} />
             </div>
             <div>
@@ -1003,7 +1003,7 @@ function PlanoSaudeTab({ petId, plano, onUpdate }: {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mg-label">Vigencia</label>
+              <label className="mg-label">Vigência</label>
               <input type="date" className="mg-input" value={form.dataVigencia} onChange={(e) => setForm(f => ({ ...f, dataVigencia: e.target.value }))} />
             </div>
             <div>
@@ -1016,8 +1016,8 @@ function PlanoSaudeTab({ petId, plano, onUpdate }: {
             <input className="mg-input" placeholder="Consultas, exames, cirurgias..." value={form.coberturas} onChange={(e) => setForm(f => ({ ...f, coberturas: e.target.value }))} />
           </div>
           <div>
-            <label className="mg-label">Observacoes</label>
-            <textarea className="mg-input resize-none" rows={2} placeholder="Observacoes adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
+            <label className="mg-label">Observações</label>
+            <textarea className="mg-input resize-none" rows={2} placeholder="Observações adicionais..." value={form.observacoes} onChange={(e) => setForm(f => ({ ...f, observacoes: e.target.value }))} />
           </div>
           {saveError && <p className="text-xs text-rose-500">{saveError}</p>}
           <div className="flex gap-2 pt-1">
@@ -1058,7 +1058,7 @@ function ConsultasTab({ compromissos }: { compromissos: Compromisso[] }) {
     <div className="space-y-4 animate-fade-in">
       {upcoming.length > 0 && (
         <>
-          <p className="text-xs text-texto-soft font-headline font-medium uppercase tracking-wider">Proximas consultas</p>
+          <p className="text-xs text-texto-soft font-headline font-medium uppercase tracking-wider">Próximas consultas</p>
           <div className="space-y-3">
             {upcoming.map(c => (
               <div key={c.id} className="mg-card-solid rounded-xl p-4">
@@ -1113,8 +1113,8 @@ function ConsultasTab({ compromissos }: { compromissos: Compromisso[] }) {
 const BADGE_DEFS = [
   { id: 'primeira', icon: '🛡️', label: 'Primeira vacina', check: (applied: number) => applied >= 1 },
   { id: 'dia', icon: '💉', label: 'Dia em dia', check: (_a: number, _t: number, overdue: number) => overdue === 0 && _a > 0 },
-  { id: 'total', icon: '🏆', label: 'Protecao total', check: (applied: number, total: number) => total > 0 && applied >= total },
-  { id: 'vet', icon: '⭐', label: 'Vet de confianca', check: (_a: number, _t: number, _o: number, hasVet: boolean) => hasVet },
+  { id: 'total', icon: '🏆', label: 'Proteção total', check: (applied: number, total: number) => total > 0 && applied >= total },
+  { id: 'vet', icon: '⭐', label: 'Vet de confiança', check: (_a: number, _t: number, _o: number, hasVet: boolean) => hasVet },
 ] as const;
 
 function ProtectionRing({ percentage }: { percentage: number }) {
@@ -1190,7 +1190,7 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
   const totalProtected = allRecommended.filter(name => protectedNames.has(normalize(name))).length;
   const percentage = totalRecommended > 0 ? Math.round((totalProtected / totalRecommended) * 100) : 0;
 
-  const protectionLabel = percentage < 40 ? 'Protecao inicial' : percentage < 70 ? 'Bem protegido' : 'Imunizacao completa';
+  const protectionLabel = percentage < 40 ? 'Proteção inicial' : percentage < 70 ? 'Bem protegido' : 'Imunização completa';
   const protectionEmoji = percentage < 40 ? '🛡️' : percentage < 70 ? '💪' : '🏆';
 
   // Overdue count
@@ -1371,7 +1371,7 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
                   {nextAgendamento
                     ? `${nextAgendamento.nomeVacina} em ${formatDate(nextAgendamento.dataAgendada)}`
                     : nextVacina
-                      ? `Proxima: ${nextVacina.nome} em ${formatDate(nextVacina.proximaDose!)}`
+                      ? `Próxima: ${nextVacina.nome} em ${formatDate(nextVacina.proximaDose!)}`
                       : ''
                   }
                 </span>
@@ -1510,7 +1510,7 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
                     {v.lote && <p className="text-[11px] text-texto-soft font-body">Lote {v.lote}</p>}
                     {v.proximaDose && (
                       <p className={cn('text-[11px] font-medium', alert === 'overdue' ? 'text-rose' : alert === 'soon' ? 'text-amber' : 'text-teal')}>
-                        Proxima: {formatDate(v.proximaDose)}
+                        Próxima: {formatDate(v.proximaDose)}
                       </p>
                     )}
                   </div>
@@ -1718,7 +1718,7 @@ export default function SaudePage() {
       setPlano(planoRes.data as PlanoSaude | null);
       setCompromissos(Array.isArray(compRes.data) ? compRes.data : []);
     } catch (err) {
-      console.error('Erro ao carregar dados de saude:', err);
+      console.error('Erro ao carregar dados de saúde:', err);
     } finally {
       setLoading(false);
     }
@@ -1774,8 +1774,8 @@ export default function SaudePage() {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="font-headline text-xl font-bold text-texto">Saude</h1>
-        <p className="text-sm text-texto-soft font-body mt-0.5">Painel de saude de {pet?.nome || 'seu pet'}</p>
+        <h1 className="font-headline text-xl font-bold text-texto">Saúde</h1>
+        <p className="text-sm text-texto-soft font-body mt-0.5">Painel de saúde de {pet?.nome || 'seu pet'}</p>
       </div>
 
       {/* Stat Cards */}

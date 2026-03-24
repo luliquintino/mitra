@@ -233,7 +233,7 @@ export default function GuardaPage() {
       {/* Section header */}
       <div>
         <h2 className="font-headline font-bold text-xl text-texto">Guarda</h2>
-        <p className="text-sm text-texto-soft font-body">Gerencie a guarda e custodia do pet</p>
+        <p className="text-sm text-texto-soft font-body">Gerencie a guarda e custódia do pet</p>
       </div>
 
       {/* ── 1. GUARDA ATUAL ──────────────────────────────────────────────────── */}
@@ -292,7 +292,7 @@ export default function GuardaPage() {
             <AlertCircle className="w-4 h-4 text-amber" />
           </div>
           <h3 className="font-headline text-lg font-bold text-texto">
-            Solicitacoes Pendentes
+            Solicitações Pendentes
           </h3>
         </div>
 
@@ -300,7 +300,7 @@ export default function GuardaPage() {
           <div className="mg-card-solid rounded-xl py-8 flex flex-col items-center gap-2">
             <Check className="w-8 h-8 text-texto-soft/40" />
             <p className="text-sm text-texto-soft font-body text-center">
-              Nenhuma solicitacao pendente
+              Nenhuma solicitação pendente
             </p>
           </div>
         ) : (
@@ -361,7 +361,7 @@ export default function GuardaPage() {
                         className="mg-btn text-sm"
                       >
                         <Check className="w-3.5 h-3.5" />
-                        Confirmar Aprovacao
+                        Confirmar Aprovação
                       </button>
                       <button
                         onClick={() => handleResponder(sol.id, 'RECUSAR')}
@@ -374,7 +374,7 @@ export default function GuardaPage() {
                         onClick={() => handleResponder(sol.id, 'SUGERIR')}
                         className="mg-btn-ghost text-sm"
                       >
-                        Enviar Sugestao
+                        Enviar Sugestão
                       </button>
                       <button
                         onClick={() => {
@@ -425,7 +425,7 @@ export default function GuardaPage() {
               <Clock className="w-4 h-4 text-teal" />
             </div>
             <h3 className="font-headline text-lg font-bold text-texto">
-              Guardas Temporarias
+              Guardas Temporárias
             </h3>
           </div>
           <button
@@ -449,9 +449,9 @@ export default function GuardaPage() {
         {/* Inline form */}
         {showForm && (
           <div className="space-y-3 mg-card-solid rounded-xl p-5">
-            <h4 className="font-headline font-bold text-texto text-sm">Nova guarda temporaria</h4>
+            <h4 className="font-headline font-bold text-texto text-sm">Nova guarda temporária</h4>
             <div>
-              <label className="mg-label">Responsavel</label>
+              <label className="mg-label">Responsável</label>
               <select
                 className="mg-select"
                 value={formData.responsavelId}
@@ -472,7 +472,7 @@ export default function GuardaPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mg-label">Data Inicio</label>
+                <label className="mg-label">Data Início</label>
                 <input
                   type="date"
                   className="mg-input"
@@ -496,11 +496,11 @@ export default function GuardaPage() {
             </div>
 
             <div>
-              <label className="mg-label">Observacoes</label>
+              <label className="mg-label">Observações</label>
               <textarea
                 className="mg-input resize-none"
                 rows={2}
-                placeholder="Observacoes opcionais..."
+                placeholder="Observações opcionais..."
                 value={formData.observacoes}
                 onChange={(e) =>
                   setFormData({ ...formData, observacoes: e.target.value })
@@ -517,7 +517,7 @@ export default function GuardaPage() {
                   'opacity-40 cursor-not-allowed',
               )}
             >
-              {formLoading ? 'Criando...' : 'Criar Guarda Temporaria'}
+              {formLoading ? 'Criando...' : 'Criar Guarda Temporária'}
             </button>
           </div>
         )}
@@ -527,7 +527,7 @@ export default function GuardaPage() {
           <div className="mg-card-solid rounded-xl py-8 flex flex-col items-center gap-2">
             <Calendar className="w-8 h-8 text-texto-soft/40" />
             <p className="text-sm text-texto-soft font-body text-center">
-              Nenhuma guarda temporaria registrada
+              Nenhuma guarda temporária registrada
             </p>
           </div>
         ) : (
@@ -605,7 +605,7 @@ export default function GuardaPage() {
             <FileText className="w-4 h-4 text-rose" />
           </div>
           <h3 className="font-headline text-lg font-bold text-texto">
-            Historico de Trocas
+            Histórico de Trocas
           </h3>
         </div>
 

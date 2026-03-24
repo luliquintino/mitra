@@ -30,8 +30,8 @@ const INVITE_ROLES = [
 const PRESTADOR_ROLES = ['VETERINARIO', 'ADESTRADOR', 'PASSEADOR'];
 
 const PERMISSAO_LABELS: Record<PermissaoVisitante, string> = {
-  DADOS_BASICOS: 'Dados basicos',
-  STATUS_SAUDE: 'Saude',
+  DADOS_BASICOS: 'Dados básicos',
+  STATUS_SAUDE: 'Saúde',
   HISTORICO_VACINACAO: 'Vacinas',
   MEDICAMENTOS: 'Medicamentos',
   AGENDA_CONSULTAS: 'Consultas',
@@ -350,7 +350,7 @@ function VisitantesTab({
         <EmptyState
           icon="👁️"
           title="Funcionalidade em breve"
-          description="O sistema de visitantes esta sendo finalizado. Em breve voce podera convidar visitantes para acompanhar o pet."
+          description="O sistema de visitantes está sendo finalizado. Em breve você poderá convidar visitantes para acompanhar o pet."
         />
       </div>
     );
@@ -388,7 +388,7 @@ function VisitantesTab({
         <EmptyState
           icon="👁️"
           title="Nenhum visitante vinculado"
-          description="Visitantes podem visualizar informacoes do pet com permissoes limitadas."
+          description="Visitantes podem visualizar informações do pet com permissões limitadas."
         />
       ) : (
         <div className="space-y-2">

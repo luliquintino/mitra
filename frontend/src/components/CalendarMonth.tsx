@@ -13,11 +13,11 @@ interface CalendarMonthProps {
 }
 
 const MONTH_NAMES = [
-  'Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho',
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
 ];
 
-const WEEKDAY_HEADERS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
+const WEEKDAY_HEADERS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
 function getCalendarDays(month: number, year: number): (number | null)[] {
   const firstDay = new Date(year, month, 1).getDay();
@@ -64,7 +64,7 @@ export function CalendarMonth({
         <button
           onClick={handlePrev}
           className="w-9 h-9 rounded-xl bg-white text-primary shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center"
-          aria-label="Mes anterior"
+          aria-label="Mês anterior"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -74,7 +74,7 @@ export function CalendarMonth({
         <button
           onClick={handleNext}
           className="w-9 h-9 rounded-xl bg-white text-primary shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center"
-          aria-label="Proximo mes"
+          aria-label="Próximo mês"
         >
           <ChevronRight className="w-4 h-4" />
         </button>

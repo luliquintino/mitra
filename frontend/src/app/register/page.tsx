@@ -21,10 +21,10 @@ import {
 
 type Passo = 1 | 2 | 3;
 
-const STEP_LABELS = ['Dados Basicos', 'Tipo de Usuario', 'Dados Profissionais'];
+const STEP_LABELS = ['Dados Básicos', 'Tipo de Usuário', 'Dados Profissionais'];
 
 const tiposServico = [
-  { valor: 'VETERINARIO', label: 'Veterinario' },
+  { valor: 'VETERINARIO', label: 'Veterinário' },
   { valor: 'PET_SITTER', label: 'Pet Sitter' },
   { valor: 'DAY_CARE', label: 'Day Care' },
   { valor: 'ADESTRADOR', label: 'Adestrador' },
@@ -38,7 +38,7 @@ export default function RegisterPage() {
   const [passo, setPasso] = useState<Passo>(1);
   const [tipoUsuario, setTipoUsuario] = useState('');
 
-  // Passo 1: Dados basicos
+  // Passo 1: Dados básicos
   const [form, setForm] = useState({
     nome: '',
     email: '',
@@ -99,7 +99,7 @@ export default function RegisterPage() {
       !formPro.endereco ||
       !formPro.descricao
     ) {
-      setError('Preencha todos os campos obrigatorios');
+      setError('Preencha todos os campos obrigatórios');
       return;
     }
 
@@ -129,28 +129,28 @@ export default function RegisterPage() {
     {
       id: 'TUTOR',
       label: 'Sou Tutor',
-      descricao: 'Tenho pet(s) e quero gerencia-los',
+      descricao: 'Tenho pet(s) e quero gerenciá-los',
       icon: Dog,
     },
     {
       id: 'PRESTADOR',
       label: 'Sou Prestador',
-      descricao: 'Veterinario, pet sitter, adestrador, etc',
+      descricao: 'Veterinário, pet sitter, adestrador, etc',
       icon: Stethoscope,
     },
     {
       id: 'AMBOS',
       label: 'Ambos',
-      descricao: 'Tenho pets e tambem presto servicos',
+      descricao: 'Tenho pets e também presto serviços',
       icon: UserCheck,
     },
   ];
 
   // Step heading data
   const stepHeadings: Record<Passo, { title: string; subtitle: string }> = {
-    1: { title: 'Criar conta', subtitle: 'Comece com suas informacoes basicas' },
-    2: { title: 'Tipo de usuario', subtitle: 'Escolha como voce deseja utilizar a MITRA' },
-    3: { title: 'Dados profissionais', subtitle: 'Conte-nos sobre seus servicos' },
+    1: { title: 'Criar conta', subtitle: 'Comece com suas informações básicas' },
+    2: { title: 'Tipo de usuário', subtitle: 'Escolha como você deseja utilizar a MITRA' },
+    3: { title: 'Dados profissionais', subtitle: 'Conte-nos sobre seus serviços' },
   };
 
   return (
@@ -232,7 +232,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* ===== PASSO 1: Dados Basicos ===== */}
+          {/* ===== PASSO 1: Dados Básicos ===== */}
           {passo === 1 && (
             <div className="animate-fade-in" key="step-1">
               <form onSubmit={handlePasso1} className="space-y-4">
@@ -299,7 +299,7 @@ export default function RegisterPage() {
                     <input
                       type="password"
                       className="mg-input pl-10"
-                      placeholder="Minimo 8 caracteres"
+                      placeholder="Mínimo 8 caracteres"
                       value={form.senha}
                       onChange={(e) => setForm((f) => ({ ...f, senha: e.target.value }))}
                       required
@@ -319,7 +319,7 @@ export default function RegisterPage() {
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <>
-                        Proximo
+                        Próximo
                         <ChevronRight className="w-4 h-4" />
                       </>
                     )}
@@ -329,7 +329,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* ===== PASSO 2: Tipo de Usuario ===== */}
+          {/* ===== PASSO 2: Tipo de Usuário ===== */}
           {passo === 2 && (
             <div className="animate-fade-in" key="step-2">
               <div className="space-y-3 mb-6">
@@ -396,7 +396,7 @@ export default function RegisterPage() {
                     </>
                   ) : (
                     <>
-                      Proximo
+                      Próximo
                       <ChevronRight className="w-4 h-4" />
                     </>
                   )}
@@ -409,9 +409,9 @@ export default function RegisterPage() {
           {passo === 3 && (
             <div className="animate-fade-in" key="step-3">
               <form onSubmit={handlePasso3} className="space-y-4">
-                {/* Tipo de servico */}
+                {/* Tipo de serviço */}
                 <div className="space-y-1.5">
-                  <label className="mg-label">Tipo de servico *</label>
+                  <label className="mg-label">Tipo de serviço *</label>
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                       <Briefcase className="w-4 h-4" />
@@ -482,13 +482,13 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Endereco */}
+                {/* Endereço */}
                 <div className="space-y-1.5">
-                  <label className="mg-label">Endereco *</label>
+                  <label className="mg-label">Endereço *</label>
                   <input
                     type="text"
                     className="mg-input"
-                    placeholder="Rua, numero, cidade, estado"
+                    placeholder="Rua, número, cidade, estado"
                     value={formPro.endereco}
                     onChange={(e) =>
                       setFormPro((f) => ({ ...f, endereco: e.target.value }))
@@ -519,13 +519,13 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Descricao */}
+                {/* Descrição */}
                 <div className="space-y-1.5">
-                  <label className="mg-label">Descricao do servico *</label>
+                  <label className="mg-label">Descrição do serviço *</label>
                   <textarea
                     className="mg-input resize-none"
                     rows={3}
-                    placeholder="Descreva seu servico, especialidades, etc"
+                    placeholder="Descreva seu serviço, especialidades, etc"
                     value={formPro.descricao}
                     onChange={(e) =>
                       setFormPro((f) => ({ ...f, descricao: e.target.value }))
@@ -580,7 +580,7 @@ export default function RegisterPage() {
           {/* Login link - only on step 1 */}
           {passo === 1 && (
             <p className="text-center text-gray-500 font-body text-sm pt-1">
-              Ja tem conta?{' '}
+              Já tem conta?{' '}
               <Link
                 href="/login"
                 className="text-[#7C3AED] font-bold hover:underline transition-colors"

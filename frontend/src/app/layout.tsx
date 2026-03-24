@@ -25,12 +25,12 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'MITRA — Gestao completa do pet',
-  description: 'Saude, guarda, historico e governanca do seu pet num unico lugar. Organizacao e tranquilidade para tutores, prestadores e familiares.',
-  keywords: ['pet', 'gestao', 'saude animal', 'guarda compartilhada', 'veterinario', 'tutor'],
+  title: 'MITRA — Gestão completa do pet',
+  description: 'Saúde, guarda, histórico e governança do seu pet num único lugar. Organização e tranquilidade para tutores, prestadores e familiares.',
+  keywords: ['pet', 'gestão', 'saúde animal', 'guarda compartilhada', 'veterinário', 'tutor'],
   openGraph: {
-    title: 'MITRA — Gestao completa do pet',
-    description: 'Saude, guarda, historico e governanca do seu pet num unico lugar.',
+    title: 'MITRA — Gestão completa do pet',
+    description: 'Saúde, guarda, histórico e governança do seu pet num único lugar.',
     type: 'website',
     locale: 'pt_BR',
   },

@@ -49,11 +49,11 @@ interface RoleStyle {
 
 const ROLE_STYLE: Record<string, RoleStyle> = {
   TUTOR_PRINCIPAL:  { label: 'Principal',   badge: 'mg-badge-primary'  },
-  TUTOR_EMERGENCIA: { label: 'Emergencia',  badge: 'mg-badge-error'    },
-  VETERINARIO:      { label: 'Veterinario', badge: 'mg-badge-info'     },
+  TUTOR_EMERGENCIA: { label: 'Emergência',  badge: 'mg-badge-error'    },
+  VETERINARIO:      { label: 'Veterinário', badge: 'mg-badge-info'     },
   ADESTRADOR:       { label: 'Adestrador',  badge: 'mg-badge-warning'  },
   PASSEADOR:        { label: 'Passeador',   badge: 'mg-badge-success'  },
-  FAMILIAR:         { label: 'Familia',     badge: 'mg-badge'          },
+  FAMILIAR:         { label: 'Família',     badge: 'mg-badge'          },
   AMIGO:            { label: 'Amigo',       badge: 'mg-badge'          },
   OUTRO:            { label: 'Outro',       badge: 'mg-badge'          },
 };
@@ -104,7 +104,7 @@ export default function HomePage() {
           <div className="flex items-end justify-between">
             <div>
               <p className="text-sm text-texto-soft font-medium mb-0.5">
-                Ola, {user?.nome?.split(' ')[0]} 👋
+                Olá, {user?.nome?.split(' ')[0]} 👋
               </p>
               <h1 className="text-2xl font-bold font-headline text-texto tracking-tight">
                 {userType === 'TUTOR' && 'Meus pets'}
@@ -112,7 +112,7 @@ export default function HomePage() {
                 {userType === 'AMBOS' && 'Dashboard'}
               </h1>
               {userType === 'AMBOS' && (
-                <p className="text-xs text-texto-soft mt-1">Tutor e prestador de servicos</p>
+                <p className="text-xs text-texto-soft mt-1">Tutor e prestador de serviços</p>
               )}
             </div>
             {isTutor && (
@@ -188,7 +188,7 @@ export default function HomePage() {
             </div>
             <div className="space-y-1">
               <p className="font-bold font-headline text-texto text-base">Nenhum pet cadastrado</p>
-              <p className="text-sm text-texto-soft">Adicione seu primeiro pet para comecar</p>
+              <p className="text-sm text-texto-soft">Adicione seu primeiro pet para começar</p>
             </div>
             <button
               onClick={() => router.push('/home/novo-pet')}
@@ -248,7 +248,7 @@ export default function HomePage() {
               <section className="space-y-3">
                 <SectionLabel icon={<Key className="w-4 h-4 text-[#F59E0B]" />} label="Acesso compartilhado" />
                 <p className="text-xs text-texto-soft -mt-1">
-                  Voce tem acesso a {accessPets.length === 1 ? 'este pet' : 'estes pets'} com permissoes limitadas conforme seu papel.
+                  Você tem acesso a {accessPets.length === 1 ? 'este pet' : 'estes pets'} com permissões limitadas conforme seu papel.
                 </p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {accessPets.map((pet) => (
@@ -278,7 +278,7 @@ export default function HomePage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-texto">Nenhum pet convidado ainda</p>
-                        <p className="text-xs text-texto-soft mt-0.5">Tutores podem convida-lo para atender seus pets</p>
+                        <p className="text-xs text-texto-soft mt-0.5">Tutores podem convidá-lo para atender seus pets</p>
                       </div>
                     </div>
                   </div>
@@ -487,9 +487,9 @@ function formatarData(data: string) {
   const diffDias = Math.floor(diffMs / timeConfig.MS_PER_DAY);
 
   if (diffMins < 1) return 'Agora mesmo';
-  if (diffMins < 60) return `${diffMins}m atras`;
-  if (diffHoras < 24) return `${diffHoras}h atras`;
-  if (diffDias < 7) return `${diffDias}d atras`;
+  if (diffMins < 60) return `${diffMins}m atrás`;
+  if (diffHoras < 24) return `${diffHoras}h atrás`;
+  if (diffDias < 7) return `${diffDias}d atrás`;
   return date.toLocaleDateString('pt-BR');
 }
 
@@ -528,7 +528,7 @@ function NotificacoesSection({
       >
         <div className="flex items-center gap-2.5">
           <Bell className="w-5 h-5 text-[#7C3AED]" />
-          <span className="text-sm font-bold font-headline text-texto">Notificacoes</span>
+          <span className="text-sm font-bold font-headline text-texto">Notificações</span>
           {contNaoLidas > 0 && (
             <span className="text-xs font-bold text-white bg-[#F43F5E] rounded-full w-5 h-5 flex items-center justify-center animate-scale-in">
               {contNaoLidas}

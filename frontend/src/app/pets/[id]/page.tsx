@@ -394,7 +394,7 @@ export default function PetHomePage() {
             {medicamentosAtivos}
           </p>
           <p className="text-[10px] font-body text-texto-soft mt-0.5">
-            {medicamentosAtivos === 1 ? 'remedio' : 'remedios'}
+            {medicamentosAtivos === 1 ? 'remédio' : 'remédios'}
           </p>
         </button>
 
@@ -430,13 +430,13 @@ export default function PetHomePage() {
                   : ''}
               </p>
               <p className="text-[10px] font-body text-texto-soft mt-0.5 truncate">
-                proximo
+                próximo
               </p>
             </>
           ) : (
             <>
               <p className="font-headline font-bold text-xs text-texto-soft leading-tight">—</p>
-              <p className="text-[10px] font-body text-texto-soft mt-0.5">proximo</p>
+              <p className="text-[10px] font-body text-texto-soft mt-0.5">próximo</p>
             </>
           )}
         </button>
@@ -457,7 +457,7 @@ export default function PetHomePage() {
             </div>
             <div className="text-left">
               <p className="font-headline font-bold text-sm text-texto">
-                Calendario
+                Calendário
               </p>
               <p className="text-xs font-body text-texto-soft">
                 {todayEventCount > 0

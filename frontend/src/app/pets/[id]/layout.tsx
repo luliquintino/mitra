@@ -16,9 +16,9 @@ const ESPECIE_EMOJI: Record<string, string> = {
 
 const TABS = [
   { id: 'home', label: 'Home', path: '' },
-  { id: 'saude', label: 'Saude', path: '/saude' },
+  { id: 'saude', label: 'Saúde', path: '/saude' },
   { id: 'guarda', label: 'Guarda', path: '/guarda' },
-  { id: 'historico', label: 'Historico', path: '/historico' },
+  { id: 'historico', label: 'Histórico', path: '/historico' },
   { id: 'perfil', label: 'Perfil', path: '/perfil' },
 ];
 
