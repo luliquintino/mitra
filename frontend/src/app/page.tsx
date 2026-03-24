@@ -149,7 +149,7 @@ export default function RootPage() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#14B8A6]" />
                 </span>
                 <span className="font-body text-sm font-semibold text-[#7C3AED]">
-                  Novo: IA Veterinaria integrada
+                  Novo: Carteira de Vacinacao gamificada
                 </span>
               </div>
             </ScrollReveal>
@@ -260,8 +260,8 @@ export default function RootPage() {
                       <Activity className="w-4 h-4 text-[#F43F5E]" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-[#9CA3AF] font-medium">IA Analise</p>
-                      <p className="text-xs font-bold text-[#1E1B4B]">Saudavel</p>
+                      <p className="text-[10px] text-[#9CA3AF] font-medium">Status</p>
+                      <p className="text-xs font-bold text-[#1E1B4B]">Saudavel ✨</p>
                     </div>
                   </div>
                 </div>
