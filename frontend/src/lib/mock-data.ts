@@ -15,6 +15,7 @@ import type {
   VisitantePet,
   RecomendacaoVacina,
   AgendamentoVacina,
+  MuralPost,
 } from '@/types';
 
 // ─── Usuários ────────────────────────────────────
@@ -593,6 +594,42 @@ export const mockAgendamentosLuna: AgendamentoVacina[] = [
 ];
 
 export const mockAgendamentosMochi: AgendamentoVacina[] = [];
+
+// ─── Mural Posts ─────────────────────────────────
+export const mockMuralLuna: MuralPost[] = [
+  {
+    id: 'mural-1',
+    petId: 'pet-luna',
+    autorId: 'usr-ana',
+    autorNome: 'Dra. Camila Torres',
+    autorRole: 'VETERINARIO',
+    texto: 'Luna está respondendo bem ao tratamento. Pelagem mais brilhante e sem sinais de irritação.',
+    fotos: ['https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop'],
+    criadoEm: '2026-03-20T14:30:00Z',
+  },
+  {
+    id: 'mural-2',
+    petId: 'pet-luna',
+    autorId: 'user-1',
+    autorNome: 'Ana Souza',
+    autorRole: 'TUTOR_PRINCIPAL',
+    texto: 'Luna brincando no parque hoje! Muito mais ativa depois do novo remédio.',
+    fotos: ['https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=300&fit=crop'],
+    criadoEm: '2026-03-18T10:15:00Z',
+  },
+  {
+    id: 'mural-3',
+    petId: 'pet-luna',
+    autorId: 'usr-ana',
+    autorNome: 'Dra. Camila Torres',
+    autorRole: 'VETERINARIO',
+    texto: 'Resultado do exame de sangue: tudo dentro dos parâmetros normais. Próxima consulta em 3 meses.',
+    fotos: [],
+    criadoEm: '2026-03-15T09:00:00Z',
+  },
+];
+
+export const mockMuralMochi: MuralPost[] = [];
 
 // ─── Notificações ─────────────────────────────────
 export const mockNotificacoes: Notificacao[] = [

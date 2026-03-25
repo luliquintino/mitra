@@ -25,6 +25,8 @@ import {
   mockRecomendacoesMochi,
   mockAgendamentosLuna,
   mockAgendamentosMochi,
+  mockMuralLuna,
+  mockMuralMochi,
 } from './mock-data';
 
 import type {
@@ -40,6 +42,7 @@ import type {
   VisitantePet,
   RecomendacaoVacina,
   AgendamentoVacina,
+  MuralPost,
 } from '@/types';
 
 // ─── State local (simula DB em memória) ──────────────────────────────────────
@@ -98,6 +101,10 @@ let _recomendacoes: Record<string, RecomendacaoVacina[]> = {
 let _agendamentos: Record<string, AgendamentoVacina[]> = {
   'pet-luna': [...mockAgendamentosLuna],
   'pet-mochi': [...mockAgendamentosMochi],
+};
+let _muralPosts: Record<string, MuralPost[]> = {
+  'pet-luna': [...mockMuralLuna],
+  'pet-mochi': [...mockMuralMochi],
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -505,6 +512,29 @@ export const mockHealthApi = {
       criadoEm: new Date().toISOString(),
     });
     return delay({ mensagem: `Lembrete enviado ao tutor sobre ${nomeVacina}.` });
+  },
+
+  // ─── Mural Posts ─────────────────────────────────────────────────────────────
+
+  getMuralPosts: async (petId: string) => {
+    return delay({ data: _muralPosts[petId] || [] });
+  },
+
+  createMuralPost: async (petId: string, data: { texto?: string; fotos: string[] }) => {
+    const post: MuralPost = {
+      id: uuid(),
+      petId,
+      autorId: _user?.id || '',
+      autorNome: _user?.nome || '',
+      autorRole:
+        (_tutores[petId] || []).find((pu) => pu.usuarioId === _user?.id)?.role || 'TUTOR_PRINCIPAL',
+      texto: data.texto,
+      fotos: data.fotos,
+      criadoEm: new Date().toISOString(),
+    };
+    if (!_muralPosts[petId]) _muralPosts[petId] = [];
+    _muralPosts[petId].unshift(post);
+    return delay({ data: post, mensagem: 'Post criado com sucesso!' });
   },
 
   upsertPlano: async (petId: string, data: any) => {

@@ -256,6 +256,19 @@ export const healthApi = {
       () => api.post(`/pets/${petId}/health/vacinas/lembrar`, { nomeVacina }),
       () => mockHealthApi.lembrarTutorVacina(petId, nomeVacina),
     ),
+
+  // ─── Mural Posts ───────────────────────────────────
+  getMuralPosts: (petId: string) =>
+    tryReal(
+      () => api.get(`/pets/${petId}/saude/mural`),
+      () => mockHealthApi.getMuralPosts(petId),
+    ),
+
+  createMuralPost: (petId: string, data: { texto?: string; fotos: string[] }) =>
+    tryReal(
+      () => api.post(`/pets/${petId}/saude/mural`, data),
+      () => mockHealthApi.createMuralPost(petId, data),
+    ),
 };
 
 // ─── Custody ──────────────────────────────────────────────────────────────────

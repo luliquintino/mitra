@@ -3,8 +3,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { petsApi, healthApi, compromissosApi } from '@/lib/api';
-import { Pet, Vacina, Medicamento, Sintoma, PlanoSaude, Compromisso, RecomendacaoVacina, AgendamentoVacina } from '@/types';
-import { formatDate, cn } from '@/lib/utils';
+import { Pet, Vacina, Medicamento, Sintoma, PlanoSaude, Compromisso, RecomendacaoVacina, AgendamentoVacina, MuralPost } from '@/types';
+import { formatDate, formatRelative, cn } from '@/lib/utils';
 import {
   Heart,
   Syringe,
@@ -155,21 +155,29 @@ function ConfirmationBanner({ message }: { message: string }) {
 
 // ─── Sub-tab types ───────────────────────────────────────────────────────────
 
-type SubTab = 'carteira' | 'vacinas' | 'medicamentos' | 'sintomas' | 'plano' | 'consultas';
+type SubTab = 'carteira' | 'vacinas' | 'medicamentos' | 'sintomas' | 'mural' | 'plano' | 'consultas';
 
 const SUBTABS: { id: SubTab; label: string; emoji?: string }[] = [
   { id: 'carteira', label: 'Carteira', emoji: '📋' },
   { id: 'vacinas', label: 'Vacinas' },
   { id: 'medicamentos', label: 'Medicamentos' },
   { id: 'sintomas', label: 'Sintomas' },
+  { id: 'mural', label: 'Mural', emoji: '📸' },
   { id: 'plano', label: 'Plano de Saúde' },
   { id: 'consultas', label: 'Consultas' },
 ];
 
+const SUB_TABS_BY_ROLE: Record<string, string[]> = {
+  TUTOR_PRINCIPAL: ['carteira', 'vacinas', 'medicamentos', 'sintomas', 'mural', 'plano', 'consultas'],
+  TUTOR_EMERGENCIA: ['carteira', 'vacinas', 'medicamentos', 'sintomas', 'mural', 'plano', 'consultas'],
+  VETERINARIO: ['carteira', 'vacinas', 'medicamentos', 'sintomas', 'mural'],
+  VISITANTE: ['carteira', 'vacinas', 'medicamentos'],
+};
+
 // ─── Vacinas Tab ─────────────────────────────────────────────────────────────
 
-function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
-  petId: string; especie: string; vacinas: Vacina[]; onUpdate: () => void;
+function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate, readOnly }: {
+  petId: string; especie: string; vacinas: Vacina[]; onUpdate: () => void; readOnly?: boolean;
 }) {
   const vacinasDisponiveis = VACINAS_POR_ESPECIE[especie] ?? [];
   const [showForm, setShowForm] = useState(false);
@@ -223,13 +231,15 @@ function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
         <p className="text-sm font-headline font-semibold text-texto">
           {initialVacinas.length} {initialVacinas.length === 1 ? 'vacina' : 'vacinas'}
         </p>
-        <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
-          <Plus className="w-4 h-4" />
-          Vacina
-        </button>
+        {!readOnly && (
+          <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
+            <Plus className="w-4 h-4" />
+            Vacina
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {!readOnly && showForm && (
         <form onSubmit={handleSave} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Nova vacina</h3>
           <div className="space-y-2">
@@ -340,8 +350,8 @@ function VacinasTab({ petId, especie, vacinas: initialVacinas, onUpdate }: {
 
 // ─── Medicamentos Tab ────────────────────────────────────────────────────────
 
-function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }: {
-  petId: string; especie: string; medicamentos: Medicamento[]; onUpdate: () => void;
+function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate, readOnly }: {
+  petId: string; especie: string; medicamentos: Medicamento[]; onUpdate: () => void; readOnly?: boolean;
 }) {
   const medsDisponiveis = MEDICAMENTOS_POR_ESPECIE[especie] ?? [];
   const [medFilter, setMedFilter] = useState<'ATIVO' | 'HISTORICO'>('ATIVO');
@@ -424,10 +434,12 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
         <p className="text-sm font-headline font-semibold text-texto">
           {initialMeds.length} {initialMeds.length === 1 ? 'medicamento' : 'medicamentos'}
         </p>
-        <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
-          <Plus className="w-4 h-4" />
-          Medicamento
-        </button>
+        {!readOnly && (
+          <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
+            <Plus className="w-4 h-4" />
+            Medicamento
+          </button>
+        )}
       </div>
 
       {/* Active / Completed filter */}
@@ -452,7 +464,7 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
         </button>
       </div>
 
-      {showForm && (
+      {!readOnly && showForm && (
         <form onSubmit={handleSave} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Novo medicamento</h3>
           <div className="space-y-2">
@@ -557,8 +569,8 @@ function MedicamentosTab({ petId, especie, medicamentos: initialMeds, onUpdate }
 
 // ─── Sintomas Tab ────────────────────────────────────────────────────────────
 
-function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
-  petId: string; sintomas: Sintoma[]; onUpdate: () => void;
+function SintomasTab({ petId, sintomas: initialSintomas, onUpdate, readOnly }: {
+  petId: string; sintomas: Sintoma[]; onUpdate: () => void; readOnly?: boolean;
 }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ descricao: '', dataInicio: '', dataFim: '', intensidade: '', observacoes: '' });
@@ -644,13 +656,15 @@ function SintomasTab({ petId, sintomas: initialSintomas, onUpdate }: {
         <p className="text-sm font-headline font-semibold text-texto">
           {initialSintomas.length} {initialSintomas.length === 1 ? 'sintoma' : 'sintomas'}
         </p>
-        <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
-          <Plus className="w-4 h-4" />
-          Sintoma
-        </button>
+        {!readOnly && (
+          <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
+            <Plus className="w-4 h-4" />
+            Sintoma
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {!readOnly && showForm && (
         <form onSubmit={handleSave} className="mg-card space-y-3">
           <h3 className="font-headline font-semibold text-texto text-sm">Novo sintoma</h3>
           <div>
@@ -1654,6 +1668,231 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
   );
 }
 
+// ─── Mural Tab ──────────────────────────────────────────────────────────────
+
+function MuralTab({ petId, readOnly }: { petId: string; readOnly?: boolean }) {
+  const [posts, setPosts] = useState<MuralPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [texto, setTexto] = useState('');
+  const [fotos, setFotos] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [lightbox, setLightbox] = useState<string | null>(null);
+
+  const loadPosts = useCallback(async () => {
+    try {
+      const { data } = await healthApi.getMuralPosts(petId);
+      setPosts(Array.isArray(data) ? data : []);
+    } catch { /* silent */ } finally { setLoading(false); }
+  }, [petId]);
+
+  useEffect(() => { loadPosts(); }, [loadPosts]);
+
+  const handleFotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach(file => {
+      if (fotos.length >= 5 || file.size > 5 * 1024 * 1024 || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setFotos(prev => prev.length < 5 ? [...prev, reader.result as string] : prev);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  const removeFoto = (index: number) => {
+    setFotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!texto.trim() && fotos.length === 0) return;
+    setSaving(true);
+    try {
+      await healthApi.createMuralPost(petId, { texto: texto.trim() || undefined, fotos });
+      setTexto('');
+      setFotos([]);
+      setShowForm(false);
+      loadPosts();
+    } catch { /* silent */ } finally { setSaving(false); }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map(i => <div key={i} className="mg-card"><div className="h-24 mg-skeleton rounded-xl" /></div>)}
+      </div>
+    );
+  }
+
+  const roleBadge = (role: string) => {
+    const isTutor = role === 'TUTOR_PRINCIPAL' || role === 'TUTOR_EMERGENCIA';
+    const isVet = role === 'VETERINARIO';
+    return (
+      <span className={cn('mg-badge text-[10px]', isTutor ? 'mg-badge-primary' : isVet ? 'mg-badge-info' : 'mg-badge-warning')}>
+        {isTutor ? 'Tutor' : isVet ? 'Veterinário' : role.charAt(0) + role.slice(1).toLowerCase().replace('_', ' ')}
+      </span>
+    );
+  };
+
+  return (
+    <div className="space-y-4 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">📸</span>
+          <p className="text-sm font-headline font-semibold text-texto">
+            Mural <span className="text-texto-soft font-normal">({posts.length})</span>
+          </p>
+        </div>
+        {!readOnly && (
+          <button onClick={() => setShowForm(!showForm)} className="mg-btn text-sm flex items-center gap-1.5">
+            <Plus className="w-4 h-4" />
+            Novo post
+          </button>
+        )}
+      </div>
+
+      {/* Form */}
+      {!readOnly && showForm && (
+        <form onSubmit={handleSubmit} className="mg-card space-y-3">
+          <h3 className="font-headline font-semibold text-texto text-sm">Novo post</h3>
+          <div>
+            <label className="mg-label">Texto</label>
+            <textarea
+              className="mg-input resize-none"
+              rows={3}
+              placeholder="Compartilhe uma atualização, observação ou momento especial..."
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+            />
+          </div>
+
+          {/* Photo upload */}
+          <div>
+            <label className="mg-label">Fotos</label>
+            <p className="text-[11px] text-texto-soft font-body mb-2">Anexe até 5 fotos. Max 5MB cada.</p>
+
+            {fotos.length > 0 && (
+              <div className="flex gap-2 flex-wrap mb-2">
+                {fotos.map((src, idx) => (
+                  <div key={idx} className="relative group">
+                    <img
+                      src={src}
+                      alt={`Foto ${idx + 1}`}
+                      className="w-20 h-20 rounded-xl object-cover border-2 border-white/50 cursor-pointer hover:border-primary transition-colors"
+                      onClick={() => setLightbox(src)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeFoto(idx)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {fotos.length < 5 && (
+              <label className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-primary/30 bg-primary/[0.03] cursor-pointer hover:border-primary/50 hover:bg-primary/[0.06] transition-all">
+                <Camera className="w-5 h-5 text-primary" />
+                <span className="text-sm text-primary font-medium">{fotos.length === 0 ? 'Adicionar fotos' : `Adicionar mais (${fotos.length}/5)`}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleFotoUpload}
+                />
+              </label>
+            )}
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <button type="submit" disabled={saving || (!texto.trim() && fotos.length === 0)} className="mg-btn flex-1 text-sm">
+              {saving ? 'Publicando...' : 'Publicar'}
+            </button>
+            <button type="button" onClick={() => { setShowForm(false); setTexto(''); setFotos([]); }} className="mg-btn-secondary text-sm px-4">Cancelar</button>
+          </div>
+        </form>
+      )}
+
+      {/* Posts */}
+      {posts.length === 0 ? (
+        <EmptyState icon="📸" title="Nenhum post no mural" description="Compartilhe fotos, atualizações e momentos do seu pet." />
+      ) : (
+        <div className="space-y-3">
+          {posts.map((post) => (
+            <div key={post.id} className="mg-card-solid rounded-xl p-4">
+              {/* Author */}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm font-bold text-primary">
+                    {post.autorNome ? post.autorNome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : '?'}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-headline font-semibold text-texto text-sm truncate">{post.autorNome}</p>
+                    {roleBadge(post.autorRole)}
+                  </div>
+                  <p className="text-[11px] text-texto-soft font-body">{formatRelative(post.criadoEm)}</p>
+                </div>
+              </div>
+
+              {/* Text */}
+              {post.texto && (
+                <p className="text-sm text-texto font-body mb-2 whitespace-pre-wrap">{post.texto}</p>
+              )}
+
+              {/* Photos */}
+              {post.fotos && post.fotos.length > 0 && (
+                <div className="grid gap-2" style={{
+                  gridTemplateColumns: post.fotos.length === 1 ? '1fr' : post.fotos.length === 2 ? '1fr 1fr' : 'repeat(3, 1fr)',
+                }}>
+                  {post.fotos.map((src, idx) => (
+                    <img
+                      key={idx}
+                      src={src}
+                      alt={`Foto ${idx + 1}`}
+                      className="w-full h-32 rounded-xl object-cover border border-white/50 cursor-pointer hover:border-primary hover:shadow-md transition-all"
+                      onClick={() => setLightbox(src)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setLightbox(null)}
+        >
+          <div className="relative max-w-lg max-h-[80vh]" onClick={e => e.stopPropagation()}>
+            <img src={lightbox} alt="Foto ampliada" className="max-w-full max-h-[80vh] rounded-2xl object-contain shadow-2xl" />
+            <button
+              onClick={() => setLightbox(null)}
+              className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm text-texto shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Saude Page ─────────────────────────────────────────────────────────
 
 export default function SaudePage() {
@@ -1727,6 +1966,15 @@ export default function SaudePage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // ─── Role-based filtering ──────────────────────────────────────────────────
+
+  const allowedSubTabs = SUB_TABS_BY_ROLE[pet?.meuRole || 'TUTOR_PRINCIPAL'] || SUB_TABS_BY_ROLE.TUTOR_PRINCIPAL;
+  const visibleSubTabs = SUBTABS.filter(t => allowedSubTabs.includes(t.id));
+
+  const isVetRole = pet?.meuRole === 'VETERINARIO';
+  const isVisitante = pet?.meuRole === 'FAMILIAR' || pet?.meuRole === 'AMIGO' || (pet?.meuRole as string) === 'VISITANTE';
+  const readOnlyHealth = isVisitante;
 
   // ─── Computed stats ────────────────────────────────────────────────────────
 
@@ -1806,7 +2054,7 @@ export default function SaudePage() {
       {/* Sub-tab bar with sliding indicator */}
       <div className="relative" ref={tabsContainerRef}>
         <div className="flex gap-0 overflow-x-auto scrollbar-hide border-b border-gray-100/50">
-          {SUBTABS.map((t) => {
+          {visibleSubTabs.map((t) => {
             const isActive = activeTab === t.id;
             return (
               <button
@@ -1841,13 +2089,16 @@ export default function SaudePage() {
           <CarteiraTab petId={petId} pet={pet} vacinas={vacinas} especie={pet?.especie || 'OUTRO'} role={pet?.meuRole} onUpdate={loadData} />
         )}
         {activeTab === 'vacinas' && (
-          <VacinasTab petId={petId} especie={pet?.especie || 'OUTRO'} vacinas={vacinas} onUpdate={loadData} />
+          <VacinasTab petId={petId} especie={pet?.especie || 'OUTRO'} vacinas={vacinas} onUpdate={loadData} readOnly={readOnlyHealth} />
         )}
         {activeTab === 'medicamentos' && (
-          <MedicamentosTab petId={petId} especie={pet?.especie || 'OUTRO'} medicamentos={medicamentos} onUpdate={loadData} />
+          <MedicamentosTab petId={petId} especie={pet?.especie || 'OUTRO'} medicamentos={medicamentos} onUpdate={loadData} readOnly={readOnlyHealth} />
         )}
         {activeTab === 'sintomas' && (
-          <SintomasTab petId={petId} sintomas={sintomas} onUpdate={loadData} />
+          <SintomasTab petId={petId} sintomas={sintomas} onUpdate={loadData} readOnly={readOnlyHealth} />
+        )}
+        {activeTab === 'mural' && (
+          <MuralTab petId={petId} readOnly={readOnlyHealth} />
         )}
         {activeTab === 'plano' && (
           <PlanoSaudeTab petId={petId} plano={plano} onUpdate={loadData} />

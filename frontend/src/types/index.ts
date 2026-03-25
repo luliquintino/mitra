@@ -365,6 +365,17 @@ export interface AgendamentoVacina {
   criadoEm: string;
 }
 
+export interface MuralPost {
+  id: string;
+  petId: string;
+  autorId: string;
+  autorNome: string;
+  autorRole: string;
+  texto?: string;
+  fotos: string[];
+  criadoEm: string;
+}
+
 // Novos EventoTipos suportados (complementam o tipo string em Evento)
 // 'CONSULTA_REGISTRADA' | 'EXAME_ANEXADO'
 // 'VISITA_REGISTRADA' | 'ALIMENTACAO_REGISTRADA'
