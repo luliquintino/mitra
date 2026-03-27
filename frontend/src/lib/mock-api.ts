@@ -27,6 +27,7 @@ import {
   mockAgendamentosMochi,
   mockMuralLuna,
   mockMuralMochi,
+  DEFAULT_PRESTADOR_SAUDE_PERMISSIONS,
 } from './mock-data';
 
 import type {
@@ -238,6 +239,7 @@ export const mockPetsApi = {
     return delay({
       ...pet,
       meuRole: myVinculo?.role ?? pet.meuRole,
+      permissoesSaude: myVinculo?.permissoesSaude || DEFAULT_PRESTADOR_SAUDE_PERMISSIONS[myVinculo?.role || ''] || undefined,
       petUsuarios: _tutores[id] || [],
       vacinas: _vacinas[id] || [],
       medicamentos: _medicamentos[id] || [],
@@ -807,7 +809,7 @@ export const mockPrestadoresApi = {
       .map((link) => {
         const pet = _pets.find((p) => p.id === link.petId);
         if (!pet) return null;
-        return { ...pet, role: link.role, permissoes: ['VISUALIZAR', 'REGISTRAR_SERVICO'] };
+        return { ...pet, role: link.role, permissoes: ['VISUALIZAR', 'REGISTRAR_SERVICO'], permissoesSaude: link.permissoesSaude || DEFAULT_PRESTADOR_SAUDE_PERMISSIONS[link.role] || ['mural'] };
       })
       .filter(Boolean);
     return delay(result);
@@ -818,7 +820,20 @@ export const mockPrestadoresApi = {
     if (!pet) throw Object.assign(new Error('Pet não encontrado'), { response: { data: { message: 'Pet não encontrado' } } });
     const link = (_tutores[petId] || []).find((t) => t.usuarioId === _user?.id);
     if (!link) throw Object.assign(new Error('Sem acesso'), { response: { data: { message: 'Você não tem acesso a este pet.' } } });
-    return delay({ ...pet, role: link.role, permissoes: ['VISUALIZAR', 'REGISTRAR_SERVICO'] });
+    return delay({ ...pet, role: link.role, permissoes: ['VISUALIZAR', 'REGISTRAR_SERVICO'], permissoesSaude: link.permissoesSaude || DEFAULT_PRESTADOR_SAUDE_PERMISSIONS[link.role] || ['mural'] });
+  },
+
+  getPrestadorPermissoes: async (petId: string, userId: string) => {
+    const tutores = _tutores[petId] || [];
+    const link = tutores.find((t) => t.usuarioId === userId);
+    return delay(link?.permissoesSaude || DEFAULT_PRESTADOR_SAUDE_PERMISSIONS[link?.role || 'OUTRO'] || ['mural']);
+  },
+
+  updatePrestadorPermissoes: async (petId: string, userId: string, permissoes: string[]) => {
+    const tutores = _tutores[petId] || [];
+    const link = tutores.find((t) => t.usuarioId === userId);
+    if (link) (link as any).permissoesSaude = permissoes;
+    return delay({ mensagem: 'Permissões atualizadas com sucesso!' });
   },
 };
 

@@ -18,6 +18,19 @@ import type {
   MuralPost,
 } from '@/types';
 
+// ─── Permissões padrão por tipo de prestador ─────
+export const DEFAULT_PRESTADOR_SAUDE_PERMISSIONS: Record<string, string[]> = {
+  VETERINARIO:  ['carteira', 'vacinas', 'medicamentos', 'sintomas', 'mural'],
+  PASSEADOR:    ['mural'],
+  ADESTRADOR:   ['mural', 'sintomas'],
+  PET_SITTER:   ['mural', 'sintomas'],
+  DAY_CARE:     ['mural', 'sintomas'],
+  HOTEL:        ['mural', 'sintomas'],
+  CRECHE:       ['mural', 'sintomas'],
+  CUIDADOR:     ['mural'],
+  OUTRO:        ['mural'],
+};
+
 // ─── Usuários ────────────────────────────────────
 export const mockUsuarios: Usuario[] = [
   {
@@ -106,6 +119,7 @@ export const mockPetUsuariosLuna: PetUsuario[] = [
     role: 'ADESTRADOR',
     ativo: true,
     adicionadoEm: '2025-07-10T10:00:00Z',
+    permissoesSaude: ['mural', 'sintomas'],
     usuario: { id: 'usr-joao', nome: 'João Ferreira', email: 'joao@mitra.com', avatarUrl: undefined },
   },
   {
@@ -115,6 +129,7 @@ export const mockPetUsuariosLuna: PetUsuario[] = [
     role: 'PASSEADOR',
     ativo: true,
     adicionadoEm: '2025-08-01T10:00:00Z',
+    permissoesSaude: ['mural'],
     usuario: { id: 'usr-pedro', nome: 'Pedro Santos', email: 'pedro@mitra.com', avatarUrl: undefined },
   },
 ];

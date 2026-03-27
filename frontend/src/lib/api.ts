@@ -165,6 +165,17 @@ export const petsApi = {
     api.delete(`/pets/${petId}/visitantes/${visitanteId}`),
   updateVisitantePermissions: (petId: string, visitanteId: string, permissoes: string[]) =>
     api.patch(`/pets/${petId}/visitantes/${visitanteId}/permissoes`, { permissoes }),
+  // Prestador permissions
+  getPrestadorPermissoes: (petId: string, userId: string) =>
+    tryReal(
+      () => api.get(`/pets/${petId}/prestadores/${userId}/permissoes-saude`),
+      () => mockPrestadoresApi.getPrestadorPermissoes(petId, userId),
+    ),
+  updatePrestadorPermissoes: (petId: string, userId: string, permissoes: string[]) =>
+    tryReal(
+      () => api.patch(`/pets/${petId}/prestadores/${userId}/permissoes-saude`, { permissoes }),
+      () => mockPrestadoresApi.updatePrestadorPermissoes(petId, userId, permissoes),
+    ),
 };
 
 // ─── Health ───────────────────────────────────────────────────────────────────

@@ -49,6 +49,10 @@ export interface Pet {
   airTagUrl?: string;
 }
 
+export type PermissaoPrestadorSaude =
+  | 'carteira' | 'vacinas' | 'medicamentos'
+  | 'sintomas' | 'mural' | 'plano' | 'consultas';
+
 export interface PetUsuario {
   id: string;
   petId: string;
@@ -57,6 +61,7 @@ export interface PetUsuario {
   ativo: boolean;
   adicionadoEm: string;
   apresentacao?: string;
+  permissoesSaude?: PermissaoPrestadorSaude[];
   usuario: Pick<Usuario, 'id' | 'nome' | 'email' | 'avatarUrl'>;
 }
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { petsApi, governanceApi, usersApi, custodyApi } from '@/lib/api';
+import { DEFAULT_PRESTADOR_SAUDE_PERMISSIONS } from '@/lib/mock-data';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Pet, PetUsuario, PetVisitante } from '@/types';
 import {
@@ -36,6 +37,8 @@ import {
   Weight,
   Ruler,
   Tag,
+  Settings,
+  Save,
 } from 'lucide-react';
 
 export default function PerfilPage() {
@@ -72,6 +75,9 @@ export default function PerfilPage() {
   const [prestadorForm, setPrestadorForm] = useState({ email: '', permissoes: [] as string[] });
   const [prestadorSaving, setPrestadorSaving] = useState(false);
   const [prestadorError, setPrestadorError] = useState('');
+  const [editingPrestadorPerms, setEditingPrestadorPerms] = useState<string | null>(null);
+  const [prestadorPerms, setPrestadorPerms] = useState<Record<string, string[]>>({});
+  const [permsSaving, setPermsSaving] = useState(false);
 
   const [visitantes, setVisitantes] = useState<PetVisitante[]>([]);
   const [visitantesLoading, setVisitantesLoading] = useState(false);
@@ -270,9 +276,9 @@ export default function PerfilPage() {
   const plano = (pet as any).planoSaude;
 
   // Rede de Cuidado derived lists
-  const PRESTADOR_ROLES = ['VETERINARIO', 'ADESTRADOR', 'PASSEADOR'];
+  const PRESTADOR_ROLES_LIST = ['VETERINARIO', 'ADESTRADOR', 'PASSEADOR', 'PET_SITTER', 'DAY_CARE', 'HOTEL', 'CRECHE', 'CUIDADOR', 'OUTRO'];
   const tutoresList = tutores.filter((t) => ['TUTOR_PRINCIPAL', 'TUTOR_EMERGENCIA'].includes(t.role));
-  const prestadoresList = tutores.filter((t) => PRESTADOR_ROLES.includes(t.role));
+  const prestadoresList = tutores.filter((t) => PRESTADOR_ROLES_LIST.includes(t.role));
 
   // Compute pet age
   const ageText = pet.dataNascimento ? petAge(pet.dataNascimento) : null;
@@ -603,9 +609,114 @@ export default function PerfilPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {prestadoresList.map((pu) => (
-                <TutorRow key={pu.id} pu={pu} isMe={pu.usuarioId === user?.id} />
-              ))}
+              {prestadoresList.map((pu) => {
+                const isEditing = editingPrestadorPerms === pu.usuarioId;
+                const currentPerms = prestadorPerms[pu.usuarioId] || pu.permissoesSaude || DEFAULT_PRESTADOR_SAUDE_PERMISSIONS[pu.role] || ['mural'];
+                const isTutor = pet.meuRole === 'TUTOR_PRINCIPAL' || pet.meuRole === 'TUTOR_EMERGENCIA';
+
+                const togglePerm = (perm: string) => {
+                  setPrestadorPerms(prev => {
+                    const curr = prev[pu.usuarioId] || [...currentPerms];
+                    return {
+                      ...prev,
+                      [pu.usuarioId]: curr.includes(perm) ? curr.filter(p => p !== perm) : [...curr, perm],
+                    };
+                  });
+                };
+
+                const handleSavePerms = async () => {
+                  setPermsSaving(true);
+                  try {
+                    const permsToSave = prestadorPerms[pu.usuarioId] || currentPerms;
+                    await petsApi.updatePrestadorPermissoes(petId, pu.usuarioId, permsToSave);
+                    setEditingPrestadorPerms(null);
+                  } catch {
+                    // silent
+                  } finally {
+                    setPermsSaving(false);
+                  }
+                };
+
+                const PERM_OPTIONS = [
+                  { value: 'carteira', label: 'Carteira de vacinação' },
+                  { value: 'vacinas', label: 'Vacinas' },
+                  { value: 'medicamentos', label: 'Medicamentos' },
+                  { value: 'sintomas', label: 'Sintomas' },
+                  { value: 'mural', label: 'Mural' },
+                  { value: 'plano', label: 'Plano de saúde' },
+                  { value: 'consultas', label: 'Consultas' },
+                ];
+
+                const activePerms = prestadorPerms[pu.usuarioId] || currentPerms;
+
+                return (
+                  <div key={pu.id} className="space-y-0">
+                    <div className="flex items-center justify-between">
+                      <TutorRow pu={pu} isMe={pu.usuarioId === user?.id} />
+                      {isTutor && (
+                        <button
+                          onClick={() => {
+                            if (isEditing) {
+                              setEditingPrestadorPerms(null);
+                            } else {
+                              setPrestadorPerms(prev => ({ ...prev, [pu.usuarioId]: [...currentPerms] }));
+                              setEditingPrestadorPerms(pu.usuarioId);
+                            }
+                          }}
+                          className="mg-btn-ghost text-xs gap-1 px-2 py-1 flex-shrink-0"
+                          title="Configurar acesso"
+                        >
+                          <Settings className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+
+                    {isEditing && (
+                      <div className="mg-card-solid rounded-xl p-4 mt-2 space-y-3 animate-fade-in">
+                        <p className="text-xs font-headline font-bold text-texto">Acesso à Saúde</p>
+                        <p className="text-[11px] text-texto-soft font-body">Selecione as informações que {pu.usuario.nome.split(' ')[0]} pode ver</p>
+                        <div className="flex flex-wrap gap-2">
+                          {PERM_OPTIONS.map(opt => {
+                            const active = activePerms.includes(opt.value);
+                            return (
+                              <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() => togglePerm(opt.value)}
+                                className={cn(
+                                  'text-xs px-3 py-1.5 rounded-full border font-medium transition-all',
+                                  active
+                                    ? 'bg-primary/10 border-primary/30 text-primary'
+                                    : 'bg-surface-muted border-surface-muted text-texto-soft hover:border-primary/20'
+                                )}
+                              >
+                                {active && <Check className="w-3 h-3 inline mr-1" />}
+                                {opt.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="flex gap-2 pt-1">
+                          <button
+                            onClick={handleSavePerms}
+                            disabled={permsSaving}
+                            className="mg-btn text-xs px-4 py-1.5 flex items-center gap-1"
+                          >
+                            <Save className="w-3 h-3" />
+                            {permsSaving ? 'Salvando...' : 'Salvar'}
+                          </button>
+                          <button
+                            onClick={() => setEditingPrestadorPerms(null)}
+                            className="mg-btn-ghost text-xs px-3 py-1.5"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { petsApi, healthApi, compromissosApi } from '@/lib/api';
+import { DEFAULT_PRESTADOR_SAUDE_PERMISSIONS } from '@/lib/mock-data';
 import { Pet, Vacina, Medicamento, Sintoma, PlanoSaude, Compromisso, RecomendacaoVacina, AgendamentoVacina, MuralPost } from '@/types';
 import { formatDate, formatRelative, cn } from '@/lib/utils';
 import {
@@ -173,6 +174,8 @@ const SUB_TABS_BY_ROLE: Record<string, string[]> = {
   VETERINARIO: ['carteira', 'vacinas', 'medicamentos', 'sintomas', 'mural'],
   VISITANTE: ['carteira', 'vacinas', 'medicamentos'],
 };
+
+const PRESTADOR_ROLES = ['ADESTRADOR', 'PASSEADOR', 'PET_SITTER', 'DAY_CARE', 'HOTEL', 'CRECHE', 'CUIDADOR', 'OUTRO'];
 
 // ─── Vacinas Tab ─────────────────────────────────────────────────────────────
 
@@ -1969,12 +1972,17 @@ export default function SaudePage() {
 
   // ─── Role-based filtering ──────────────────────────────────────────────────
 
-  const allowedSubTabs = SUB_TABS_BY_ROLE[pet?.meuRole || 'TUTOR_PRINCIPAL'] || SUB_TABS_BY_ROLE.TUTOR_PRINCIPAL;
-  const visibleSubTabs = SUBTABS.filter(t => allowedSubTabs.includes(t.id));
-
+  const isPrestador = PRESTADOR_ROLES.includes(pet?.meuRole || '');
   const isVetRole = pet?.meuRole === 'VETERINARIO';
   const isVisitante = pet?.meuRole === 'FAMILIAR' || pet?.meuRole === 'AMIGO' || (pet?.meuRole as string) === 'VISITANTE';
+
+  const allowedSubTabs = isPrestador
+    ? (pet as any)?.permissoesSaude || DEFAULT_PRESTADOR_SAUDE_PERMISSIONS[pet?.meuRole || 'OUTRO'] || ['mural']
+    : SUB_TABS_BY_ROLE[pet?.meuRole || 'TUTOR_PRINCIPAL'] || SUB_TABS_BY_ROLE.TUTOR_PRINCIPAL;
+  const visibleSubTabs = SUBTABS.filter(t => allowedSubTabs.includes(t.id));
+
   const readOnlyHealth = isVisitante;
+  const prestadorReadOnly = isPrestador; // Prestadores são read-only em vacinas/meds/plano/consultas
 
   // ─── Computed stats ────────────────────────────────────────────────────────
 
@@ -2089,10 +2097,10 @@ export default function SaudePage() {
           <CarteiraTab petId={petId} pet={pet} vacinas={vacinas} especie={pet?.especie || 'OUTRO'} role={pet?.meuRole} onUpdate={loadData} />
         )}
         {activeTab === 'vacinas' && (
-          <VacinasTab petId={petId} especie={pet?.especie || 'OUTRO'} vacinas={vacinas} onUpdate={loadData} readOnly={readOnlyHealth} />
+          <VacinasTab petId={petId} especie={pet?.especie || 'OUTRO'} vacinas={vacinas} onUpdate={loadData} readOnly={readOnlyHealth || prestadorReadOnly} />
         )}
         {activeTab === 'medicamentos' && (
-          <MedicamentosTab petId={petId} especie={pet?.especie || 'OUTRO'} medicamentos={medicamentos} onUpdate={loadData} readOnly={readOnlyHealth} />
+          <MedicamentosTab petId={petId} especie={pet?.especie || 'OUTRO'} medicamentos={medicamentos} onUpdate={loadData} readOnly={readOnlyHealth || prestadorReadOnly} />
         )}
         {activeTab === 'sintomas' && (
           <SintomasTab petId={petId} sintomas={sintomas} onUpdate={loadData} readOnly={readOnlyHealth} />

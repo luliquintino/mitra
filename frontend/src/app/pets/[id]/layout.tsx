@@ -26,11 +26,16 @@ const TABS_BY_ROLE: Record<string, string[]> = {
   TUTOR_PRINCIPAL:  ['home', 'saude', 'guarda', 'historico', 'perfil'],
   TUTOR_EMERGENCIA: ['home', 'saude', 'guarda', 'historico', 'perfil'],
   VETERINARIO:      ['home', 'saude', 'historico'],
-  ADESTRADOR:       ['home', 'saude', 'historico'],
+  ADESTRADOR:       ['home', 'saude'],
   PASSEADOR:        ['home', 'saude'],
+  PET_SITTER:       ['home', 'saude'],
+  DAY_CARE:         ['home', 'saude'],
+  HOTEL:            ['home', 'saude'],
+  CRECHE:           ['home', 'saude'],
+  CUIDADOR:         ['home', 'saude'],
   FAMILIAR:         ['home'],
   AMIGO:            ['home'],
-  OUTRO:            ['home'],
+  OUTRO:            ['home', 'saude'],
 };
 
 export default function PetLayout({ children }: { children: React.ReactNode }) {
