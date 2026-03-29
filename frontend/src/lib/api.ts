@@ -12,6 +12,8 @@ import {
   mockRegistrosApi,
   mockPrestadoresApi,
   mockVisitantesApi,
+  mockAccessLogsApi,
+  mockCheckInApi,
 } from './mock-api';
 import { apiConfig, featureConfig } from './config';
 
@@ -280,6 +282,12 @@ export const healthApi = {
       () => api.post(`/pets/${petId}/saude/mural`, data),
       () => mockHealthApi.createMuralPost(petId, data),
     ),
+
+  addReaction: (petId: string, postId: string, emoji: string) =>
+    tryReal(
+      () => api.post(`/pets/${petId}/saude/mural/${postId}/reactions`, { emoji }),
+      () => mockHealthApi.addReaction(petId, postId, emoji),
+    ),
 };
 
 // ─── Custody ──────────────────────────────────────────────────────────────────
@@ -488,5 +496,40 @@ export const registrosApi = {
     tryReal(
       () => api.get(`/pets/${petId}/registros/meus`),
       () => mockRegistrosApi.listMeus(petId),
+    ),
+};
+
+// ─── Access Logs (F10) ──────────────────────────────────────────────────────
+
+export const accessLogsApi = {
+  list: (petId: string) =>
+    tryReal(
+      () => api.get(`/pets/${petId}/access-logs`),
+      () => mockAccessLogsApi.list(petId),
+    ),
+};
+
+// ─── Check-in Sessions (F11) ────────────────────────────────────────────────
+
+export const checkInApi = {
+  list: (petId: string) =>
+    tryReal(
+      () => api.get(`/pets/${petId}/check-in`),
+      () => mockCheckInApi.list(petId),
+    ),
+  checkIn: (petId: string) =>
+    tryReal(
+      () => api.post(`/pets/${petId}/check-in`),
+      () => mockCheckInApi.checkIn(petId),
+    ),
+  checkOut: (petId: string, sessionId: string, observacoes?: string) =>
+    tryReal(
+      () => api.put(`/pets/${petId}/check-in/${sessionId}/check-out`, { observacoes }),
+      () => mockCheckInApi.checkOut(petId, sessionId, observacoes),
+    ),
+  getActive: (petId: string) =>
+    tryReal(
+      () => api.get(`/pets/${petId}/check-in/active`),
+      () => mockCheckInApi.getActive(petId),
     ),
 };

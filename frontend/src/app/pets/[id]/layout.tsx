@@ -131,11 +131,21 @@ export default function PetLayout({ children }: { children: React.ReactNode }) {
               <ChevronLeft className="w-4 h-4" />
               Meus pets
             </button>
-            {pet.status === 'ATIVO' ? (
-              <span className="mg-badge mg-badge-success text-xs">Ativo</span>
-            ) : (
-              <span className="mg-badge text-xs bg-surface-muted text-texto-soft">Arquivado</span>
-            )}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => router.push(`/pets/${petId}/emergencia`)}
+                className="w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center hover:bg-rose-500/20 transition-colors relative"
+                title="Modo Emergência"
+              >
+                <span className="text-sm">🚨</span>
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white" />
+              </button>
+              {pet.status === 'ATIVO' ? (
+                <span className="mg-badge mg-badge-success text-xs">Ativo</span>
+              ) : (
+                <span className="mg-badge text-xs bg-surface-muted text-texto-soft">Arquivado</span>
+              )}
+            </div>
           </div>
 
           {/* Pet name */}

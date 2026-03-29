@@ -16,6 +16,8 @@ import type {
   RecomendacaoVacina,
   AgendamentoVacina,
   MuralPost,
+  AccessLog,
+  CheckInSession,
 } from '@/types';
 
 // ─── Permissões padrão por tipo de prestador ─────
@@ -88,6 +90,20 @@ export const mockUsuarios: Usuario[] = [
     areaAtuacao: 'Vila Mariana, Moema, Paraíso - SP',
     site: 'instagram.com/pedropetwalker',
   },
+  {
+    id: 'usr-roberto',
+    nome: 'Dr. Roberto Silva',
+    email: 'roberto@mitra.com',
+    telefone: '11999990006',
+    criadoEm: '2025-05-01T10:00:00Z',
+    tipoConta: 'PRESTADOR',
+    tipoUsuario: 'AMBOS',
+    profissao: 'VETERINARIO',
+    bio: 'Veterinário há 12 anos, tutor do Thor e atendo a Mochi como veterinário. Acompanho o Nemo da minha sobrinha.',
+    descricaoServicos: 'Clínica geral, vacinação, dermatologia veterinária.',
+    areaAtuacao: 'São Paulo - SP (Zona Oeste e Centro)',
+    site: 'vetcare.com.br/dr-roberto',
+  },
 ];
 
 // ─── PetUsuarios ─────────────────────────────────
@@ -153,9 +169,93 @@ export const mockPetUsuariosMochi: PetUsuario[] = [
     adicionadoEm: '2025-10-10T10:00:00Z',
     usuario: { id: 'usr-beatriz', nome: 'Beatriz Melo', email: 'beatriz@mitra.com', avatarUrl: undefined },
   },
+  {
+    id: 'pu-7',
+    petId: 'pet-mochi',
+    usuarioId: 'usr-roberto',
+    role: 'VETERINARIO',
+    ativo: true,
+    adicionadoEm: '2025-11-01T10:00:00Z',
+    permissoesSaude: ['carteira', 'vacinas', 'medicamentos', 'sintomas', 'mural'],
+    usuario: { id: 'usr-roberto', nome: 'Dr. Roberto Silva', email: 'roberto@mitra.com', avatarUrl: undefined },
+  },
 ];
 
-// ─── Vacinas ──────────────────────────────────────
+// ─── PetUsuarios Thor (Dr. Roberto é tutor) ──────
+export const mockPetUsuariosThor: PetUsuario[] = [
+  {
+    id: 'pu-8',
+    petId: 'pet-thor',
+    usuarioId: 'usr-roberto',
+    role: 'TUTOR_PRINCIPAL',
+    ativo: true,
+    adicionadoEm: '2025-05-10T10:00:00Z',
+    apresentacao: 'Thor é meu companheiro de trilhas. Como veterinário, cuido dele pessoalmente e acompanho cada detalhe da saúde dele.',
+    usuario: { id: 'usr-roberto', nome: 'Dr. Roberto Silva', email: 'roberto@mitra.com', avatarUrl: undefined },
+  },
+];
+
+// ─── PetUsuarios Nemo (sem vínculo direto — Roberto é visitante via convite) ──
+export const mockPetUsuariosNemo: PetUsuario[] = [
+  {
+    id: 'pu-9',
+    petId: 'pet-nemo',
+    usuarioId: 'usr-ana',
+    role: 'TUTOR_PRINCIPAL',
+    ativo: true,
+    adicionadoEm: '2026-01-15T10:00:00Z',
+    usuario: { id: 'usr-ana', nome: 'Ana Souza', email: 'ana@mitra.com', avatarUrl: undefined },
+  },
+];
+
+// ─── Vacinas Thor ────────────────────────────────────
+export const mockVacinasThor: Vacina[] = [
+  {
+    id: 'vac-thor-1',
+    petId: 'pet-thor',
+    nome: 'V10 (Déctupla)',
+    dataAplicacao: '2025-06-10T10:00:00Z',
+    proximaDose: '2026-06-10T10:00:00Z',
+    veterinario: 'Dr. Roberto Silva',
+    clinica: 'Clínica VetCare',
+    lote: 'VX2025-010',
+    criadoEm: '2025-06-10T10:00:00Z',
+  },
+  {
+    id: 'vac-thor-2',
+    petId: 'pet-thor',
+    nome: 'Antirrábica',
+    dataAplicacao: '2025-09-05T10:00:00Z',
+    proximaDose: '2026-09-05T10:00:00Z',
+    veterinario: 'Dr. Roberto Silva',
+    clinica: 'Clínica VetCare',
+    criadoEm: '2025-09-05T10:00:00Z',
+  },
+];
+
+// ─── Medicamentos Thor ──────────────────────────────
+export const mockMedicamentosThor: Medicamento[] = [
+  {
+    id: 'med-thor-1',
+    petId: 'pet-thor',
+    nome: 'NexGard',
+    dosagem: '1 comprimido (68mg)',
+    frequencia: 'Mensal',
+    dataInicio: '2026-03-01T10:00:00Z',
+    dataFim: '2026-06-01T10:00:00Z',
+    horarios: ['08:00'],
+    veterinario: 'Dr. Roberto Silva',
+    motivo: 'Prevenção de pulgas e carrapatos',
+    status: 'ATIVO',
+    criadoEm: '2026-03-01T10:00:00Z',
+    administracoes: [],
+  },
+];
+
+// ─── Sintomas Thor ──────────────────────────────────
+export const mockSintomasThor: Sintoma[] = [];
+
+// ─── Vacinas Luna ────────────────────────────────────
 export const mockVacinasLuna: Vacina[] = [
   {
     id: 'vac-1',
@@ -497,6 +597,47 @@ export const mockPets: Pet[] = [
     medicamentosAtivos: 0,
     petUsuarios: mockPetUsuariosMochi,
   },
+  {
+    id: 'pet-thor',
+    codigoPet: 'THR9ZW',
+    nome: 'Thor',
+    especie: 'CACHORRO',
+    raca: 'Pastor Alemão',
+    genero: 'MACHO',
+    dataNascimento: '2020-11-08T00:00:00Z',
+    cor: 'Preto e marrom',
+    peso: 35,
+    altura: 62,
+    microchip: '985113009876543',
+    fotoUrl: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=200&h=200&fit=crop&auto=format',
+    brincadeiraFavorita: 'Buscar a bolinha',
+    petiscoFavorito: 'Osso de couro',
+    status: 'ATIVO',
+    criadoEm: '2025-05-10T10:00:00Z',
+    meuRole: 'TUTOR_PRINCIPAL',
+    guardaAtual: null,
+    proximaVacina: mockVacinasThor[1],
+    medicamentosAtivos: 1,
+    petUsuarios: mockPetUsuariosThor,
+  },
+  {
+    id: 'pet-nemo',
+    codigoPet: 'NEM2QR',
+    nome: 'Nemo',
+    especie: 'PEIXE',
+    raca: 'Betta Splendens',
+    genero: 'MACHO',
+    dataNascimento: '2025-08-01T00:00:00Z',
+    cor: 'Vermelho e azul',
+    fotoUrl: 'https://images.unsplash.com/photo-1520302630591-fd1c66edc19d?w=200&h=200&fit=crop&auto=format',
+    status: 'ATIVO',
+    criadoEm: '2026-01-15T10:00:00Z',
+    meuRole: 'TUTOR_PRINCIPAL',
+    guardaAtual: null,
+    proximaVacina: null,
+    medicamentosAtivos: 0,
+    petUsuarios: mockPetUsuariosNemo,
+  },
 ];
 
 // ─── VisitantePets (Beatriz acompanha Mochi) ─────
@@ -517,6 +658,25 @@ export const mockVisitantePets: VisitantePet[] = [
     ],
     relacao: 'Amiga da família',
     petVisitanteId: 'pv-1',
+  },
+];
+
+// Roberto acompanha Nemo como visitante (sobrinha da Ana)
+export const mockVisitantePetsRoberto: VisitantePet[] = [
+  {
+    id: 'pet-nemo',
+    nome: 'Nemo',
+    especie: 'PEIXE',
+    raca: 'Betta Splendens',
+    fotoUrl: mockPets[3].fotoUrl,
+    dataNascimento: mockPets[3].dataNascimento,
+    permissoesVisualizacao: [
+      'DADOS_BASICOS',
+      'STATUS_SAUDE',
+      'TIMELINE_ATUALIZACOES',
+    ],
+    relacao: 'Tio / Veterinário da família',
+    petVisitanteId: 'pv-2',
   },
 ];
 
@@ -556,6 +716,65 @@ export const mockDashboardMochi: DashboardData = {
       descricao: 'Pet adicionado ao sistema por Ana Souza.',
       autorId: 'usr-ana',
       criadoEm: '2025-10-01T10:00:00Z',
+    },
+  ],
+};
+
+// ─── Dashboard Thor ──────────────────────────────
+export const mockDashboardThor: DashboardData = {
+  pet: mockPets[2],
+  alertas: {
+    vacinaVencendo: false,
+    solicitacoesPendentes: 0,
+  },
+  hoje: {
+    proximaVacina: mockVacinasThor[1],
+    proximoMedicamento: mockMedicamentosThor[0],
+    guardaAtual: null,
+  },
+  atividadeRecente: [
+    {
+      id: 'evt-thor-2',
+      petId: 'pet-thor',
+      tipo: 'MEDICAMENTO_ADMINISTRADO',
+      titulo: 'NexGard administrado',
+      descricao: 'Dose mensal administrada por Dr. Roberto.',
+      autorId: 'usr-roberto',
+      criadoEm: '2026-03-01T08:00:00Z',
+    },
+    {
+      id: 'evt-thor-1',
+      petId: 'pet-thor',
+      tipo: 'PET_CRIADO',
+      titulo: 'Thor cadastrado no MITRA',
+      descricao: 'Pet adicionado ao sistema por Dr. Roberto Silva.',
+      autorId: 'usr-roberto',
+      criadoEm: '2025-05-10T10:00:00Z',
+    },
+  ],
+};
+
+// ─── Dashboard Nemo ──────────────────────────────
+export const mockDashboardNemo: DashboardData = {
+  pet: mockPets[3],
+  alertas: {
+    vacinaVencendo: false,
+    solicitacoesPendentes: 0,
+  },
+  hoje: {
+    proximaVacina: null,
+    proximoMedicamento: null,
+    guardaAtual: null,
+  },
+  atividadeRecente: [
+    {
+      id: 'evt-nemo-1',
+      petId: 'pet-nemo',
+      tipo: 'PET_CRIADO',
+      titulo: 'Nemo cadastrado no MITRA',
+      descricao: 'Pet adicionado ao sistema por Ana Souza.',
+      autorId: 'usr-ana',
+      criadoEm: '2026-01-15T10:00:00Z',
     },
   ],
 };
@@ -613,13 +832,33 @@ export const mockAgendamentosMochi: AgendamentoVacina[] = [];
 // ─── Mural Posts ─────────────────────────────────
 export const mockMuralLuna: MuralPost[] = [
   {
+    id: 'mural-auto-1',
+    petId: 'pet-luna',
+    autorId: 'system',
+    autorNome: 'MITRA',
+    autorRole: 'SISTEMA',
+    tipo: 'AUTO_EVENT',
+    texto: 'Ana registrou vacina V10 🎉',
+    fotos: [],
+    reactions: [
+      { emoji: '🐾', autorId: 'usr-roberto', autorNome: 'Dr. Roberto' },
+    ],
+    criadoEm: '2026-03-22T09:00:00Z',
+  },
+  {
     id: 'mural-1',
     petId: 'pet-luna',
     autorId: 'usr-ana',
     autorNome: 'Dra. Camila Torres',
     autorRole: 'VETERINARIO',
+    tipo: 'PHOTO',
     texto: 'Luna está respondendo bem ao tratamento. Pelagem mais brilhante e sem sinais de irritação.',
     fotos: ['https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop'],
+    reactions: [
+      { emoji: '❤️', autorId: 'user-1', autorNome: 'Ana Souza' },
+      { emoji: '🐾', autorId: 'usr-roberto', autorNome: 'Dr. Roberto' },
+      { emoji: '👏', autorId: 'user-2', autorNome: 'Pedro' },
+    ],
     criadoEm: '2026-03-20T14:30:00Z',
   },
   {
@@ -628,8 +867,12 @@ export const mockMuralLuna: MuralPost[] = [
     autorId: 'user-1',
     autorNome: 'Ana Souza',
     autorRole: 'TUTOR_PRINCIPAL',
+    tipo: 'PHOTO',
     texto: 'Luna brincando no parque hoje! Muito mais ativa depois do novo remédio.',
     fotos: ['https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=300&fit=crop'],
+    reactions: [
+      { emoji: '❤️', autorId: 'usr-ana', autorNome: 'Dra. Camila' },
+    ],
     criadoEm: '2026-03-18T10:15:00Z',
   },
   {
@@ -638,13 +881,58 @@ export const mockMuralLuna: MuralPost[] = [
     autorId: 'usr-ana',
     autorNome: 'Dra. Camila Torres',
     autorRole: 'VETERINARIO',
+    tipo: 'TEXT',
     texto: 'Resultado do exame de sangue: tudo dentro dos parâmetros normais. Próxima consulta em 3 meses.',
     fotos: [],
+    reactions: [
+      { emoji: '👏', autorId: 'user-1', autorNome: 'Ana Souza' },
+      { emoji: '❤️', autorId: 'user-2', autorNome: 'Pedro' },
+    ],
     criadoEm: '2026-03-15T09:00:00Z',
   },
 ];
 
 export const mockMuralMochi: MuralPost[] = [];
+
+export const mockMuralThor: MuralPost[] = [
+  {
+    id: 'mural-thor-auto-1',
+    petId: 'pet-thor',
+    autorId: 'system',
+    autorNome: 'MITRA',
+    autorRole: 'SISTEMA',
+    tipo: 'AUTO_EVENT',
+    texto: 'Dr. Roberto registrou vacina V10 para Thor 🛡️',
+    fotos: [],
+    reactions: [],
+    criadoEm: '2026-03-10T10:00:00Z',
+  },
+];
+export const mockMuralNemo: MuralPost[] = [];
+
+// ─── Access Logs (F10) ────────────────────────────
+export const mockAccessLogs: AccessLog[] = [
+  { id: 'al-1', petId: 'pet-luna', usuarioId: 'usr-roberto', usuarioNome: 'Dr. Roberto Silva', acao: 'Visualizou carteira de vacinação', criadoEm: '2026-03-28T14:30:00Z' },
+  { id: 'al-2', petId: 'pet-luna', usuarioId: 'usr-roberto', usuarioNome: 'Dr. Roberto Silva', acao: 'Visualizou medicamentos', criadoEm: '2026-03-28T14:28:00Z' },
+  { id: 'al-3', petId: 'pet-luna', usuarioId: 'user-2', usuarioNome: 'Pedro Santos', acao: 'Visualizou perfil', criadoEm: '2026-03-27T10:00:00Z' },
+  { id: 'al-4', petId: 'pet-luna', usuarioId: 'usr-roberto', usuarioNome: 'Dr. Roberto Silva', acao: 'Registrou vacina V10', criadoEm: '2026-03-25T09:15:00Z' },
+  { id: 'al-5', petId: 'pet-luna', usuarioId: 'user-1', usuarioNome: 'Ana Souza', acao: 'Atualizou dados do perfil', criadoEm: '2026-03-24T16:00:00Z' },
+  { id: 'al-6', petId: 'pet-thor', usuarioId: 'usr-roberto', usuarioNome: 'Dr. Roberto Silva', acao: 'Registrou vacina V10', criadoEm: '2026-03-10T10:00:00Z' },
+];
+
+// ─── Check-in Sessions (F11) ────────────────────────
+export const mockCheckInSessions: CheckInSession[] = [
+  {
+    id: 'ci-1', petId: 'pet-luna', prestadorId: 'user-3', prestadorNome: 'João Mendes',
+    tipo: 'PASSEIO', inicio: '2026-03-28T09:30:00Z', fim: '2026-03-28T10:15:00Z',
+    duracao: 45, observacoes: 'Luna passeou pelo parque e brincou com outros cães.',
+  },
+  {
+    id: 'ci-2', petId: 'pet-luna', prestadorId: 'user-3', prestadorNome: 'João Mendes',
+    tipo: 'PASSEIO', inicio: '2026-03-26T09:00:00Z', fim: '2026-03-26T09:50:00Z',
+    duracao: 50, observacoes: 'Passeio tranquilo, clima bom.',
+  },
+];
 
 // ─── Notificações ─────────────────────────────────
 export const mockNotificacoes: Notificacao[] = [

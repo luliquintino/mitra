@@ -8,25 +8,35 @@ import {
   mockUsuarios,
   mockPets,
   mockVacinasLuna,
+  mockVacinasThor,
   mockMedicamentosLuna,
+  mockMedicamentosThor,
   mockSintomasLuna,
+  mockSintomasThor,
   mockPlanoSaudeLuna,
   mockGuardasLuna,
   mockSolicitacoesLuna,
   mockEventosLuna,
   mockDashboardLuna,
   mockDashboardMochi,
+  mockDashboardThor,
+  mockDashboardNemo,
   mockPetUsuariosLuna,
   mockPetUsuariosMochi,
+  mockPetUsuariosThor,
+  mockPetUsuariosNemo,
   mockNotificacoes,
   mockCompromissosLuna,
   mockVisitantePets,
+  mockVisitantePetsRoberto,
   mockRecomendacoesLuna,
   mockRecomendacoesMochi,
   mockAgendamentosLuna,
   mockAgendamentosMochi,
   mockMuralLuna,
   mockMuralMochi,
+  mockMuralThor,
+  mockMuralNemo,
   DEFAULT_PRESTADOR_SAUDE_PERMISSIONS,
 } from './mock-data';
 
@@ -53,22 +63,32 @@ let _pets = [...mockPets];
 let _vacinas: Record<string, Vacina[]> = {
   'pet-luna': [...mockVacinasLuna],
   'pet-mochi': [],
+  'pet-thor': [...mockVacinasThor],
+  'pet-nemo': [],
 };
 let _medicamentos: Record<string, Medicamento[]> = {
   'pet-luna': [...mockMedicamentosLuna],
   'pet-mochi': [],
+  'pet-thor': [...mockMedicamentosThor],
+  'pet-nemo': [],
 };
 let _sintomas: Record<string, Sintoma[]> = {
   'pet-luna': [...mockSintomasLuna],
   'pet-mochi': [],
+  'pet-thor': [...mockSintomasThor],
+  'pet-nemo': [],
 };
 let _planos: Record<string, PlanoSaude | null> = {
   'pet-luna': { ...mockPlanoSaudeLuna },
   'pet-mochi': null,
+  'pet-thor': null,
+  'pet-nemo': null,
 };
 let _solicitacoes: Record<string, Solicitacao[]> = {
   'pet-luna': [...mockSolicitacoesLuna],
   'pet-mochi': [],
+  'pet-thor': [],
+  'pet-nemo': [],
 };
 let _eventos: Record<string, Evento[]> = {
   'pet-luna': [...mockEventosLuna],
@@ -83,29 +103,70 @@ let _eventos: Record<string, Evento[]> = {
       criadoEm: '2025-10-01T10:00:00Z',
     },
   ],
+  'pet-thor': [
+    {
+      id: 'evt-thor-2',
+      petId: 'pet-thor',
+      tipo: 'MEDICAMENTO_ADMINISTRADO',
+      titulo: 'NexGard administrado',
+      descricao: 'Dose mensal administrada por Dr. Roberto.',
+      autorId: 'usr-roberto',
+      criadoEm: '2026-03-01T08:00:00Z',
+    },
+    {
+      id: 'evt-thor-1',
+      petId: 'pet-thor',
+      tipo: 'PET_CRIADO',
+      titulo: 'Thor cadastrado no MITRA',
+      descricao: 'Pet adicionado ao sistema por Dr. Roberto Silva.',
+      autorId: 'usr-roberto',
+      criadoEm: '2025-05-10T10:00:00Z',
+    },
+  ],
+  'pet-nemo': [
+    {
+      id: 'evt-nemo-1',
+      petId: 'pet-nemo',
+      tipo: 'PET_CRIADO',
+      titulo: 'Nemo cadastrado no MITRA',
+      descricao: 'Pet adicionado ao sistema por Ana Souza.',
+      autorId: 'usr-ana',
+      criadoEm: '2026-01-15T10:00:00Z',
+    },
+  ],
 };
 let _tutores: Record<string, PetUsuario[]> = {
   'pet-luna': [...mockPetUsuariosLuna],
   'pet-mochi': [...mockPetUsuariosMochi],
+  'pet-thor': [...mockPetUsuariosThor],
+  'pet-nemo': [...mockPetUsuariosNemo],
 };
 let _notifications = [...mockNotificacoes];
 let _compromissos: Record<string, Compromisso[]> = {
   'pet-luna': [...mockCompromissosLuna],
   'pet-mochi': [],
+  'pet-thor': [],
+  'pet-nemo': [],
 };
 
 let _guardasTemporarias: Record<string, any[]> = {};
 let _recomendacoes: Record<string, RecomendacaoVacina[]> = {
   'pet-luna': [...mockRecomendacoesLuna],
   'pet-mochi': [...mockRecomendacoesMochi],
+  'pet-thor': [],
+  'pet-nemo': [],
 };
 let _agendamentos: Record<string, AgendamentoVacina[]> = {
   'pet-luna': [...mockAgendamentosLuna],
   'pet-mochi': [...mockAgendamentosMochi],
+  'pet-thor': [],
+  'pet-nemo': [],
 };
 let _muralPosts: Record<string, MuralPost[]> = {
   'pet-luna': [...mockMuralLuna],
   'pet-mochi': [...mockMuralMochi],
+  'pet-thor': [...mockMuralThor],
+  'pet-nemo': [...mockMuralNemo],
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -252,6 +313,8 @@ export const mockPetsApi = {
   dashboard: async (id: string) => {
     if (id === 'pet-luna') return delay(mockDashboardLuna);
     if (id === 'pet-mochi') return delay(mockDashboardMochi);
+    if (id === 'pet-thor') return delay(mockDashboardThor);
+    if (id === 'pet-nemo') return delay(mockDashboardNemo);
     // Pet recém-criado: dashboard vazio
     return delay({
       alertas: [],
@@ -523,6 +586,7 @@ export const mockHealthApi = {
   },
 
   createMuralPost: async (petId: string, data: { texto?: string; fotos: string[] }) => {
+    const tipo = data.fotos.length > 0 ? 'PHOTO' : 'TEXT';
     const post: MuralPost = {
       id: uuid(),
       petId,
@@ -530,13 +594,36 @@ export const mockHealthApi = {
       autorNome: _user?.nome || '',
       autorRole:
         (_tutores[petId] || []).find((pu) => pu.usuarioId === _user?.id)?.role || 'TUTOR_PRINCIPAL',
+      tipo: tipo as any,
       texto: data.texto,
       fotos: data.fotos,
+      reactions: [],
       criadoEm: new Date().toISOString(),
     };
     if (!_muralPosts[petId]) _muralPosts[petId] = [];
     _muralPosts[petId].unshift(post);
     return delay({ data: post, mensagem: 'Post criado com sucesso!' });
+  },
+
+  addReaction: async (petId: string, postId: string, emoji: string) => {
+    const posts = _muralPosts[petId] || [];
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return delay({ error: 'Post não encontrado' });
+    if (!post.reactions) post.reactions = [];
+    // Toggle: remove if already reacted with same emoji
+    const existing = post.reactions.findIndex(
+      (r) => r.autorId === (_user?.id || '') && r.emoji === emoji,
+    );
+    if (existing >= 0) {
+      post.reactions.splice(existing, 1);
+    } else {
+      post.reactions.push({
+        emoji,
+        autorId: _user?.id || '',
+        autorNome: _user?.nome || '',
+      });
+    }
+    return delay({ data: post });
   },
 
   upsertPlano: async (petId: string, data: any) => {
@@ -560,7 +647,7 @@ export const mockHealthApi = {
 // ─── Custody ──────────────────────────────────────────────────────────────────
 
 export const mockCustodyApi = {
-  guardas: async (petId: string) => delay(petId === 'pet-luna' ? mockGuardasLuna : []),
+  guardas: async (petId: string) => delay(petId === 'pet-luna' ? [...mockGuardasLuna] : []),
 
   solicitacoes: async (petId: string) => delay(_solicitacoes[petId] || []),
 
@@ -837,6 +924,60 @@ export const mockPrestadoresApi = {
   },
 };
 
+// ─── Access Logs (F10) ──────────────────────────────────────────────────────
+
+export const mockAccessLogsApi = {
+  list: async (petId: string) => {
+    const { mockAccessLogs } = await import('@/lib/mock-data');
+    const logs = mockAccessLogs.filter((l) => l.petId === petId);
+    return delay(logs);
+  },
+};
+
+// ─── Check-in Sessions (F11) ────────────────────────────────────────────────
+
+let _checkInSessions: Record<string, any[]> = {};
+
+export const mockCheckInApi = {
+  list: async (petId: string) => {
+    if (Object.keys(_checkInSessions).length === 0) {
+      const { mockCheckInSessions } = await import('@/lib/mock-data');
+      for (const s of mockCheckInSessions) {
+        if (!_checkInSessions[s.petId]) _checkInSessions[s.petId] = [];
+        _checkInSessions[s.petId].push(s);
+      }
+    }
+    return delay(_checkInSessions[petId] || []);
+  },
+  checkIn: async (petId: string) => {
+    const session = {
+      id: uuid(),
+      petId,
+      prestadorId: _user?.id || '',
+      prestadorNome: _user?.nome || '',
+      tipo: 'PASSEIO',
+      inicio: new Date().toISOString(),
+    };
+    if (!_checkInSessions[petId]) _checkInSessions[petId] = [];
+    _checkInSessions[petId].unshift(session);
+    return delay(session);
+  },
+  checkOut: async (petId: string, sessionId: string, observacoes?: string) => {
+    const sessions = _checkInSessions[petId] || [];
+    const session = sessions.find((s) => s.id === sessionId);
+    if (!session) return delay({ error: 'Sessão não encontrada' });
+    session.fim = new Date().toISOString();
+    session.duracao = Math.round((new Date(session.fim).getTime() - new Date(session.inicio).getTime()) / 60000);
+    if (observacoes) session.observacoes = observacoes;
+    return delay(session);
+  },
+  getActive: async (petId: string) => {
+    const sessions = _checkInSessions[petId] || [];
+    const active = sessions.find((s: any) => !s.fim);
+    return delay(active || null);
+  },
+};
+
 // ─── Visitantes ──────────────────────────────────────────────────────────────
 
 export const mockVisitantesApi = {
@@ -852,6 +993,9 @@ export const mockVisitantesApi = {
     }
     if (_user?.tipoConta === 'VISITANTE' || _user?.id === 'usr-beatriz') {
       return delay([...mockVisitantePets]);
+    }
+    if (_user?.id === 'usr-roberto') {
+      return delay([...mockVisitantePetsRoberto]);
     }
     return delay([]);
   },

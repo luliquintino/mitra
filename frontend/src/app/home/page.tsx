@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNotificacoes } from '@/contexts/NotificacaoContext';
 import { petsApi, visitantesApi } from '@/lib/api';
 import { Pet, VisitantePet, ConvitePendente, Notificacao } from '@/types';
-import { cn, especieLabel, petAge } from '@/lib/utils';
+import { cn, especieLabel, petAge, daysUntilBirthday, petAgeYears } from '@/lib/utils';
 import { timeConfig } from '@/lib/config';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 import { PetImage } from '@/components/PetImage';
@@ -398,7 +398,19 @@ function PetCard({ pet, onClick }: { pet: Pet; onClick: () => void }) {
             {pet.raca ? ` · ${pet.raca}` : ''}
           </p>
           {pet.dataNascimento && (
-            <p className="text-xs text-texto-soft mt-0.5">{petAge(pet.dataNascimento)}</p>
+            <p className="text-xs text-texto-soft mt-0.5">
+              {petAge(pet.dataNascimento)}
+              {(() => {
+                const days = daysUntilBirthday(pet.dataNascimento);
+                if (days === null) return null;
+                if (days === 0) return <span className="ml-1.5 text-primary font-bold">🎂 Hoje!</span>;
+                if (days <= 30) {
+                  const nextAge = (petAgeYears(pet.dataNascimento) ?? 0) + 1;
+                  return <span className="ml-1.5 text-primary/80"> · 🎂 faz {nextAge} em {days}d</span>;
+                }
+                return null;
+              })()}
+            </p>
           )}
         </div>
 

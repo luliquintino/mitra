@@ -265,6 +265,81 @@ export function generateTutorSmartCards(input: SmartCardInput): SmartCard[] {
     });
   }
 
+  // ── REMINDER: Vet overdue (>6 meses sem consulta) ──
+  const vetEvents = input.eventos.filter(
+    (e) => e.tipo === 'CONSULTA_VETERINARIA' || e.tipo === 'CONSULTA_REGISTRADA',
+  );
+  if (vetEvents.length > 0) {
+    const lastVet = vetEvents.reduce((a, b) =>
+      new Date(a.criadoEm) > new Date(b.criadoEm) ? a : b,
+    );
+    const daysSinceVet = differenceInDays(now, new Date(lastVet.criadoEm));
+    if (daysSinceVet > 180) {
+      cards.push({
+        id: 'vet-overdue',
+        priority: 'reminder',
+        icon: '🩺',
+        title: `${input.pet.nome} não vai ao veterinário há ${Math.floor(daysSinceVet / 30)} meses`,
+        description: 'Agende um check-up de rotina.',
+        action: { label: 'Ver saúde', href: `/pets/${petId}/saude` },
+      });
+    }
+  } else if (input.eventos.length > 0) {
+    // Has events but never went to vet
+    cards.push({
+      id: 'vet-never',
+      priority: 'suggestion',
+      icon: '🩺',
+      title: `Nenhuma consulta veterinária registrada para ${input.pet.nome}`,
+      description: 'Agende a primeira consulta.',
+      action: { label: 'Ver saúde', href: `/pets/${petId}/saude` },
+    });
+  }
+
+  // ── REMINDER: Check-up geriátrico (cão >7a, gato >10a) ──
+  if (input.pet.dataNascimento) {
+    const birthDate = new Date(input.pet.dataNascimento);
+    const ageYears = Math.floor(differenceInDays(now, birthDate) / 365.25);
+    const isGeriatric =
+      (input.pet.especie === 'CACHORRO' && ageYears >= 7) ||
+      (input.pet.especie === 'GATO' && ageYears >= 10) ||
+      ageYears >= 10;
+
+    if (isGeriatric) {
+      // Check if had a vet visit in last 6 months
+      const recentVet = vetEvents.some(
+        (e) => differenceInDays(now, new Date(e.criadoEm)) < 180,
+      );
+      if (!recentVet) {
+        cards.push({
+          id: 'geriatric-checkup',
+          priority: 'warning',
+          icon: '🏥',
+          title: `${input.pet.nome} tem ${ageYears} anos — check-up geriátrico recomendado`,
+          description: 'Pets seniores precisam de acompanhamento mais frequente.',
+          action: { label: 'Ver saúde', href: `/pets/${petId}/saude` },
+        });
+      }
+    }
+  }
+
+  // ── SUGGESTION: Inatividade (>7 dias sem eventos) ──
+  if (input.eventos.length > 0) {
+    const latestEvent = input.eventos.reduce((a, b) =>
+      new Date(a.criadoEm) > new Date(b.criadoEm) ? a : b,
+    );
+    const daysSinceLast = differenceInDays(now, new Date(latestEvent.criadoEm));
+    if (daysSinceLast >= 7) {
+      cards.push({
+        id: 'inactivity',
+        priority: 'suggestion',
+        icon: '💤',
+        title: `Nenhum registro há ${daysSinceLast} dias`,
+        description: `Que tal atualizar algo sobre ${input.pet.nome}?`,
+      });
+    }
+  }
+
   // Sort by priority
   cards.sort(
     (a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority],

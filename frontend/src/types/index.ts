@@ -225,6 +225,7 @@ export interface Evento {
   descricao?: string;
   dados?: Record<string, unknown>;
   autorId?: string;
+  autorNome?: string;
   criadoEm: string;
 }
 
@@ -370,15 +371,49 @@ export interface AgendamentoVacina {
   criadoEm: string;
 }
 
+export interface MuralReaction {
+  emoji: string;
+  autorId: string;
+  autorNome: string;
+}
+
+export type MuralPostType = 'TEXT' | 'PHOTO' | 'AUTO_EVENT';
+
 export interface MuralPost {
   id: string;
   petId: string;
   autorId: string;
   autorNome: string;
   autorRole: string;
+  tipo?: MuralPostType;
   texto?: string;
   fotos: string[];
+  reactions?: MuralReaction[];
   criadoEm: string;
+}
+
+// F10: Access Log
+export interface AccessLog {
+  id: string;
+  petId: string;
+  usuarioId: string;
+  usuarioNome: string;
+  acao: string;
+  criadoEm: string;
+}
+
+// F11: Check-in Session
+export interface CheckInSession {
+  id: string;
+  petId: string;
+  prestadorId: string;
+  prestadorNome: string;
+  tipo: string;
+  inicio: string;
+  fim?: string;
+  duracao?: number; // minutos
+  fotos?: string[];
+  observacoes?: string;
 }
 
 // Novos EventoTipos suportados (complementam o tipo string em Evento)

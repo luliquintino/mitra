@@ -162,3 +162,68 @@ export function getInitials(nome: string): string {
     .join('')
     .toUpperCase();
 }
+
+// ─── F2: Aniversário e Marcos Temporais ──────────────────────────────────
+
+export function daysUntilBirthday(dataNascimento: string | null | undefined): number | null {
+  if (!dataNascimento) return null;
+  try {
+    const birth = typeof dataNascimento === 'string' ? parseISO(dataNascimento) : dataNascimento;
+    if (!isValid(birth)) return null;
+    const now = new Date();
+    const thisYearBirthday = new Date(now.getFullYear(), birth.getMonth(), birth.getDate());
+    if (thisYearBirthday < now) {
+      // Already passed this year, calculate for next year
+      thisYearBirthday.setFullYear(now.getFullYear() + 1);
+    }
+    return Math.ceil((thisYearBirthday.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  } catch {
+    return null;
+  }
+}
+
+export function petAgeYears(dataNascimento: string | null | undefined): number | null {
+  if (!dataNascimento) return null;
+  try {
+    const birth = typeof dataNascimento === 'string' ? parseISO(dataNascimento) : dataNascimento;
+    if (!isValid(birth)) return null;
+    const now = new Date();
+    let age = now.getFullYear() - birth.getFullYear();
+    const m = now.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+    return age;
+  } catch {
+    return null;
+  }
+}
+
+export interface MitraMilestone {
+  id: string;
+  emoji: string;
+  label: string;
+  achieved: boolean;
+  days: number;
+}
+
+export function mitraMilestones(criadoEm: string): MitraMilestone[] {
+  const created = parseISO(criadoEm);
+  if (!isValid(created)) return [];
+  const now = new Date();
+  const daysSinceCreation = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+
+  const defs = [
+    { days: 7, emoji: '🌱', label: '1 semana no MITRA' },
+    { days: 30, emoji: '🌿', label: '1 mês no MITRA' },
+    { days: 100, emoji: '🌟', label: '100 dias no MITRA' },
+    { days: 365, emoji: '🏆', label: '1 ano no MITRA' },
+    { days: 730, emoji: '💎', label: '2 anos no MITRA' },
+  ];
+
+  return defs.map((d) => ({
+    id: `milestone-${d.days}`,
+    emoji: d.emoji,
+    label: d.label,
+    achieved: daysSinceCreation >= d.days,
+    days: d.days,
+  }));
+}

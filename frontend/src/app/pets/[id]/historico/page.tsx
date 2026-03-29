@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { eventsApi } from '@/lib/api';
-import { Evento } from '@/types';
-import { cn, formatDate, eventoIcon } from '@/lib/utils';
+import { eventsApi, accessLogsApi } from '@/lib/api';
+import { Evento, AccessLog } from '@/types';
+import { cn, formatDate, formatRelative, eventoIcon, getInitials } from '@/lib/utils';
 import {
   Clock,
   Calendar,
@@ -14,6 +14,9 @@ import {
   Camera,
   Plus,
   Tag,
+  Eye,
+  Filter,
+  Users,
 } from 'lucide-react';
 
 // ─── Filter Categories ──────────────────────────────────────────────────────────
@@ -118,19 +121,26 @@ export default function HistoricoPage() {
   const petId = params?.id as string;
 
   const [eventos, setEventos] = useState<Evento[]>([]);
+  const [accessLogs, setAccessLogs] = useState<AccessLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<SubTab>('timeline');
   const [activeFilters, setActiveFilters] = useState<Set<FilterKey>>(() => new Set<FilterKey>(['TODOS']));
+  const [personFilter, setPersonFilter] = useState<string | null>(null);
+  const [showPersonDropdown, setShowPersonDropdown] = useState(false);
 
   // ─── Data Fetching ──────────────────────────────────────────────────────────
 
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await eventsApi.historico(petId);
-        const data = res.data;
+        const [evRes, logsData] = await Promise.all([
+          eventsApi.historico(petId),
+          accessLogsApi.list(petId).catch(() => []),
+        ]);
+        const data = evRes.data;
         const list = Array.isArray(data) ? data : (data as Record<string, unknown>)?.eventos as Evento[] || [];
         setEventos(list);
+        setAccessLogs(Array.isArray(logsData) ? logsData : []);
       } catch {
         setEventos([]);
       } finally {
@@ -159,14 +169,47 @@ export default function HistoricoPage() {
     });
   }
 
-  const filteredEventos = useMemo(() => {
-    if (activeFilters.has('TODOS')) return eventos;
-    const allowedTipos = new Set<string>();
-    activeFilters.forEach((f) => {
-      FILTER_TIPOS[f].forEach((t) => allowedTipos.add(t));
+  // Build author name map from access logs + event descriptions
+  const authorNames = useMemo(() => {
+    const map = new Map<string, string>();
+    accessLogs.forEach((l) => map.set(l.usuarioId, l.usuarioNome));
+    // Extract from event descriptions (common pattern: "Ana Souza registrou...")
+    eventos.forEach((e) => {
+      if (e.autorId && e.autorNome) map.set(e.autorId, e.autorNome);
     });
-    return eventos.filter((e) => allowedTipos.has(e.tipo));
-  }, [eventos, activeFilters]);
+    return map;
+  }, [eventos, accessLogs]);
+
+  // Unique authors for person filter
+  const uniquePersons = useMemo(() => {
+    const ids = new Set<string>();
+    eventos.forEach((e) => { if (e.autorId) ids.add(e.autorId); });
+    accessLogs.forEach((l) => ids.add(l.usuarioId));
+    return Array.from(ids).map((id) => ({
+      id,
+      nome: authorNames.get(id) || id,
+    }));
+  }, [eventos, accessLogs, authorNames]);
+
+  const filteredEventos = useMemo(() => {
+    let result = eventos;
+
+    // Type filter
+    if (!activeFilters.has('TODOS')) {
+      const allowedTipos = new Set<string>();
+      activeFilters.forEach((f) => {
+        FILTER_TIPOS[f].forEach((t) => allowedTipos.add(t));
+      });
+      result = result.filter((e) => allowedTipos.has(e.tipo));
+    }
+
+    // Person filter
+    if (personFilter) {
+      result = result.filter((e) => e.autorId === personFilter);
+    }
+
+    return result;
+  }, [eventos, activeFilters, personFilter]);
 
   const groups = useMemo(() => groupByMonth(filteredEventos), [filteredEventos]);
 
@@ -263,6 +306,74 @@ export default function HistoricoPage() {
             })}
           </div>
 
+          {/* Person Filter (F12) */}
+          {uniquePersons.length > 1 && (
+            <div className="relative">
+              <button
+                onClick={() => setShowPersonDropdown(!showPersonDropdown)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-headline font-bold transition-all',
+                  personFilter
+                    ? 'bg-primary text-white'
+                    : 'bg-surface-muted/50 text-texto-soft hover:bg-surface-muted',
+                )}
+              >
+                <Users className="w-3 h-3" />
+                {personFilter ? authorNames.get(personFilter)?.split(' ')[0] || 'Pessoa' : 'Por pessoa'}
+              </button>
+              {showPersonDropdown && (
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border z-20 py-1 min-w-[180px] animate-fade-in">
+                  <button
+                    onClick={() => { setPersonFilter(null); setShowPersonDropdown(false); }}
+                    className={cn(
+                      'w-full text-left px-3 py-2 text-xs hover:bg-surface-muted/50 transition-colors',
+                      !personFilter && 'text-primary font-bold',
+                    )}
+                  >
+                    Todos
+                  </button>
+                  {uniquePersons.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => { setPersonFilter(p.id); setShowPersonDropdown(false); }}
+                      className={cn(
+                        'w-full text-left px-3 py-2 text-xs hover:bg-surface-muted/50 transition-colors flex items-center gap-2',
+                        personFilter === p.id && 'text-primary font-bold',
+                      )}
+                    >
+                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-[8px] font-bold text-primary shrink-0">
+                        {getInitials(p.nome)}
+                      </div>
+                      {p.nome}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Access Log Events (F12) */}
+          {accessLogs.length > 0 && !personFilter && activeFilters.has('TODOS') && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-headline font-bold text-texto-soft uppercase tracking-wider flex items-center gap-1.5">
+                <Eye className="w-3 h-3" /> Atividade de acesso
+              </p>
+              {accessLogs.slice(0, 5).map((log) => (
+                <div key={log.id} className="flex items-center gap-3 py-1.5 opacity-60">
+                  <div className="w-7 h-7 rounded-full bg-surface-muted/50 flex items-center justify-center shrink-0">
+                    <Eye className="w-3 h-3 text-texto-muted" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] text-texto-soft truncate">
+                      <span className="font-semibold">{log.usuarioNome.split(' ')[0]}</span> {log.acao.toLowerCase()}
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-texto-muted whitespace-nowrap">{formatRelative(log.criadoEm)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Event Count */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-texto-soft">
@@ -342,8 +453,11 @@ export default function HistoricoPage() {
                                 {/* Meta row */}
                                 <div className="flex items-center gap-2 mt-2 flex-wrap">
                                   {evento.autorId && (
-                                    <span className="mg-badge">
-                                      Registrado
+                                    <span className="mg-badge flex items-center gap-1">
+                                      <span className="w-3.5 h-3.5 rounded-full bg-primary/20 flex items-center justify-center text-[7px] font-bold text-primary">
+                                        {getInitials(authorNames.get(evento.autorId) || '?')}
+                                      </span>
+                                      {(authorNames.get(evento.autorId) || 'Registrado').split(' ')[0]}
                                     </span>
                                   )}
                                   <span className="text-[10px] text-texto-soft/60">

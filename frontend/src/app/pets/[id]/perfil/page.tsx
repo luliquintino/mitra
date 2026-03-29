@@ -2,15 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { petsApi, governanceApi, usersApi, custodyApi } from '@/lib/api';
+import { petsApi, governanceApi, usersApi, custodyApi, accessLogsApi } from '@/lib/api';
 import { DEFAULT_PRESTADOR_SAUDE_PERMISSIONS } from '@/lib/mock-data';
 import { BottomSheet } from '@/components/BottomSheet';
-import { Pet, PetUsuario, PetVisitante } from '@/types';
+import { CareCircle } from '@/components/pet/CareCircle';
+import { QRCodeSVG } from 'qrcode.react';
+import { Pet, PetUsuario, PetVisitante, AccessLog } from '@/types';
 import {
   especieLabel,
   generoLabel,
   petAge,
   formatDate,
+  formatRelative,
   roleLabel,
   getInitials,
   cn,
@@ -39,6 +42,7 @@ import {
   Tag,
   Settings,
   Save,
+  Eye,
 } from 'lucide-react';
 
 export default function PerfilPage() {
@@ -90,6 +94,9 @@ export default function PerfilPage() {
   const [visitanteSaving, setVisitanteSaving] = useState(false);
   const [visitanteError, setVisitanteError] = useState('');
 
+  // F10: Access logs
+  const [accessLogs, setAccessLogs] = useState<AccessLog[]>([]);
+
   useEffect(() => {
     Promise.all([
       petsApi.get(petId),
@@ -108,6 +115,11 @@ export default function PerfilPage() {
       .then(({ data }) => setVisitantes(Array.isArray(data) ? data : []))
       .catch(() => setVisitantes([]))
       .finally(() => setVisitantesLoading(false));
+
+    // F10: Load access logs
+    accessLogsApi.list(petId)
+      .then((data: any) => setAccessLogs(Array.isArray(data) ? data : []))
+      .catch(() => setAccessLogs([]));
   }, [petId, router]);
 
   const handleAddTutor = async (e: React.FormEvent) => {
@@ -492,6 +504,16 @@ export default function PerfilPage() {
           <p className="text-sm text-texto-soft font-body mt-1">Pessoas com acesso ao perfil de {pet.nome}</p>
         </div>
 
+        {/* Care Circle Visual (F6) */}
+        {tutores.length > 0 && (
+          <CareCircle
+            petNome={pet.nome}
+            petEmoji={({'CACHORRO':'🐶','GATO':'🐱','CAVALO':'🐴','PEIXE':'🐟','PASSARO':'🐦','ROEDOR':'���','COELHO':'🐰','REPTIL':'🦎','FURAO':'🦦'} as Record<string, string>)[pet.especie] || '🐾'}
+            tutores={tutores}
+            className="py-2"
+          />
+        )}
+
         {/* === Tutores === */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -822,6 +844,37 @@ export default function PerfilPage() {
         </div>
       </div>
 
+      {/* Section 3b: Access Log (F10) */}
+      {accessLogs.length > 0 && (
+        <div className="mg-card space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center">
+              <Eye className="w-4 h-4 text-info" />
+            </div>
+            <h3 className="font-headline text-lg font-bold text-texto">Atividade de acesso</h3>
+          </div>
+          <p className="text-sm text-texto-soft font-body">Últimas ações na ficha de {pet.nome}</p>
+          <div className="space-y-2">
+            {accessLogs.slice(0, 8).map((log) => (
+              <div key={log.id} className="flex items-center gap-3 py-2">
+                <div className="w-8 h-8 rounded-full bg-surface-muted/50 flex items-center justify-center shrink-0">
+                  <Eye className="w-3.5 h-3.5 text-texto-muted" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-headline font-semibold text-texto truncate">
+                    {log.usuarioNome}
+                  </p>
+                  <p className="text-[10px] text-texto-soft font-body">{log.acao}</p>
+                </div>
+                <span className="text-[10px] text-texto-muted font-body whitespace-nowrap">
+                  {formatRelative(log.criadoEm)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Section 4: Acoes */}
       <div className="mg-card space-y-3">
         <div className="flex items-center gap-2">
@@ -1059,6 +1112,11 @@ function VisitanteRow({ visitante, onRemove }: { visitante: PetVisitante; onRemo
 
 function CodigoPetDisplay({ codigo, nome }: { codigo: string; nome: string }) {
   const [copied, setCopied] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const publicUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/pet-publico/${codigo}`
+    : `/pet-publico/${codigo}`;
+
   const handleCopy = () => {
     navigator.clipboard.writeText(codigo);
     setCopied(true);
@@ -1066,7 +1124,7 @@ function CodigoPetDisplay({ codigo, nome }: { codigo: string; nome: string }) {
   };
 
   return (
-    <div className="mg-card-solid rounded-xl px-4 py-3">
+    <div className="mg-card-solid rounded-xl px-4 py-3 space-y-3">
       <div className="flex items-center justify-between">
         <div>
           <p className="mg-label mb-0.5">Código do pet</p>
@@ -1089,9 +1147,40 @@ function CodigoPetDisplay({ codigo, nome }: { codigo: string; nome: string }) {
           )}
         </button>
       </div>
-      <p className="text-xs text-texto-soft mt-1 font-body">
+      <p className="text-xs text-texto-soft font-body">
         Compartilhe para outros se vincularem a {nome}
       </p>
+
+      {/* QR Code toggle */}
+      <button
+        onClick={() => setShowQR(!showQR)}
+        className="text-xs font-headline font-bold text-primary flex items-center gap-1"
+      >
+        {showQR ? '▲ Esconder QR Code' : '▼ Mostrar QR Code'}
+      </button>
+
+      {showQR && (
+        <div className="flex flex-col items-center gap-3 py-3">
+          <div className="bg-white p-4 rounded-2xl shadow-sm border">
+            <QRCodeSVG
+              value={publicUrl}
+              size={160}
+              level="M"
+              fgColor="#7C3AED"
+              bgColor="#ffffff"
+            />
+          </div>
+          <p className="text-[10px] text-texto-soft font-body text-center max-w-[200px]">
+            Escaneie para acessar o perfil de emergência de {nome}
+          </p>
+          <button
+            onClick={() => window.print()}
+            className="mg-btn text-xs px-4 py-2"
+          >
+            🖨️ Imprimir cartão
+          </button>
+        </div>
+      )}
     </div>
   );
 }

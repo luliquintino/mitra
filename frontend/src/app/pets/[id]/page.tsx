@@ -10,6 +10,7 @@ import {
   compromissosApi,
   governanceApi,
   eventsApi,
+  checkInApi,
 } from '@/lib/api';
 import {
   DashboardData,
@@ -20,7 +21,11 @@ import {
   Pet,
   PetUsuario,
 } from '@/types';
-import { formatRelative, eventoIcon, cn } from '@/lib/utils';
+import { formatRelative, eventoIcon, cn, daysUntilBirthday, petAgeYears, mitraMilestones } from '@/lib/utils';
+import { getPersonality, getHumor, isInactive } from '@/lib/pet-personality';
+import { generateTutorSmartCards, SmartCard } from '@/lib/smart-cards';
+import { computeAchievements, Achievement, CATEGORY_LABELS } from '@/lib/achievements';
+import { MuralPost } from '@/types';
 import { CalendarMonth } from '@/components/CalendarMonth';
 import { RegisterEventModal } from '@/components/RegisterEventModal';
 import {
@@ -122,6 +127,8 @@ export default function PetHomePage() {
   const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
   const [compromissos, setCompromissos] = useState<Compromisso[]>([]);
   const [eventos, setEventos] = useState<any[]>([]);
+  const [muralPosts, setMuralPosts] = useState<MuralPost[]>([]);
+  const [activeCheckIn, setActiveCheckIn] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   // Calendar state
@@ -140,7 +147,7 @@ export default function PetHomePage() {
 
   const loadData = useCallback(async () => {
     try {
-      const [petRes, dashRes, tutRes, vacsRes, medsRes, compRes, evRes] =
+      const [petRes, dashRes, tutRes, vacsRes, medsRes, compRes, evRes, muralRes] =
         await Promise.all([
           petsApi.get(petId),
           petsApi.dashboard(petId),
@@ -149,6 +156,7 @@ export default function PetHomePage() {
           healthApi.medicamentos(petId),
           compromissosApi.list(petId),
           eventsApi.historico(petId).catch(() => ({ data: { eventos: [] } })),
+          healthApi.getMuralPosts(petId).catch(() => ({ data: [] })),
         ]);
 
       setPet(petRes.data as Pet);
@@ -165,6 +173,12 @@ export default function PetHomePage() {
           ? evData
           : (evData as any)?.eventos || dashRes.data?.atividadeRecente || []
       );
+      setMuralPosts(Array.isArray(muralRes.data) ? muralRes.data : []);
+
+      // F11: Check active check-in session
+      checkInApi.getActive(petId).then((data: any) => {
+        setActiveCheckIn(data?.data || data || null);
+      }).catch(() => {});
     } catch (err) {
       console.error('Erro ao carregar dados:', err);
     } finally {
@@ -302,6 +316,56 @@ export default function PetHomePage() {
     return calendarEvents.filter((e) => e.date === todayStr()).length;
   }, [calendarEvents]);
 
+  // Smart cards from engine (F4)
+  const smartCards = useMemo(() => {
+    if (!pet) return [];
+    return generateTutorSmartCards({
+      pet,
+      vacinas,
+      medicamentos,
+      sintomas: [],
+      eventos,
+      compromissos,
+      solicitacoes: [],
+      tutores,
+      guardas: [],
+      planoSaude: null,
+    });
+  }, [pet, vacinas, medicamentos, eventos, compromissos, tutores]);
+
+  // ─── Personality ──────────────────────────────────────────────────────────
+
+  const personality = useMemo(() => {
+    if (!pet) return null;
+    return getPersonality({ pet, vacinas, medicamentos, eventos });
+  }, [pet, vacinas, medicamentos, eventos]);
+
+  const inactivityHumor = useMemo(() => {
+    if (!pet || !isInactive(eventos, 3)) return null;
+    return getHumor(pet.nome, pet.especie, 'INATIVIDADE');
+  }, [pet, eventos]);
+
+  const birthdayDays = useMemo(() => {
+    if (!pet?.dataNascimento) return null;
+    return daysUntilBirthday(pet.dataNascimento);
+  }, [pet]);
+
+  const nextAge = useMemo(() => {
+    if (!pet?.dataNascimento) return null;
+    return (petAgeYears(pet.dataNascimento) ?? 0) + 1;
+  }, [pet]);
+
+  const milestones = useMemo(() => {
+    if (!pet) return [];
+    return mitraMilestones(pet.criadoEm);
+  }, [pet]);
+
+  // F7: Achievements
+  const achievements = useMemo(() => {
+    if (!pet) return [];
+    return computeAchievements({ pet, vacinas, medicamentos, eventos, tutores, muralPosts });
+  }, [pet, vacinas, medicamentos, eventos, tutores, muralPosts]);
+
   // ── Loading ──
   if (loading) {
     return (
@@ -330,6 +394,91 @@ export default function PetHomePage() {
 
   return (
     <div className="space-y-5 pb-24">
+      {/* ─────────────────────────────────────────────────────────────────────
+          F11: Active check-in banner
+      ───────────────────────────────────────────────────────────────────── */}
+      {activeCheckIn && (
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-4 text-white">
+          <div className="flex items-center gap-2 mb-1">
+            <span>📍</span>
+            <p className="font-headline font-bold text-sm">Sessão ativa</p>
+          </div>
+          <p className="text-sm text-white/80 font-body">
+            {activeCheckIn.prestadorNome} iniciou {activeCheckIn.tipo?.toLowerCase() || 'atendimento'} às{' '}
+            {new Date(activeCheckIn.inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────────────
+          0. PERSONALIDADE — archetype card
+      ───────────────────────────────────────────────────────────────────── */}
+      {personality && (
+        <div className="mg-card !p-0 overflow-hidden">
+          <div className="relative px-5 py-4">
+            {/* Gradient accent */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/3 to-transparent pointer-events-none" />
+            <div className="relative flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center text-2xl shrink-0">
+                {personality.emoji}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-headline font-bold text-sm text-primary">
+                  {personality.title}
+                </p>
+                <p className="text-xs font-body text-texto-soft mt-0.5">
+                  {inactivityHumor ? inactivityHumor.message : personality.phrase}
+                </p>
+              </div>
+              <Sparkles className="text-primary/30 shrink-0" size={20} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────────────
+          0b. ANIVERSÁRIO + MARCOS
+      ───────────────────────────────────────────────────────────────────── */}
+      {birthdayDays !== null && birthdayDays <= 30 && (
+        <div className={cn(
+          'mg-card-solid rounded-2xl px-4 py-3 flex items-center gap-3',
+          birthdayDays === 0
+            ? 'bg-gradient-to-r from-amber/10 via-primary/5 to-rose/10 border border-amber/20'
+            : 'border border-primary/10',
+        )}>
+          <span className="text-2xl">{birthdayDays === 0 ? '🎉' : '🎂'}</span>
+          <div className="flex-1 min-w-0">
+            <p className="font-headline font-bold text-sm text-texto">
+              {birthdayDays === 0
+                ? `${pet.nome} faz ${nextAge} ano${(nextAge ?? 0) > 1 ? 's' : ''} hoje!`
+                : `${pet.nome} faz ${nextAge} ano${(nextAge ?? 0) > 1 ? 's' : ''} em ${birthdayDays} dia${birthdayDays > 1 ? 's' : ''}`}
+            </p>
+            {birthdayDays === 0 && (
+              <p className="text-xs font-body text-texto-soft">Parabéns! 🥳</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {milestones.some((m) => m.achieved) && (
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
+          {milestones.map((m) => (
+            <div
+              key={m.id}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-headline whitespace-nowrap shrink-0 transition-all',
+                m.achieved
+                  ? 'bg-primary/10 text-primary font-bold'
+                  : 'bg-surface-muted/50 text-texto-muted'
+              )}
+            >
+              <span>{m.emoji}</span>
+              <span>{m.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ─────────────────────────────────────────────────────────────────────
           1. ALERTAS — glass cards with colored left border
       ───────────────────────────────────────────────────────────────────── */}
@@ -441,6 +590,89 @@ export default function PetHomePage() {
           )}
         </button>
       </div>
+
+      {/* ─────────────────────────────────────────────────────────────────────
+          2b. SMART CARDS — lembretes inteligentes (F4)
+      ───────────────────────────────────────────────────────────────────── */}
+      {smartCards.filter((c) => c.priority === 'reminder' || c.priority === 'suggestion').length > 0 && (
+        <div className="space-y-2">
+          {smartCards
+            .filter((c) => c.priority === 'reminder' || c.priority === 'suggestion')
+            .slice(0, 3)
+            .map((card) => (
+              <div
+                key={card.id}
+                className={cn(
+                  'mg-card-solid flex items-center gap-3 px-4 py-3 rounded-2xl transition-all',
+                  card.priority === 'reminder' ? 'border-l-4 border-amber/50' : 'border-l-4 border-primary/30',
+                )}
+              >
+                <span className="text-lg shrink-0">{card.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-headline font-semibold text-xs text-texto">
+                    {card.title}
+                  </p>
+                  {card.description && (
+                    <p className="text-[10px] font-body text-texto-soft mt-0.5">
+                      {card.description}
+                    </p>
+                  )}
+                </div>
+                {card.action && (
+                  <a
+                    href={card.action.href}
+                    className="text-[10px] font-headline font-bold text-primary whitespace-nowrap"
+                  >
+                    {card.action.label}
+                  </a>
+                )}
+              </div>
+            ))}
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────────────
+          2c. CONQUISTAS (F7)
+      ───────────────────────────────────────────────────────────────────── */}
+      {achievements.length > 0 && (
+        <div>
+          <h3 className="font-headline font-bold text-sm text-texto mb-3 flex items-center gap-2">
+            <span>🏆</span> Conquistas
+            <span className="text-texto-soft font-normal text-xs">
+              {achievements.filter((a) => a.earned).length}/{achievements.length}
+            </span>
+          </h3>
+          <div className="grid grid-cols-4 gap-2">
+            {achievements.map((badge) => (
+              <div
+                key={badge.id}
+                className={cn(
+                  'mg-card-solid rounded-2xl p-2.5 text-center transition-all',
+                  badge.earned ? 'opacity-100' : 'opacity-40 grayscale',
+                )}
+              >
+                <span className="text-xl block mb-1">{badge.emoji}</span>
+                <p className="font-headline font-bold text-[10px] text-texto leading-tight truncate">
+                  {badge.title}
+                </p>
+                {!badge.earned && badge.total > 1 && (
+                  <div className="mt-1.5">
+                    <div className="h-1 bg-surface-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary/50 rounded-full transition-all"
+                        style={{ width: `${(badge.progress / badge.total) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-[8px] text-texto-muted mt-0.5">
+                      {badge.progress}/{badge.total}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ─────────────────────────────────────────────────────────────────────
           3. CALENDARIO — collapsible mg-card
@@ -555,7 +787,7 @@ export default function PetHomePage() {
           <div className="mg-card text-center py-8">
             <ClipboardList className="mx-auto text-texto-soft mb-2" size={28} />
             <p className="text-sm font-body text-texto-soft">
-              Nenhuma atividade registrada
+              {pet ? getHumor(pet.nome, pet.especie, 'EMPTY_STATE').message : 'Nenhuma atividade registrada'}
             </p>
           </div>
         ) : (

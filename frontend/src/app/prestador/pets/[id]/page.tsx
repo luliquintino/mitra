@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { prestadoresApi, healthApi, registrosApi, governanceApi } from '@/lib/api';
+import { prestadoresApi, healthApi, registrosApi, governanceApi, checkInApi } from '@/lib/api';
 import { Pet, Registro, TipoRegistro, Evento, Vacina, Medicamento, PetUsuario } from '@/types';
 import {
   especieLabel,
@@ -192,6 +192,12 @@ export default function PrestadorPetPage() {
   // Modal state
   const [activeAcao, setActiveAcao] = useState<AcaoConfig | null>(null);
 
+  // F11: Check-in state
+  const [activeSession, setActiveSession] = useState<any>(null);
+  const [checkInLoading, setCheckInLoading] = useState(false);
+  const [checkInObs, setCheckInObs] = useState('');
+  const [showCheckOutForm, setShowCheckOutForm] = useState(false);
+
   const acoes = getAcoesByProfissao(user?.profissao);
 
   const loadPet = useCallback(async () => {
@@ -240,8 +246,33 @@ export default function PrestadorPetPage() {
     if (petId) {
       loadPet();
       loadRegistros();
+      // F11: Check for active session
+      checkInApi.getActive(petId).then((data: any) => {
+        setActiveSession(data?.data || data || null);
+      }).catch(() => {});
     }
   }, [petId, loadPet, loadRegistros]);
+
+  const handleCheckIn = async () => {
+    setCheckInLoading(true);
+    try {
+      const data: any = await checkInApi.checkIn(petId);
+      setActiveSession(data?.data || data);
+    } catch { /* silent */ }
+    finally { setCheckInLoading(false); }
+  };
+
+  const handleCheckOut = async () => {
+    if (!activeSession?.id) return;
+    setCheckInLoading(true);
+    try {
+      await checkInApi.checkOut(petId, activeSession.id, checkInObs || undefined);
+      setActiveSession(null);
+      setShowCheckOutForm(false);
+      setCheckInObs('');
+    } catch { /* silent */ }
+    finally { setCheckInLoading(false); }
+  };
 
   const handleRegistroSaved = (ev: Evento) => {
     setActiveAcao(null);
@@ -290,6 +321,69 @@ export default function PrestadorPetPage() {
 
   return (
     <div className="space-y-4 animate-fade-in">
+      {/* ── F11: Check-in/Check-out bar ── */}
+      <div className="rounded-2xl overflow-hidden">
+        {activeSession ? (
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-4 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">⏱️</span>
+                <p className="font-headline font-bold text-sm">Sessão em andamento</p>
+              </div>
+              <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">
+                desde {new Date(activeSession.inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+            {!showCheckOutForm ? (
+              <button
+                onClick={() => setShowCheckOutForm(true)}
+                disabled={checkInLoading}
+                className="w-full mt-2 bg-white/20 hover:bg-white/30 text-white font-headline font-bold text-sm py-2.5 rounded-xl transition-colors"
+              >
+                🚪 Fazer Check-out
+              </button>
+            ) : (
+              <div className="mt-2 space-y-2">
+                <textarea
+                  value={checkInObs}
+                  onChange={(e) => setCheckInObs(e.target.value)}
+                  placeholder="Observações (opcional)..."
+                  className="w-full bg-white/20 text-white placeholder-white/50 rounded-xl px-3 py-2 text-sm resize-none"
+                  rows={2}
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCheckOut}
+                    disabled={checkInLoading}
+                    className="flex-1 bg-white text-teal-600 font-headline font-bold text-sm py-2 rounded-xl hover:bg-white/90 transition-colors"
+                  >
+                    {checkInLoading ? 'Salvando...' : 'Confirmar Check-out'}
+                  </button>
+                  <button
+                    onClick={() => setShowCheckOutForm(false)}
+                    className="px-3 bg-white/20 text-white rounded-xl text-sm hover:bg-white/30 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={handleCheckIn}
+            disabled={checkInLoading}
+            className="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-headline font-bold text-sm py-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            {checkInLoading ? (
+              <span className="animate-pulse">Iniciando...</span>
+            ) : (
+              <>📍 Fazer Check-in com {pet.nome}</>
+            )}
+          </button>
+        )}
+      </div>
+
       {/* ── Briefing de entrada ── */}
       {briefingCards.length > 0 && (
         <div className="space-y-2 animate-slide-up">

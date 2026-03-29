@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { petsApi, healthApi, compromissosApi } from '@/lib/api';
 import { DEFAULT_PRESTADOR_SAUDE_PERMISSIONS } from '@/lib/mock-data';
 import { Pet, Vacina, Medicamento, Sintoma, PlanoSaude, Compromisso, RecomendacaoVacina, AgendamentoVacina, MuralPost } from '@/types';
@@ -1673,7 +1674,10 @@ function CarteiraTab({ petId, pet, vacinas, especie, role, onUpdate }: {
 
 // ─── Mural Tab ──────────────────────────────────────────────────────────────
 
+const REACTION_EMOJIS = ['❤️', '🐾', '👏'];
+
 function MuralTab({ petId, readOnly }: { petId: string; readOnly?: boolean }) {
+  const { user } = useAuth();
   const [posts, setPosts] = useState<MuralPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -1681,6 +1685,13 @@ function MuralTab({ petId, readOnly }: { petId: string; readOnly?: boolean }) {
   const [fotos, setFotos] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [lightbox, setLightbox] = useState<string | null>(null);
+
+  const handleReaction = async (postId: string, emoji: string) => {
+    try {
+      await healthApi.addReaction(petId, postId, emoji);
+      loadPosts();
+    } catch { /* silent */ }
+  };
 
   const loadPosts = useCallback(async () => {
     try {
@@ -1831,47 +1842,90 @@ function MuralTab({ petId, readOnly }: { petId: string; readOnly?: boolean }) {
         <EmptyState icon="📸" title="Nenhum post no mural" description="Compartilhe fotos, atualizações e momentos do seu pet." />
       ) : (
         <div className="space-y-3">
-          {posts.map((post) => (
-            <div key={post.id} className="mg-card-solid rounded-xl p-4">
-              {/* Author */}
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-bold text-primary">
-                    {post.autorNome ? post.autorNome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : '?'}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-headline font-semibold text-texto text-sm truncate">{post.autorNome}</p>
-                    {roleBadge(post.autorRole)}
+          {posts.map((post) => {
+            const isAutoEvent = post.tipo === 'AUTO_EVENT';
+            return (
+              <div
+                key={post.id}
+                className={cn(
+                  'mg-card-solid rounded-xl p-4',
+                  isAutoEvent && 'border-l-4 border-teal/40 bg-teal/[0.02]',
+                )}
+              >
+                {/* Author */}
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={cn(
+                    'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0',
+                    isAutoEvent ? 'bg-teal/10' : 'bg-primary/10',
+                  )}>
+                    {isAutoEvent ? (
+                      <span className="text-sm">🤖</span>
+                    ) : (
+                      <span className="text-sm font-bold text-primary">
+                        {post.autorNome ? post.autorNome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : '?'}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-[11px] text-texto-soft font-body">{formatRelative(post.criadoEm)}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className={cn('font-headline font-semibold text-sm truncate', isAutoEvent ? 'text-teal' : 'text-texto')}>
+                        {isAutoEvent ? 'MITRA' : post.autorNome}
+                      </p>
+                      {!isAutoEvent && roleBadge(post.autorRole)}
+                    </div>
+                    <p className="text-[11px] text-texto-soft font-body">{formatRelative(post.criadoEm)}</p>
+                  </div>
+                </div>
+
+                {/* Text */}
+                {post.texto && (
+                  <p className={cn('text-sm font-body mb-2 whitespace-pre-wrap', isAutoEvent ? 'text-texto-soft' : 'text-texto')}>
+                    {post.texto}
+                  </p>
+                )}
+
+                {/* Photos */}
+                {post.fotos && post.fotos.length > 0 && (
+                  <div className="grid gap-2 mb-2" style={{
+                    gridTemplateColumns: post.fotos.length === 1 ? '1fr' : post.fotos.length === 2 ? '1fr 1fr' : 'repeat(3, 1fr)',
+                  }}>
+                    {post.fotos.map((src, idx) => (
+                      <img
+                        key={idx}
+                        src={src}
+                        alt={`Foto ${idx + 1}`}
+                        className="w-full h-32 rounded-xl object-cover border border-white/50 cursor-pointer hover:border-primary hover:shadow-md transition-all"
+                        onClick={() => setLightbox(src)}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Reactions */}
+                <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-white/20">
+                  {REACTION_EMOJIS.map((emoji) => {
+                    const reactions = (post.reactions || []).filter((r) => r.emoji === emoji);
+                    const myReaction = reactions.some((r) => r.autorId === user?.id);
+                    return (
+                      <button
+                        key={emoji}
+                        onClick={() => handleReaction(post.id, emoji)}
+                        className={cn(
+                          'flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-all',
+                          myReaction
+                            ? 'bg-primary/15 text-primary font-bold'
+                            : 'bg-surface-muted/50 text-texto-soft hover:bg-primary/10',
+                        )}
+                      >
+                        <span>{emoji}</span>
+                        {reactions.length > 0 && <span>{reactions.length}</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-
-              {/* Text */}
-              {post.texto && (
-                <p className="text-sm text-texto font-body mb-2 whitespace-pre-wrap">{post.texto}</p>
-              )}
-
-              {/* Photos */}
-              {post.fotos && post.fotos.length > 0 && (
-                <div className="grid gap-2" style={{
-                  gridTemplateColumns: post.fotos.length === 1 ? '1fr' : post.fotos.length === 2 ? '1fr 1fr' : 'repeat(3, 1fr)',
-                }}>
-                  {post.fotos.map((src, idx) => (
-                    <img
-                      key={idx}
-                      src={src}
-                      alt={`Foto ${idx + 1}`}
-                      className="w-full h-32 rounded-xl object-cover border border-white/50 cursor-pointer hover:border-primary hover:shadow-md transition-all"
-                      onClick={() => setLightbox(src)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
