@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotificacoes } from '@/contexts/NotificacaoContext';
-import { petsApi, visitantesApi } from '@/lib/api';
+import { petsApi, visitantesApi, governanceApi } from '@/lib/api';
 import { Pet, VisitantePet, ConvitePendente, Notificacao } from '@/types';
 import { cn, especieLabel, petAge, daysUntilBirthday, petAgeYears } from '@/lib/utils';
 import { timeConfig } from '@/lib/config';
@@ -36,6 +36,9 @@ import {
   Handshake,
   UserCheck,
   Ban,
+  MoreVertical,
+  Trash2,
+  Unlink,
 } from 'lucide-react';
 
 // ─── Role config ──────────────────────────────────────────────────────────────
@@ -94,6 +97,26 @@ export default function HomePage() {
 
   const isEmpty = !loading && !error && pets.length === 0 && prestadorPets.length === 0 && visitantePets.length === 0;
   const hasBothTutorAndPrestador = (myPets.length > 0 && prestadorPets.length > 0) || (isTutor && isPrestador && (myPets.length > 0 || prestadorPets.length > 0));
+
+  const handleUnlink = async (pet: Pet) => {
+    if (!confirm(`Tem certeza que deseja se desvincular de ${pet.nome}?`)) return;
+    try {
+      await governanceApi.removerTutor(pet.id, user!.id);
+      setPets((prev) => prev.filter((p) => p.id !== pet.id));
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Erro ao desvincular.');
+    }
+  };
+
+  const handleDeletePet = async (pet: Pet) => {
+    if (!confirm(`Tem certeza que deseja APAGAR ${pet.nome}? Esta ação não pode ser desfeita.`)) return;
+    try {
+      await petsApi.deletePet(pet.id);
+      setPets((prev) => prev.filter((p) => p.id !== pet.id));
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Erro ao apagar pet.');
+    }
+  };
 
   return (
     <ProtectedLayout>
@@ -234,7 +257,7 @@ export default function HomePage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   {myPets.map((pet, i) => (
                     <div key={pet.id} className="animate-fade-in" style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}>
-                      <PetCard pet={pet} onClick={() => router.push(`/pets/${pet.id}`)} />
+                      <PetCard pet={pet} onClick={() => router.push(`/pets/${pet.id}`)} onUnlink={() => handleUnlink(pet)} onDelete={() => handleDeletePet(pet)} />
                     </div>
                   ))}
                 </div>
@@ -250,7 +273,7 @@ export default function HomePage() {
                 </p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {accessPets.map((pet) => (
-                    <PetCard key={pet.id} pet={pet} onClick={() => router.push(`/pets/${pet.id}`)} />
+                    <PetCard key={pet.id} pet={pet} onClick={() => router.push(`/pets/${pet.id}`)} onUnlink={() => handleUnlink(pet)} />
                   ))}
                 </div>
               </section>
@@ -345,9 +368,11 @@ function SectionLabel({ icon, label }: { icon: React.ReactNode; label: string })
 
 // ─── PetCard ──────────────────────────────────────────────────────────────────
 
-function PetCard({ pet, onClick }: { pet: Pet; onClick: () => void }) {
+function PetCard({ pet, onClick, onUnlink, onDelete }: { pet: Pet; onClick: () => void; onUnlink?: () => void; onDelete?: () => void }) {
   const isTutor = TUTOR_ROLES.has(pet.meuRole ?? '');
+  const isPrincipal = pet.meuRole === 'TUTOR_PRINCIPAL';
   const role = pet.meuRole ? ROLE_STYLE[pet.meuRole] : null;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Only count actual tutors (principal + emergencia) for the avatar stack
   const tutoresVinculados = (pet.petUsuarios ?? []).filter((pu) =>
@@ -356,64 +381,65 @@ function PetCard({ pet, onClick }: { pet: Pet; onClick: () => void }) {
   const hasAlert = (pet.medicamentosAtivos ?? 0) > 0 || !!pet.proximaVacina;
 
   return (
-    <button
-      onClick={onClick}
-      className="mg-card hover:shadow-glass-hover hover:-translate-y-0.5 active:scale-[0.98] text-left w-full group transition-all"
-    >
-      <div className="flex items-start gap-4">
-        {/* Avatar with Pet Image */}
-        <div className="relative">
-          <PetImage
-            fotoUrl={pet.fotoUrl}
-            nome={pet.nome}
-            especie={pet.especie}
-            className="w-20 h-20 ring-2 ring-[#7C3AED]/20 rounded-2xl"
-            fallbackClassName="bg-[#7C3AED]/5"
-          />
-          {hasAlert && (
-            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#F59E0B] border-2 border-white shadow-sm" title="Alertas pendentes" />
-          )}
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          {/* Name row */}
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-bold font-headline text-texto text-base leading-tight truncate group-hover:text-[#7C3AED] transition-colors">
-              {pet.nome}
-            </h2>
+    <div className="relative">
+      <button
+        onClick={onClick}
+        className="mg-card hover:shadow-glass-hover hover:-translate-y-0.5 active:scale-[0.98] text-left w-full group transition-all"
+      >
+        <div className="flex items-start gap-4">
+          {/* Avatar with Pet Image */}
+          <div className="relative">
+            <PetImage
+              fotoUrl={pet.fotoUrl}
+              nome={pet.nome}
+              especie={pet.especie}
+              className="w-20 h-20 ring-2 ring-[#7C3AED]/20 rounded-2xl"
+              fallbackClassName="bg-[#7C3AED]/5"
+            />
+            {hasAlert && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#F59E0B] border-2 border-white shadow-sm" title="Alertas pendentes" />
+            )}
           </div>
 
-          {/* Role badge */}
-          {role && (
-            <span className={cn('mg-badge mb-1.5', role.badge)}>
-              {role.label}
-            </span>
-          )}
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            {/* Name row */}
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="font-bold font-headline text-texto text-base leading-tight truncate group-hover:text-[#7C3AED] transition-colors">
+                {pet.nome}
+              </h2>
+            </div>
 
-          <p className="text-sm text-texto-soft leading-snug">
-            {especieLabel(pet.especie)}
-            {pet.raca ? ` · ${pet.raca}` : ''}
-          </p>
-          {pet.dataNascimento && (
-            <p className="text-xs text-texto-soft mt-0.5">
-              {petAge(pet.dataNascimento)}
-              {(() => {
-                const days = daysUntilBirthday(pet.dataNascimento);
-                if (days === null) return null;
-                if (days === 0) return <span className="ml-1.5 text-primary font-bold">🎂 Hoje!</span>;
-                if (days <= 30) {
-                  const nextAge = (petAgeYears(pet.dataNascimento) ?? 0) + 1;
-                  return <span className="ml-1.5 text-primary/80"> · 🎂 faz {nextAge} em {days}d</span>;
-                }
-                return null;
-              })()}
+            {/* Role badge */}
+            {role && (
+              <span className={cn('mg-badge mb-1.5', role.badge)}>
+                {role.label}
+              </span>
+            )}
+
+            <p className="text-sm text-texto-soft leading-snug">
+              {especieLabel(pet.especie)}
+              {pet.raca ? ` · ${pet.raca}` : ''}
             </p>
-          )}
-        </div>
+            {pet.dataNascimento && (
+              <p className="text-xs text-texto-soft mt-0.5">
+                {petAge(pet.dataNascimento)}
+                {(() => {
+                  const days = daysUntilBirthday(pet.dataNascimento);
+                  if (days === null) return null;
+                  if (days === 0) return <span className="ml-1.5 text-primary font-bold">🎂 Hoje!</span>;
+                  if (days <= 30) {
+                    const nextAge = (petAgeYears(pet.dataNascimento) ?? 0) + 1;
+                    return <span className="ml-1.5 text-primary/80"> · 🎂 faz {nextAge} em {days}d</span>;
+                  }
+                  return null;
+                })()}
+              </p>
+            )}
+          </div>
 
-        <ChevronRight className="w-4 h-4 text-texto-muted group-hover:text-[#7C3AED] transition-colors flex-shrink-0 mt-0.5" />
-      </div>
+          <ChevronRight className="w-4 h-4 text-texto-muted group-hover:text-[#7C3AED] transition-colors flex-shrink-0 mt-0.5" />
+        </div>
 
       {/* Footer */}
       <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
@@ -472,6 +498,45 @@ function PetCard({ pet, onClick }: { pet: Pet; onClick: () => void }) {
 
       </div>
     </button>
+
+      {/* Action menu button */}
+      {(onUnlink || onDelete) && (
+        <div className="absolute top-3 right-3 z-10">
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
+            className="w-7 h-7 rounded-lg bg-white/60 hover:bg-white/90 flex items-center justify-center transition-colors"
+          >
+            <MoreVertical className="w-4 h-4 text-texto-soft" />
+          </button>
+
+          {menuOpen && (
+            <>
+              <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
+              <div className="absolute right-0 top-8 z-30 bg-white rounded-xl shadow-lg border border-surface-muted py-1 min-w-[180px]">
+                {onUnlink && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onUnlink(); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-texto hover:bg-surface-muted/50 transition-colors"
+                  >
+                    <Unlink className="w-4 h-4 text-texto-soft" />
+                    Desvincular
+                  </button>
+                )}
+                {isPrincipal && onDelete && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onDelete(); }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Apagar pet
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 

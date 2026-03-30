@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -278,6 +279,48 @@ export class PetsService {
       },
       atividadeRecente: eventoRecentes,
     };
+  }
+
+  async deletePet(petId: string, userId: string) {
+    const acesso = await this.checkAccess(petId, userId);
+    if (acesso.role !== 'TUTOR_PRINCIPAL') {
+      throw new ForbiddenException(
+        'Apenas tutores principais podem apagar o pet.',
+      );
+    }
+
+    // Check if there are other tutores principais — they must all agree
+    const outrosPrincipais = await this.prisma.petUsuario.findMany({
+      where: { petId, role: 'TUTOR_PRINCIPAL', ativo: true, usuarioId: { not: userId } },
+    });
+    if (outrosPrincipais.length > 0) {
+      throw new BadRequestException(
+        'Não é possível apagar o pet enquanto houver outro tutor principal. Remova os outros tutores antes.',
+      );
+    }
+
+    // Soft delete: set status to ARQUIVADO and deactivate all links
+    await this.prisma.$transaction([
+      this.prisma.pet.update({
+        where: { id: petId },
+        data: { status: 'ARQUIVADO' },
+      }),
+      this.prisma.petUsuario.updateMany({
+        where: { petId },
+        data: { ativo: false },
+      }),
+      this.prisma.evento.create({
+        data: {
+          petId,
+          tipo: 'PET_ARQUIVADO',
+          titulo: 'Pet apagado',
+          descricao: 'O tutor principal apagou o pet permanentemente.',
+          autorId: userId,
+        },
+      }),
+    ]);
+
+    return { mensagem: 'Pet apagado com sucesso.' };
   }
 
   async checkAccess(petId: string, userId: string) {

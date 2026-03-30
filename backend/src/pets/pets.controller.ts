@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -80,5 +81,14 @@ export class PetsController {
     @Body() dto: UpdatePetDto,
   ) {
     return this.petsService.update(petId, userId, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Apagar pet (apenas tutor principal)' })
+  deletePet(
+    @Param('id') petId: string,
+    @CurrentUser('sub') userId: string,
+  ) {
+    return this.petsService.deletePet(petId, userId);
   }
 }

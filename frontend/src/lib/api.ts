@@ -142,6 +142,11 @@ export const petsApi = {
       () => api.put(`/pets/${id}`, data),
       () => mockPetsApi.update(id, data),
     ),
+  deletePet: (id: string) =>
+    tryReal(
+      () => api.delete(`/pets/${id}`),
+      () => Promise.resolve({ data: { mensagem: 'Mock: pet apagado' } }),
+    ),
   findByCodigo: (codigo: string) =>
     tryReal(
       () => api.get(`/pets/codigo/${codigo}`),
