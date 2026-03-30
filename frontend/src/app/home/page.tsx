@@ -93,7 +93,7 @@ export default function HomePage() {
   const isPrestador = userType === 'PRESTADOR' || userType === 'AMBOS';
 
   const isEmpty = !loading && !error && pets.length === 0 && prestadorPets.length === 0 && visitantePets.length === 0;
-  const hasBothTutorAndPrestador = isTutor && isPrestador && (myPets.length > 0 || prestadorPets.length > 0);
+  const hasBothTutorAndPrestador = (myPets.length > 0 && prestadorPets.length > 0) || (isTutor && isPrestador && (myPets.length > 0 || prestadorPets.length > 0));
 
   return (
     <ProtectedLayout>
@@ -115,24 +115,22 @@ export default function HomePage() {
                 <p className="text-xs text-texto-soft mt-1">Tutor e prestador de serviços</p>
               )}
             </div>
-            {isTutor && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => router.push('/home/vincular-pet')}
-                  className="mg-btn-secondary flex items-center gap-1.5 text-sm"
-                >
-                  <Link2 className="w-4 h-4" />
-                  Vincular
-                </button>
-                <button
-                  onClick={() => router.push('/home/novo-pet')}
-                  className="mg-btn flex items-center gap-2 text-sm"
-                >
-                  <Plus className="w-4 h-4" />
-                  Adicionar pet
-                </button>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => router.push('/home/vincular-pet')}
+                className="mg-btn-secondary flex items-center gap-1.5 text-sm"
+              >
+                <Link2 className="w-4 h-4" />
+                Vincular
+              </button>
+              <button
+                onClick={() => router.push('/home/novo-pet')}
+                className="mg-btn flex items-center gap-2 text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar pet
+              </button>
+            </div>
           </div>
         )}
 
@@ -228,7 +226,7 @@ export default function HomePage() {
           <div className="space-y-8">
 
             {/* Secao tutor - Meus Pets */}
-            {isTutor && myPets.length > 0 && (
+            {myPets.length > 0 && (
               <section className="space-y-3">
                 {hasBothTutorAndPrestador && (
                   <SectionLabel icon={<Home className="w-4 h-4 text-[#7C3AED]" />} label="Como tutor" />
@@ -244,7 +242,7 @@ export default function HomePage() {
             )}
 
             {/* Secao acesso compartilhado */}
-            {isTutor && accessPets.length > 0 && (
+            {accessPets.length > 0 && (
               <section className="space-y-3">
                 <SectionLabel icon={<Key className="w-4 h-4 text-[#F59E0B]" />} label="Acesso compartilhado" />
                 <p className="text-xs text-texto-soft -mt-1">
