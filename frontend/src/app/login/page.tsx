@@ -208,7 +208,7 @@ export default function LoginPage() {
                 <strong className="text-teal-500">Vet:</strong> carlos@mitra.com / 123456
               </p>
               <p>
-                <strong className="text-amber-500">Prestador:</strong> marcos@mitra.com /
+                <strong className="text-amber-500">Prestador:</strong> pedro@mitra.com /
                 123456
               </p>
             </div>

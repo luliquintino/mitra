@@ -522,10 +522,10 @@ export const checkInApi = {
       () => api.post(`/pets/${petId}/check-in`),
       () => mockCheckInApi.checkIn(petId),
     ),
-  checkOut: (petId: string, sessionId: string, observacoes?: string) =>
+  checkOut: (petId: string, sessionId: string, observacoes?: string, fotos?: string[]) =>
     tryReal(
-      () => api.put(`/pets/${petId}/check-in/${sessionId}/check-out`, { observacoes }),
-      () => mockCheckInApi.checkOut(petId, sessionId, observacoes),
+      () => api.put(`/pets/${petId}/check-in/${sessionId}/check-out`, { observacoes, fotos }),
+      () => mockCheckInApi.checkOut(petId, sessionId, observacoes, fotos),
     ),
   getActive: (petId: string) =>
     tryReal(

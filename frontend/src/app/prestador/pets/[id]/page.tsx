@@ -196,6 +196,7 @@ export default function PrestadorPetPage() {
   const [activeSession, setActiveSession] = useState<any>(null);
   const [checkInLoading, setCheckInLoading] = useState(false);
   const [checkInObs, setCheckInObs] = useState('');
+  const [checkInFotos, setCheckInFotos] = useState<string[]>([]);
   const [showCheckOutForm, setShowCheckOutForm] = useState(false);
 
   const acoes = getAcoesByProfissao(user?.profissao);
@@ -266,12 +267,28 @@ export default function PrestadorPetPage() {
     if (!activeSession?.id) return;
     setCheckInLoading(true);
     try {
-      await checkInApi.checkOut(petId, activeSession.id, checkInObs || undefined);
+      await checkInApi.checkOut(petId, activeSession.id, checkInObs || undefined, checkInFotos.length > 0 ? checkInFotos : undefined);
       setActiveSession(null);
       setShowCheckOutForm(false);
       setCheckInObs('');
+      setCheckInFotos([]);
     } catch { /* silent */ }
     finally { setCheckInLoading(false); }
+  };
+
+  const handleFotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result) {
+          setCheckInFotos((prev) => [...prev, reader.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
   };
 
   const handleRegistroSaved = (ev: Evento) => {
@@ -344,6 +361,35 @@ export default function PrestadorPetPage() {
               </button>
             ) : (
               <div className="mt-2 space-y-2">
+                {/* Fotos */}
+                <div>
+                  <label className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white rounded-xl px-3 py-2 text-sm cursor-pointer transition-colors">
+                    <span>📷</span>
+                    <span>Adicionar fotos</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFotoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {checkInFotos.length > 0 && (
+                    <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
+                      {checkInFotos.map((foto, idx) => (
+                        <div key={idx} className="relative flex-shrink-0">
+                          <img src={foto} alt={`Foto ${idx + 1}`} className="w-14 h-14 rounded-lg object-cover" />
+                          <button
+                            onClick={() => setCheckInFotos((prev) => prev.filter((_, i) => i !== idx))}
+                            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <textarea
                   value={checkInObs}
                   onChange={(e) => setCheckInObs(e.target.value)}
@@ -360,7 +406,7 @@ export default function PrestadorPetPage() {
                     {checkInLoading ? 'Salvando...' : 'Confirmar Check-out'}
                   </button>
                   <button
-                    onClick={() => setShowCheckOutForm(false)}
+                    onClick={() => { setShowCheckOutForm(false); setCheckInFotos([]); }}
                     className="px-3 bg-white/20 text-white rounded-xl text-sm hover:bg-white/30 transition-colors"
                   >
                     ✕

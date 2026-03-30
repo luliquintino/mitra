@@ -962,13 +962,14 @@ export const mockCheckInApi = {
     _checkInSessions[petId].unshift(session);
     return delay(session);
   },
-  checkOut: async (petId: string, sessionId: string, observacoes?: string) => {
+  checkOut: async (petId: string, sessionId: string, observacoes?: string, fotos?: string[]) => {
     const sessions = _checkInSessions[petId] || [];
     const session = sessions.find((s) => s.id === sessionId);
     if (!session) return delay({ error: 'Sessão não encontrada' });
     session.fim = new Date().toISOString();
     session.duracao = Math.round((new Date(session.fim).getTime() - new Date(session.inicio).getTime()) / 60000);
     if (observacoes) session.observacoes = observacoes;
+    if (fotos) session.fotos = fotos;
     return delay(session);
   },
   getActive: async (petId: string) => {
