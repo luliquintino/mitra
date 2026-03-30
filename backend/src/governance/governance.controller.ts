@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -40,6 +41,16 @@ export class GovernanceController {
       body.email,
       body.role,
     );
+  }
+
+  @Delete('tutores/:tutorId')
+  @ApiOperation({ summary: 'Remover tutor do pet (ou se desvincular)' })
+  removerTutor(
+    @Param('petId') petId: string,
+    @Param('tutorId') tutorId: string,
+    @CurrentUser('sub') userId: string,
+  ) {
+    return this.governanceService.removerTutor(petId, userId, tutorId);
   }
 
   @Post('arquivar')

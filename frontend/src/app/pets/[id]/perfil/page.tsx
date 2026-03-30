@@ -244,6 +244,28 @@ export default function PerfilPage() {
     }
   };
 
+  const handleRemoveTutor = async (tutorId: string, isSelf: boolean) => {
+    const msg = isSelf
+      ? 'Tem certeza que deseja se desvincular deste pet?'
+      : 'Tem certeza que deseja remover este tutor?';
+    if (!confirm(msg)) return;
+    try {
+      await governanceApi.removerTutor(petId, tutorId);
+      setConfirmation(isSelf ? 'Você foi desvinculado do pet.' : 'Tutor removido com sucesso.');
+      if (isSelf) {
+        router.push('/home');
+        return;
+      }
+      // Reload pet data to refresh tutor list
+      const { data: petData } = await petsApi.get(petId);
+      setPet(petData as Pet);
+      setTimeout(() => setConfirmation(''), 5000);
+    } catch (err: any) {
+      setConfirmation(err?.response?.data?.message || 'Erro ao remover tutor.');
+      setTimeout(() => setConfirmation(''), 5000);
+    }
+  };
+
   const handleRemoveVisitante = async (visitanteId: string) => {
     try {
       await petsApi.revokeVisitante(petId, visitanteId);
@@ -574,7 +596,7 @@ export default function PerfilPage() {
           ) : (
             <div className="space-y-2">
               {tutoresList.map((pu) => (
-                <TutorRow key={pu.id} pu={pu} isMe={pu.usuarioId === user?.id} />
+                <TutorRow key={pu.id} pu={pu} isMe={pu.usuarioId === user?.id} onRemove={() => handleRemoveTutor(pu.usuarioId, pu.usuarioId === user?.id)} canRemove={tutoresList.length > 1} />
               ))}
             </div>
           )}
@@ -1037,9 +1059,13 @@ const ROLE_BADGE: Record<string, string> = {
 function TutorRow({
   pu,
   isMe,
+  onRemove,
+  canRemove,
 }: {
   pu: PetUsuario;
   isMe: boolean;
+  onRemove?: () => void;
+  canRemove?: boolean;
 }) {
   const badgeClass = ROLE_BADGE[pu.role] ?? 'mg-badge';
   return (
@@ -1063,6 +1089,15 @@ function TutorRow({
       <span className={cn('mg-badge flex-shrink-0', badgeClass)}>
         {roleLabel(pu.role)}
       </span>
+      {canRemove && onRemove && (
+        <button
+          onClick={onRemove}
+          className="text-texto-soft hover:text-erro transition-colors p-1 flex-shrink-0"
+          title={isMe ? 'Desvincular-se' : 'Remover tutor'}
+        >
+          <Trash2 size={16} />
+        </button>
+      )}
     </div>
   );
 }

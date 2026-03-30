@@ -97,6 +97,62 @@ export class GovernanceService {
     };
   }
 
+  async removerTutor(petId: string, userId: string, tutorId: string) {
+    const acesso = await this.petsService.checkAccess(petId, userId);
+
+    const isSelf = userId === tutorId;
+
+    // Only TUTOR_PRINCIPAL can remove others; anyone can remove themselves
+    if (!isSelf && acesso.role !== 'TUTOR_PRINCIPAL') {
+      throw new ForbiddenException(
+        'Apenas tutores principais podem remover outros tutores.',
+      );
+    }
+
+    const vinculo = await this.prisma.petUsuario.findFirst({
+      where: { petId, usuarioId: tutorId, ativo: true },
+      include: { usuario: { select: { id: true, nome: true } } },
+    });
+    if (!vinculo) {
+      throw new BadRequestException('Tutor não encontrado neste pet.');
+    }
+
+    // Cannot remove if they are the only active tutor
+    const tutoresAtivos = await this.prisma.petUsuario.count({
+      where: { petId, ativo: true },
+    });
+    if (tutoresAtivos <= 1) {
+      throw new BadRequestException(
+        'Não é possível desvincular o único tutor do pet. Adicione outro tutor antes.',
+      );
+    }
+
+    await this.prisma.petUsuario.update({
+      where: { id: vinculo.id },
+      data: { ativo: false },
+    });
+
+    await this.prisma.evento.create({
+      data: {
+        petId,
+        tipo: 'TUTOR_REMOVIDO',
+        titulo: isSelf
+          ? `${vinculo.usuario.nome} se desvinculou`
+          : `Tutor removido: ${vinculo.usuario.nome}`,
+        descricao: isSelf
+          ? `${vinculo.usuario.nome} optou por se desvincular do pet.`
+          : `${vinculo.usuario.nome} foi removido como tutor.`,
+        autorId: userId,
+      },
+    });
+
+    return {
+      mensagem: isSelf
+        ? 'Você foi desvinculado do pet com sucesso.'
+        : `${vinculo.usuario.nome} foi removido com sucesso.`,
+    };
+  }
+
   async arquivarPet(
     petId: string,
     userId: string,

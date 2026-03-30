@@ -383,6 +383,11 @@ export const governanceApi = {
       () => api.post(`/pets/${petId}/governance/tutores`, { email, role }),
       () => mockGovernanceApi.adicionarTutor(petId, email, role),
     ),
+  removerTutor: (petId: string, tutorId: string) =>
+    tryReal(
+      () => api.delete(`/pets/${petId}/governance/tutores/${tutorId}`),
+      () => Promise.resolve({ data: { mensagem: 'Mock: tutor removido' } }),
+    ),
   arquivar: (petId: string, justificativa: string) =>
     tryReal(
       () => api.post(`/pets/${petId}/governance/arquivar`, { justificativa }),
