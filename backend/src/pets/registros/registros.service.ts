@@ -76,7 +76,7 @@ export class RegistrosService {
         tipo: eventoTipo as any,
         titulo: dto.titulo,
         descricao: dto.descricao,
-        dados: dto.dados,
+        dados: dto.dados as any,
         autorId: userId,
       },
     });
