@@ -2,12 +2,16 @@
   "name": "mitra",
   "version": "1.0.0",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "npm run dev --prefix frontend",
     "dev:backend": "npm run start:dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend",
     "install:all": "npm install --prefix backend && npm install --prefix frontend",
     "build": "npm run build --prefix frontend",
-    "start:dev": "npm run dev --prefix frontend"
+    "start:dev": "npm run dev --prefix frontend",
+    "lint": "npm run lint --prefix backend && npm run lint --prefix frontend",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\" --ignore-path .gitignore"
   }
 }
