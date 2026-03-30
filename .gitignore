@@ -17,3 +17,13 @@ Thumbs.db
 
 # Debug
 npm-debug.log*
+
+# Test outputs
+coverage/
+playwright-report/
+test-results/
+.nyc_output/
+
+# Test environment
+.env.test
+.vercel

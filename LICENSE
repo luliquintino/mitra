@@ -1,0 +1,96 @@
+# MITRA — Dual License / Licença Dual
+
+Copyright (c) 2025-2026 MITRA Contributors
+
+This software is licensed under a dual license model. Please read both
+parts carefully before using, copying, or distributing this software.
+
+---
+
+## PART A — Free Use License (NGOs, Nonprofits, and Educational Use)
+
+Permission is hereby granted, free of charge, to any person or organization
+that meets the criteria below, to use, copy, modify, merge, publish,
+distribute, and sublicense copies of this software and associated
+documentation files (the "Software"), subject to the following conditions:
+
+### Eligible Organizations
+
+This free license applies exclusively to:
+
+1. **Registered nonprofits and NGOs** (organizações sem fins lucrativos)
+2. **Animal shelters and rescue organizations** (abrigos e ONGs de resgate animal)
+3. **Veterinary schools and educational institutions** using the Software
+   for teaching or research purposes
+4. **Individual contributors** working on the open-source project itself
+
+### Conditions
+
+- The above copyright notice and this license shall be included in all
+  copies or substantial portions of the Software.
+- Any modified versions must clearly state that changes were made and must
+  not misrepresent the original authors.
+- The Software is provided "AS IS", without warranty of any kind, express
+  or implied, including but not limited to the warranties of merchantability,
+  fitness for a particular purpose, and noninfringement.
+
+### Attribution
+
+When using MITRA in a public-facing product or service, you must include
+visible attribution: "Powered by MITRA" or "Built with MITRA" with a link
+to the project repository.
+
+---
+
+## PART B — Commercial License (For-Profit Use)
+
+Any use of this Software by **for-profit organizations**, **commercial
+entities**, or **individuals generating revenue** through the use of this
+Software requires a separate commercial license agreement.
+
+### What Requires a Commercial License
+
+- Using MITRA (or derivatives) as part of a paid product or service
+- Offering MITRA as a hosted/SaaS solution for paying customers
+- Integrating MITRA into proprietary software sold commercially
+- Using MITRA in any context where the primary purpose is revenue generation
+
+### How to Obtain a Commercial License
+
+Contact the MITRA team to discuss licensing terms:
+
+- **Email:** contato@mitra.pet
+- **Subject:** Commercial License Inquiry
+
+Commercial licenses are negotiated on a case-by-case basis, with pricing
+that considers the scale of use and the nature of the commercial application.
+
+---
+
+## PART C — General Provisions
+
+### No Warranty
+
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR
+OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE
+USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+### Governing Law
+
+This license shall be governed by and construed in accordance with the laws
+of the Federative Republic of Brazil.
+
+---
+
+## Resumo em Português
+
+Este software utiliza uma **licença dual**:
+
+- **Uso gratuito** para ONGs, abrigos de animais, organizações sem fins
+  lucrativos e instituições de ensino. Você pode usar, modificar e
+  distribuir livremente, mantendo a atribuição.
+
+- **Uso comercial** (empresas e pessoas que geram receita com o software)
+  requer um **acordo comercial separado**. Entre em contato pelo email
+  contato@mitra.pet para negociar os termos.
