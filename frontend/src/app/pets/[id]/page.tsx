@@ -143,6 +143,9 @@ export default function PetHomePage() {
   // Calendar collapsed state
   const [calendarOpen, setCalendarOpen] = useState(false);
 
+  // Achievements collapsed state
+  const [showAchievements, setShowAchievements] = useState(false);
+
   // ─── Data loading ──────────────────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
@@ -392,96 +395,20 @@ export default function PetHomePage() {
 
   if (!pet) return null;
 
+  // Separate earned vs non-earned achievements
+  const earnedAchievements = achievements.filter((a) => a.earned);
+  const unearnedAchievements = achievements.filter((a) => !a.earned);
+
   return (
     <div className="space-y-5 pb-24">
-      {/* ─────────────────────────────────────────────────────────────────────
-          F11: Active check-in banner
-      ───────────────────────────────────────────────────────────────────── */}
-      {activeCheckIn && (
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-4 text-white">
-          <div className="flex items-center gap-2 mb-1">
-            <span>📍</span>
-            <p className="font-headline font-bold text-sm">Sessão ativa</p>
-          </div>
-          <p className="text-sm text-white/80 font-body">
-            {activeCheckIn.prestadorNome} iniciou {activeCheckIn.tipo?.toLowerCase() || 'atendimento'} às{' '}
-            {new Date(activeCheckIn.inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-          </p>
-        </div>
-      )}
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          0. PERSONALIDADE — archetype card
-      ───────────────────────────────────────────────────────────────────── */}
-      {personality && (
-        <div className="mg-card !p-0 overflow-hidden">
-          <div className="relative px-5 py-4">
-            {/* Gradient accent */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/3 to-transparent pointer-events-none" />
-            <div className="relative flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center text-2xl shrink-0">
-                {personality.emoji}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-headline font-bold text-sm text-primary">
-                  {personality.title}
-                </p>
-                <p className="text-xs font-body text-texto-soft mt-0.5">
-                  {inactivityHumor ? inactivityHumor.message : personality.phrase}
-                </p>
-              </div>
-              <Sparkles className="text-primary/30 shrink-0" size={20} />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOCO 1 — ATENÇÃO (alertas, ações pendentes, lembretes)
+      ═══════════════════════════════════════════════════════════════════ */}
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          0b. ANIVERSÁRIO + MARCOS
-      ───────────────────────────────────────────────────────────────────── */}
-      {birthdayDays !== null && birthdayDays <= 30 && (
-        <div className={cn(
-          'mg-card-solid rounded-2xl px-4 py-3 flex items-center gap-3',
-          birthdayDays === 0
-            ? 'bg-gradient-to-r from-amber/10 via-primary/5 to-rose/10 border border-amber/20'
-            : 'border border-primary/10',
-        )}>
-          <span className="text-2xl">{birthdayDays === 0 ? '🎉' : '🎂'}</span>
-          <div className="flex-1 min-w-0">
-            <p className="font-headline font-bold text-sm text-texto">
-              {birthdayDays === 0
-                ? `${pet.nome} faz ${nextAge} ano${(nextAge ?? 0) > 1 ? 's' : ''} hoje!`
-                : `${pet.nome} faz ${nextAge} ano${(nextAge ?? 0) > 1 ? 's' : ''} em ${birthdayDays} dia${birthdayDays > 1 ? 's' : ''}`}
-            </p>
-            {birthdayDays === 0 && (
-              <p className="text-xs font-body text-texto-soft">Parabéns! 🥳</p>
-            )}
-          </div>
-        </div>
-      )}
+      {/* F11: Active check-in banner — hidden until check-in system has real data */}
 
-      {milestones.some((m) => m.achieved) && (
-        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
-          {milestones.map((m) => (
-            <div
-              key={m.id}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-headline whitespace-nowrap shrink-0 transition-all',
-                m.achieved
-                  ? 'bg-primary/10 text-primary font-bold'
-                  : 'bg-surface-muted/50 text-texto-muted'
-              )}
-            >
-              <span>{m.emoji}</span>
-              <span>{m.label}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────────────
-          1. ALERTAS — glass cards with colored left border
-      ───────────────────────────────────────────────────────────────────── */}
+      {/* Alerts */}
       {alerts.length > 0 && (
         <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
           {alerts.map((alert, i) => {
@@ -511,89 +438,7 @@ export default function PetHomePage() {
         </div>
       )}
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          2. RESUMO RAPIDO — 4 glass stat cards with Lucide icons
-      ───────────────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-4 gap-2">
-        {/* Vacinas */}
-        <button
-          onClick={() => window.location.href = `/pets/${petId}/saude`}
-          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
-        >
-          <div className="w-9 h-9 rounded-xl bg-rose/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
-            <Syringe className="text-rose" size={18} />
-          </div>
-          <p className="font-headline font-bold text-lg text-texto leading-none">
-            {vacinasEmDia}
-          </p>
-          <p className="text-[10px] font-body text-texto-soft mt-0.5">
-            vacinas
-          </p>
-        </button>
-
-        {/* Medicamentos */}
-        <button
-          onClick={() => window.location.href = `/pets/${petId}/saude`}
-          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
-        >
-          <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
-            <Pill className="text-teal" size={18} />
-          </div>
-          <p className="font-headline font-bold text-lg text-texto leading-none">
-            {medicamentosAtivos}
-          </p>
-          <p className="text-[10px] font-body text-texto-soft mt-0.5">
-            {medicamentosAtivos === 1 ? 'remédio' : 'remédios'}
-          </p>
-        </button>
-
-        {/* Guarda */}
-        <button
-          onClick={() => window.location.href = `/pets/${petId}/guarda`}
-          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
-        >
-          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
-            <Home className="text-primary" size={18} />
-          </div>
-          <p className="font-headline font-bold text-xs text-texto leading-tight truncate px-1">
-            {guardaAtual.split(' ')[0]}
-          </p>
-          <p className="text-[10px] font-body text-texto-soft mt-0.5">
-            guarda
-          </p>
-        </button>
-
-        {/* Proximo */}
-        <button
-          onClick={() => window.location.href = `/pets/${petId}/saude`}
-          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
-        >
-          <div className="w-9 h-9 rounded-xl bg-amber/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
-            <Calendar className="text-amber" size={18} />
-          </div>
-          {proximoCompromisso ? (
-            <>
-              <p className="font-headline font-bold text-xs text-texto leading-tight truncate px-1">
-                {proximoCompromisso.dataInicio
-                  ? new Date(proximoCompromisso.dataInicio).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
-                  : ''}
-              </p>
-              <p className="text-[10px] font-body text-texto-soft mt-0.5 truncate">
-                próximo
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="font-headline font-bold text-xs text-texto-soft leading-tight">—</p>
-              <p className="text-[10px] font-body text-texto-soft mt-0.5">próximo</p>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────────────────
-          2b. SMART CARDS — lembretes inteligentes (F4)
-      ───────────────────────────────────────────────────────────────────── */}
+      {/* Smart cards — reminders & suggestions */}
       {smartCards.filter((c) => c.priority === 'reminder' || c.priority === 'suggestion').length > 0 && (
         <div className="space-y-2">
           {smartCards
@@ -631,54 +476,117 @@ export default function PetHomePage() {
         </div>
       )}
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          2c. CONQUISTAS (F7)
-      ───────────────────────────────────────────────────────────────────── */}
-      {achievements.length > 0 && (
-        <div>
-          <h3 className="font-headline font-bold text-sm text-texto mb-3 flex items-center gap-2">
-            <span>🏆</span> Conquistas
-            <span className="text-texto-soft font-normal text-xs">
-              {achievements.filter((a) => a.earned).length}/{achievements.length}
-            </span>
-          </h3>
-          <div className="grid grid-cols-4 gap-2">
-            {achievements.map((badge) => (
-              <div
-                key={badge.id}
-                className={cn(
-                  'mg-card-solid rounded-2xl p-2.5 text-center transition-all',
-                  badge.earned ? 'opacity-100' : 'opacity-40 grayscale',
-                )}
-              >
-                <span className="text-xl block mb-1">{badge.emoji}</span>
-                <p className="font-headline font-bold text-[10px] text-texto leading-tight truncate">
-                  {badge.title}
-                </p>
-                {!badge.earned && badge.total > 1 && (
-                  <div className="mt-1.5">
-                    <div className="h-1 bg-surface-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary/50 rounded-full transition-all"
-                        style={{ width: `${(badge.progress / badge.total) * 100}%` }}
-                      />
-                    </div>
-                    <p className="text-[8px] text-texto-muted mt-0.5">
-                      {badge.progress}/{badge.total}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
+      {/* Birthday banner */}
+      {birthdayDays !== null && birthdayDays <= 30 && (
+        <div className={cn(
+          'mg-card-solid rounded-2xl px-4 py-3 flex items-center gap-3',
+          birthdayDays === 0
+            ? 'bg-gradient-to-r from-amber/10 via-primary/5 to-rose/10 border border-amber/20'
+            : 'border border-primary/10',
+        )}>
+          <span className="text-2xl">{birthdayDays === 0 ? '🎉' : '🎂'}</span>
+          <div className="flex-1 min-w-0">
+            <p className="font-headline font-bold text-sm text-texto">
+              {birthdayDays === 0
+                ? `${pet.nome} faz ${nextAge} ano${(nextAge ?? 0) > 1 ? 's' : ''} hoje!`
+                : `${pet.nome} faz ${nextAge} ano${(nextAge ?? 0) > 1 ? 's' : ''} em ${birthdayDays} dia${birthdayDays > 1 ? 's' : ''}`}
+            </p>
+            {birthdayDays === 0 && (
+              <p className="text-xs font-body text-texto-soft">Parabéns!</p>
+            )}
           </div>
         </div>
       )}
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          3. CALENDARIO — collapsible mg-card
-      ───────────────────────────────────────────────────────────────────── */}
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOCO 2 — SAÚDE & CUIDADO (resumo, personalidade, calendário)
+      ═══════════════════════════════════════════════════════════════════ */}
+
+      {/* Personality — compact inline */}
+      {personality && (
+        <div className="mg-card-solid rounded-2xl px-4 py-3 flex items-center gap-3">
+          <span className="text-2xl shrink-0">{personality.emoji}</span>
+          <div className="min-w-0 flex-1">
+            <p className="font-headline font-bold text-sm text-primary">
+              {personality.title}
+            </p>
+            <p className="text-xs font-body text-texto-soft">
+              {inactivityHumor ? inactivityHumor.message : personality.phrase}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Quick stats — 4 cards */}
+      <div className="grid grid-cols-4 gap-2">
+        <button
+          onClick={() => window.location.href = `/pets/${petId}/saude`}
+          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
+        >
+          <div className="w-9 h-9 rounded-xl bg-rose/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
+            <Syringe className="text-rose" size={18} />
+          </div>
+          <p className="font-headline font-bold text-lg text-texto leading-none">
+            {vacinasEmDia}
+          </p>
+          <p className="text-[10px] font-body text-texto-soft mt-0.5">vacinas</p>
+        </button>
+
+        <button
+          onClick={() => window.location.href = `/pets/${petId}/saude`}
+          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
+        >
+          <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
+            <Pill className="text-teal" size={18} />
+          </div>
+          <p className="font-headline font-bold text-lg text-texto leading-none">
+            {medicamentosAtivos}
+          </p>
+          <p className="text-[10px] font-body text-texto-soft mt-0.5">
+            {medicamentosAtivos === 1 ? 'remédio' : 'remédios'}
+          </p>
+        </button>
+
+        <button
+          onClick={() => window.location.href = `/pets/${petId}/guarda`}
+          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
+        >
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
+            <Home className="text-primary" size={18} />
+          </div>
+          <p className="font-headline font-bold text-xs text-texto leading-tight truncate px-1">
+            {guardaAtual.split(' ')[0]}
+          </p>
+          <p className="text-[10px] font-body text-texto-soft mt-0.5">guarda</p>
+        </button>
+
+        <button
+          onClick={() => window.location.href = `/pets/${petId}/saude`}
+          className="group mg-card-solid rounded-2xl p-3 transition-all text-center"
+        >
+          <div className="w-9 h-9 rounded-xl bg-amber/10 flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform">
+            <Calendar className="text-amber" size={18} />
+          </div>
+          {proximoCompromisso ? (
+            <>
+              <p className="font-headline font-bold text-xs text-texto leading-tight truncate px-1">
+                {proximoCompromisso.dataInicio
+                  ? new Date(proximoCompromisso.dataInicio).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+                  : ''}
+              </p>
+              <p className="text-[10px] font-body text-texto-soft mt-0.5 truncate">próximo</p>
+            </>
+          ) : (
+            <>
+              <p className="font-headline font-bold text-xs text-texto-soft leading-tight">—</p>
+              <p className="text-[10px] font-body text-texto-soft mt-0.5">próximo</p>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Calendar — collapsible */}
       <div className="mg-card !p-0 overflow-hidden">
-        {/* Calendar toggle header */}
         <button
           onClick={() => setCalendarOpen(!calendarOpen)}
           className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface-muted/30 transition-colors"
@@ -688,9 +596,7 @@ export default function PetHomePage() {
               <Calendar className="text-primary" size={20} />
             </div>
             <div className="text-left">
-              <p className="font-headline font-bold text-sm text-texto">
-                Calendário
-              </p>
+              <p className="font-headline font-bold text-sm text-texto">Calendário</p>
               <p className="text-xs font-body text-texto-soft">
                 {todayEventCount > 0
                   ? `${todayEventCount} evento${todayEventCount > 1 ? 's' : ''} hoje`
@@ -712,7 +618,6 @@ export default function PetHomePage() {
           </div>
         </button>
 
-        {/* Calendar body — collapsible */}
         <div
           className={cn(
             'transition-all duration-300 ease-in-out overflow-hidden',
@@ -733,7 +638,6 @@ export default function PetHomePage() {
             />
           </div>
 
-          {/* Events for selected date */}
           <div className="px-5 pb-5">
             <div className="flex items-center gap-2 mb-2">
               <div className="h-px flex-1 bg-surface-muted" />
@@ -764,9 +668,85 @@ export default function PetHomePage() {
         </div>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          4. ATIVIDADE RECENTE
-      ───────────────────────────────────────────────────────────────────── */}
+      {/* ═══════════════════════════════════════════════════════════════════
+          BLOCO 3 — PROGRESSO (marcos, conquistas, atividade recente)
+      ═══════════════════════════════════════════════════════════════════ */}
+
+      {/* Milestones */}
+      {milestones.some((m) => m.achieved) && (
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
+          {milestones.map((m) => (
+            <div
+              key={m.id}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-headline whitespace-nowrap shrink-0 transition-all',
+                m.achieved
+                  ? 'bg-primary/10 text-primary font-bold'
+                  : 'bg-surface-muted/50 text-texto-muted'
+              )}
+            >
+              <span>{m.emoji}</span>
+              <span>{m.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Achievements — always collapsed, expand on click */}
+      {achievements.length > 0 && (
+        <div>
+          <button
+            onClick={() => setShowAchievements(!showAchievements)}
+            className="w-full flex items-center justify-between mb-3"
+          >
+            <h3 className="font-headline font-bold text-sm text-texto flex items-center gap-2">
+              <span>🏆</span> Conquistas
+              <span className="text-texto-soft font-normal text-xs">
+                {earnedAchievements.length}/{achievements.length}
+              </span>
+            </h3>
+            {showAchievements ? (
+              <ChevronUp className="text-texto-soft" size={18} />
+            ) : (
+              <ChevronDown className="text-texto-soft" size={18} />
+            )}
+          </button>
+
+          {showAchievements && (
+            <div className="grid grid-cols-4 gap-2">
+              {achievements.map((badge) => (
+                <div
+                  key={badge.id}
+                  className={cn(
+                    'mg-card-solid rounded-2xl p-2.5 text-center transition-all',
+                    badge.earned ? 'opacity-100' : 'opacity-40 grayscale',
+                  )}
+                >
+                  <span className="text-xl block mb-1">{badge.emoji}</span>
+                  <p className="font-headline font-bold text-[10px] text-texto leading-tight truncate">
+                    {badge.title}
+                  </p>
+                  {!badge.earned && badge.total > 1 && (
+                    <div className="mt-1.5">
+                      <div className="h-1 bg-surface-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary/50 rounded-full transition-all"
+                          style={{ width: `${(badge.progress / badge.total) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-[8px] text-texto-muted mt-0.5">
+                        {badge.progress}/{badge.total}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Activity feed */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-headline font-bold text-sm text-texto">
@@ -821,9 +801,7 @@ export default function PetHomePage() {
         )}
       </div>
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          5. FAB BUTTON — violet gradient with Plus icon
-      ───────────────────────────────────────────────────────────────────── */}
+      {/* ─── FAB Button ──────────────────────────────────────────────────── */}
       <button
         onClick={() => setShowRegisterModal(true)}
         className="fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary to-primary-dark text-white w-14 h-14 rounded-full shadow-lg hover:shadow-glow-primary hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center"
@@ -832,7 +810,6 @@ export default function PetHomePage() {
         <Plus size={24} strokeWidth={2.5} />
       </button>
 
-      {/* RegisterEventModal */}
       <RegisterEventModal
         open={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}

@@ -191,29 +191,6 @@ export default function LoginPage() {
           <span>Usado por tutores em todo o Brasil</span>
         </div>
 
-        {/* Dev credentials */}
-        {process.env.NODE_ENV === 'development' && (
-          <div
-            className="bg-white/40 backdrop-blur-md border border-white/30 rounded-xl p-4 space-y-2 animate-fade-in"
-            style={{ animationDelay: '500ms', animationFillMode: 'both' }}
-          >
-            <p className="text-xs font-headline font-semibold text-gray-500 uppercase tracking-wider">
-              Credenciais de teste
-            </p>
-            <div className="space-y-1 text-sm font-body text-gray-600">
-              <p>
-                <strong className="text-primary">Tutor:</strong> ana@mitra.com / 123456
-              </p>
-              <p>
-                <strong className="text-teal-500">Vet:</strong> carlos@mitra.com / 123456
-              </p>
-              <p>
-                <strong className="text-amber-500">Prestador:</strong> pedro@mitra.com /
-                123456
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
